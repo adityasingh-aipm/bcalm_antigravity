@@ -1,0 +1,136 @@
+Build a professional, credible, and visually premium landing page for a 30-day course titled “AI Product Manager Launchpad: Build the Foundation to Lead in the AI Era.”
+
+🎯 Target Audience
+
+Final-year and recently graduated students from India’s top-tier colleges (IITs, BITS, NITs, IIITs, etc.) who aspire to become AI Product Managers or future AI leaders.
+
+🌐 Design Guidelines
+
+Design aesthetic inspired by Reforge, Maven, and Product School.
+
+Clean, minimal, and aspirational layout.
+
+Color palette: white background, dark navy (#0b132b) and bright violet (#6a3df0) accents.
+
+Use modern typography (e.g., Inter or Poppins) and generous spacing.
+
+Include gradient buttons and smooth scroll animations.
+
+Fully responsive for desktop and mobile.
+
+🧩 Page Sections
+
+1. Hero Section
+
+Headline: “Become the Next-Gen AI Product Manager in 30 Days.”
+
+Subheadline: “A curated program by AI Product Managers and Leaders to help ambitious graduates build the foundation to lead in the age of intelligent products.”
+
+Call-to-Action (CTA) buttons:
+
+“Join the Waitlist”
+
+“Schedule a Call”
+
+Show metrics:
+
+“🎓 200+ students from IITs, BITS, and NITs already registered!”
+
+“🚀 Next Cohort Starts: December 2, 2025”
+
+Include a subtle AI-themed background illustration (like a neural network pattern or product-UI overlay).
+
+2. About the Program
+
+2–3 short paragraphs describing the course:
+“The AI Product Manager Launchpad is a 30-day intensive program designed by industry AI PMs from top tech companies. It bridges the gap between engineering and product — giving you a clear, actionable path to build and lead intelligent products.”
+“Learn how to think like a product manager, speak the language of AI engineers, and design products powered by data and generative models.”
+
+3. What You’ll Learn (Curriculum Overview)
+
+Week 1: Foundations of AI & Product Thinking
+
+Week 2: AI Systems, Data, and Design for PMs
+
+Week 3: GenAI, Prompt Engineering, and Product Strategy
+
+Week 4: Capstone – Design & Pitch an AI Product
+
+CTA: “Download Detailed Curriculum”
+
+4. Why This Program
+Use 4 highlight cards:
+
+“🏗️ Designed & Delivered by AI Product Leaders”
+
+“🧭 Hands-On Product Simulations & AI Tools”
+
+“💬 1:1 Mentorship and Career Guidance”
+
+“🎓 Certificate + Industry Network Access”
+
+5. Testimonials
+Add 3 student quotes (placeholders):
+
+“This program helped me connect product thinking with AI — I feel ready for PM interviews.” – Priya S., IIT Delhi
+
+“Learning from real AI PMs gave me clarity on what top companies look for.” – Rohan M., BITS Pilani
+
+“I built and pitched an AI product idea within 30 days — incredible experience!” – Ananya K., NIT Trichy
+
+6. Instructor Section
+
+Headline: “Learn Directly from AI Product Leaders.”
+
+3 instructor cards (placeholders):
+
+Rahul Mehta — Senior AI PM, Google
+
+Neha Sharma — AI Strategy Lead, Microsoft
+
+Aarav Patel — Head of Product, AI Startup
+
+7. Call-to-Action (Final Section)
+
+Headline: “Start Your AI Product Journey Today.”
+
+Subheadline: “Get mentored by AI leaders and launch your PM career in 30 days.”
+
+Buttons:
+
+“Join the Waitlist”
+
+“Schedule a Call”
+
+Embed a simple form popup for scheduling calls (Name, Email, College, Phone).
+
+Include WhatsApp and email contact icons.
+
+8. Footer
+
+Social links (LinkedIn, Twitter, Instagram).
+
+Copyright © 2025 AI Product Manager Launchpad.
+
+Terms | Privacy Policy | Contact.
+
+⚙️ Technical Requirements
+
+Build using React + TailwindCSS.
+
+Use Framer Motion for subtle animations.
+
+Smooth scrolling and sticky navigation bar.
+
+SEO-optimized meta tags (title, description, social preview).
+
+💡 Tone
+
+Aspirational, elite, and credible.
+
+Emphasize the connection to real-world AI leaders.
+
+Inspire trust and FOMO (“limited seats, hand-picked students”).
+
+Output Goal:
+A complete, production-ready, visually appealing landing page suitable for hosting on Replit or Vercel. Include placeholder text and data that can be easily replaced later.
