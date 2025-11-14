@@ -58,7 +58,7 @@ Preferred communication style: Simple, everyday language.
 9. **CTASection** - Final enrollment call-to-action
 10. **Footer** - Branding, legal links, social media, and contact information
 
-**Branding & Logo**: The Bcalm navbar features a custom Geometric Tech Badge logo (modern geometric design in brand colors violet #6a3df0 and navy #0b132b). The logo was selected from 5 AI-generated variations and integrated into the fixed navbar with responsive sizing.
+**Branding & Logo**: The Bcalm navbar features a custom Geometric Tech Badge logo (modern geometric design in brand colors violet #6a3df0 and navy #0b132b). The logo was selected from 5 AI-generated variations and integrated into the fixed navbar with transparent background and responsive sizing (h-12) for optimal visual balance with navbar CTAs.
 
 **Generated Assets**: 15 AI-generated images including hero background, 3 instructor headshots, 6 student testimonial avatars, and 5 logo variations (with the Geometric Tech Badge selected for the navbar) stored in `attached_assets/generated_images/`.
 
