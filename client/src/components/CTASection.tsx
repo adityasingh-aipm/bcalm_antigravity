@@ -8,7 +8,7 @@ interface CTASectionProps {
 
 export default function CTASection({ onEnroll, onScheduleCall }: CTASectionProps) {
   return (
-    <section className="py-24 bg-gradient-to-br from-primary/5 to-primary/10">
+    <section className="py-12 bg-gradient-to-br from-primary/5 to-primary/10">
       <div className="container mx-auto px-4 max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -20,7 +20,7 @@ export default function CTASection({ onEnroll, onScheduleCall }: CTASectionProps
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
             Start Your AI Product Journey Today
           </h2>
-          <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             Join a focused learning community, build your portfolio, and confidently prepare for AI PM interviews.
           </p>
           

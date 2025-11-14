@@ -42,11 +42,11 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             Become Interview-Ready for AI Product Roles in Just 30 Days
           </h1>
           
-          <p className="text-lg md:text-xl text-white/90 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
             A curated program by AI Product Managers and Leaders to help students and recent graduates build job-ready skills, a strong portfolio, and the confidence to crack AI PM interviews.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
             <Button 
               size="lg" 
               className="text-base px-8 py-6 bg-gradient-to-r from-primary to-primary/90"
@@ -70,7 +70,7 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-wrap gap-3 justify-center items-center mb-12"
+            className="flex flex-wrap gap-3 justify-center items-center mb-8"
           >
             {quickLinks.map((link, index) => (
               <a
