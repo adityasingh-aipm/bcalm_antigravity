@@ -16,6 +16,11 @@ Production-ready landing page for "Bcalm's AI Product Manager Launchpad" - a 30-
 - Implemented quick links navigation bar in hero section for smooth scrolling to all major sections
 - Added proper section IDs for anchor navigation (#career-support, #about, #curriculum, #why-bcalm, #reviews, #instructors, #pricing)
 - Enhanced accessibility with aria-expanded attributes on curriculum toggles and proper anchor tags
+- **Optimized page spacing using tiered system based on hellopm.co benchmark:**
+  - Most content sections: py-24 → py-16 (64px), mb-16 → mb-10 (40px)
+  - Action-oriented sections (Pricing, CTA): py-24 → py-12 (48px) for focused momentum
+  - Hero internal spacing: mb-12 → mb-8, mb-8 → mb-6 for balanced hierarchy
+  - Result: More compact, professional appearance while maintaining readability
 - Comprehensive end-to-end testing completed and passed
 
 ## User Preferences
@@ -46,15 +51,15 @@ Preferred communication style: Simple, everyday language.
 **Component Structure**: Page-level components in `client/src/pages/`, reusable UI components in `client/src/components/`, and Shadcn UI primitives in `client/src/components/ui/`. 
 
 **Landing Page Sections (in order)**:
-1. **HeroSection** - Hero with headline, dual CTAs (Join Waitlist, Schedule Call), and quick links navigation bar for smooth scrolling
-2. **CareerSupportSection** (id="career-support") - 4-card grid showing Resume Optimization, Portfolio Building, Interview Prep, and Job Board access
-3. **AboutSection** (id="about") - Program overview and value proposition
-4. **CurriculumSection** (id="curriculum") - Detailed 4-week breakdown with expandable cards showing What You Learn (bullets), Outcome, and Hands-on Assignment for each week
-5. **WhyBcalmSection** (id="why-bcalm") - Comparison table contrasting Traditional Bootcamps vs. Bcalm benefits
-6. **TestimonialsSection** (id="reviews") - 6 student testimonials with AI-generated avatars from IIT, BITS, NIT, IIIT students
-7. **InstructorsSection** (id="instructors") - 3 instructor profiles with AI-generated headshots (Google, Microsoft, AI Startup backgrounds)
-8. **PricingSection** (id="pricing") - Pricing card with ₹14,999 (special cohort price from ₹24,999), 13-item feature checklist, 7-day refund guarantee, and dual CTAs
-9. **CTASection** - Final enrollment call-to-action
+1. **HeroSection** - Hero with headline, dual CTAs (Join Waitlist, Schedule Call), and quick links navigation bar for smooth scrolling. Spacing: mb-8 paragraph, mb-6 CTAs, mb-8 quick links
+2. **CareerSupportSection** (id="career-support", py-16, mb-10) - 4-card grid showing Resume Optimization, Portfolio Building, Interview Prep, and Job Board access
+3. **AboutSection** (id="about", py-16) - Program overview and value proposition
+4. **CurriculumSection** (id="curriculum", py-16, mb-10) - Detailed 4-week breakdown with expandable cards showing What You Learn (bullets), Outcome, and Hands-on Assignment for each week
+5. **WhyBcalmSection** (id="why-bcalm", py-16, mb-10) - Comparison table contrasting Traditional Bootcamps vs. Bcalm benefits
+6. **TestimonialsSection** (id="reviews", py-16, mb-10) - 6 student testimonials with AI-generated avatars from IIT, BITS, NIT, IIIT students
+7. **InstructorsSection** (id="instructors", py-16, mb-10) - 3 instructor profiles with AI-generated headshots (Google, Microsoft, AI Startup backgrounds)
+8. **PricingSection** (id="pricing", py-12, mb-10) - Pricing card with ₹14,999 (special cohort price from ₹24,999), 13-item feature checklist in 2-column grid, 7-day refund guarantee, and dual CTAs. Tighter spacing for action-oriented focus
+9. **CTASection** (py-12, mb-8) - Final enrollment call-to-action with compact spacing for momentum
 10. **Footer** - Branding, legal links, social media, and contact information
 
 **Generated Assets**: 10 AI-generated images including hero background, 3 instructor headshots, and 6 student testimonial avatars stored in `attached_assets/generated_images/`.
@@ -138,9 +143,11 @@ This allows clean imports throughout the application without relative path compl
 
 ### Design System References
 
-The visual design draws inspiration from premium educational platforms (Reforge, Maven, Product School) with emphasis on:
-- Clean, minimal layouts with generous whitespace
-- Premium typography hierarchy
-- Aspirational, credible aesthetic
+The visual design draws inspiration from premium educational platforms (Reforge, Maven, Product School, hellopm.co) with emphasis on:
+- Clean, minimal layouts with optimized spacing (tiered system: py-16 for content, py-12 for actions)
+- Premium typography hierarchy with balanced heading-to-content gaps (mb-10 standard, mb-8 for compact sections)
+- Aspirational, credible aesthetic with professional, compact feel
 - Mobile-first responsive design
 - Smooth animations and hover effects
+
+**Spacing Philosophy**: The landing page uses a tiered spacing system inspired by hellopm.co benchmark, balancing compact professionalism with readability. Content sections use py-16 (64px) padding, action-oriented sections use py-12 (48px) for focused momentum, and heading-to-content gaps are standardized at mb-10 (40px) or mb-8 (32px) for tighter sections.
