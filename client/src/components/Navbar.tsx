@@ -29,17 +29,21 @@ export default function Navbar({ onJoinWaitlist, onScheduleCall }: NavbarProps) 
     >
       <div className="container mx-auto px-4 py-4 max-w-6xl">
         <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <img 
-              src={bcalmLogo} 
-              alt="Bcalm" 
-              className="h-10 w-auto"
-              style={{ mixBlendMode: 'lighten' }}
-              data-testid="img-logo"
-            />
-          </div>
+          {isScrolled && (
+            <div className="flex items-center">
+              <img 
+                src={bcalmLogo} 
+                alt="Bcalm" 
+                className="h-10 w-auto"
+                style={{ 
+                  filter: 'invert(1) hue-rotate(180deg) brightness(1.2)',
+                }}
+                data-testid="img-logo"
+              />
+            </div>
+          )}
           
-          <div className="hidden md:flex items-center gap-4">
+          <div className={`${isScrolled ? '' : 'ml-auto'} hidden md:flex items-center gap-4`}>
             <Button 
               variant="ghost" 
               onClick={onScheduleCall}
