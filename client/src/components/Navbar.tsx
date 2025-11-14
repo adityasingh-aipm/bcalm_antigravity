@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import bcalmLogo from "@assets/image_1763122306219.png";
+import bcalmLogo from "@assets/image_1763122705652.png";
 
 interface NavbarProps {
   onJoinWaitlist: () => void;
@@ -35,9 +35,6 @@ export default function Navbar({ onJoinWaitlist, onScheduleCall }: NavbarProps) 
                 src={bcalmLogo} 
                 alt="Bcalm" 
                 className="h-10 w-auto"
-                style={{ 
-                  filter: 'invert(1) hue-rotate(180deg) brightness(1.2)',
-                }}
                 data-testid="img-logo"
               />
             </div>
