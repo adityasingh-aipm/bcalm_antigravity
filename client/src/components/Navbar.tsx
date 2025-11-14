@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import bcalmLogo from "@assets/image_1763122705652.png";
 
 interface NavbarProps {
   onJoinWaitlist: () => void;
@@ -29,18 +28,11 @@ export default function Navbar({ onJoinWaitlist, onScheduleCall }: NavbarProps) 
     >
       <div className="container mx-auto px-4 py-4 max-w-6xl">
         <div className="flex items-center justify-between">
-          {isScrolled && (
-            <div className="flex items-center">
-              <img 
-                src={bcalmLogo} 
-                alt="Bcalm" 
-                className="h-10 w-auto"
-                data-testid="img-logo"
-              />
-            </div>
-          )}
+          <div className="font-bold text-xl text-foreground">
+            Bcalm
+          </div>
           
-          <div className={`${isScrolled ? '' : 'ml-auto'} hidden md:flex items-center gap-4`}>
+          <div className="hidden md:flex items-center gap-4">
             <Button 
               variant="ghost" 
               onClick={onScheduleCall}
