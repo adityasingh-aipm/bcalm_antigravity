@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import bcalmLogo from "@assets/generated_images/Geometric_tech_badge_logo_7f09eac2.png";
+import bcalmLogo from "@assets/generated_images/Geometric_tech_badge_transparent_6f9554fc.png";
 
 interface NavbarProps {
   onJoinWaitlist: () => void;
@@ -33,7 +33,7 @@ export default function Navbar({ onJoinWaitlist, onScheduleCall }: NavbarProps) 
             <img 
               src={bcalmLogo} 
               alt="Bcalm" 
-              className="h-8 w-auto"
+              className="h-12 w-auto"
               data-testid="img-logo"
             />
           </div>
