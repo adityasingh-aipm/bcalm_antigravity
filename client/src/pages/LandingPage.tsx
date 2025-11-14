@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import LogoSelection from "@/components/LogoSelection";
 import CareerSupportSection from "@/components/CareerSupportSection";
 import AboutSection from "@/components/AboutSection";
 import CurriculumSection from "@/components/CurriculumSection";
@@ -12,10 +13,12 @@ import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
 import WaitlistDialog from "@/components/WaitlistDialog";
 import ScheduleCallDialog from "@/components/ScheduleCallDialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LandingPage() {
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -32,6 +35,14 @@ export default function LandingPage() {
     setWaitlistOpen(true);
   };
 
+  const handleLogoSelection = (logoId: number) => {
+    console.log('Selected logo:', logoId);
+    toast({
+      title: "Logo Selected!",
+      description: `You selected Logo Option ${logoId}. This will be integrated into the header.`,
+    });
+  };
+
   return (
     <div className="min-h-screen">
       <Navbar 
@@ -43,6 +54,8 @@ export default function LandingPage() {
         onJoinWaitlist={() => setWaitlistOpen(true)} 
         onScheduleCall={() => setScheduleOpen(true)} 
       />
+      
+      <LogoSelection onSelectLogo={handleLogoSelection} />
       
       <CareerSupportSection />
       
