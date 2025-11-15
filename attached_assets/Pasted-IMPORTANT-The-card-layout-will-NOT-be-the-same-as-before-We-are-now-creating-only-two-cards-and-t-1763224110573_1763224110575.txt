@@ -1,0 +1,100 @@
+IMPORTANT:
+The card layout will NOT be the same as before.
+We are now creating only two cards, and the layout of these cards will be different and redesigned from scratch.
+The new layout should follow a premium, Apple-like, clean aesthetic — minimal, elegant, high-trust, and visually calm.
+
+📌 CARD 1 — Instructor Card (Apple-Like Premium Design)
+Title (top section):
+
+“Learn From a Product Leader Who Turned ₹3.2L Into ₹2.4Cr 
+
+Required Elements & Layout Structure:
+
+Instructor Photo (Large, Clean, Centered)
+
+High-quality portrait
+
+Neutral/soft background
+
+Minimal shadow
+
+Apple “Meet the team” style
+
+Bullet 1 — LinkedIn Section
+• A LinkedIn Presence Built on Clarity and Trust
+
+Add a subtle LinkedIn icon + hyperlink directly beneath this bullet : https://www.linkedin.com/in/rakesh-malloju-b648ab92/
+
+Keep the link visually minimal (Apple styling)
+
+Bullet 2 — Career Transformation With Offer Letters
+• A Career Transformation Driven by a Repeatable System
+
+Add a clean row or grid of offer letter thumbnails
+
+Each thumbnail shows a career jump step (₹3.2L → ₹15L → ₹45L → ₹1Cr → ₹2.4Cr)
+
+Minimalistic document-card style, soft borders
+
+Bullet 3 — Senior Director Badge
+• Senior Director at a $7B YC Company
+
+No visuals needed here — text is the focus
+
+Maintain high contrast and clean spacing
+
+Overall Style for Card 1:
+
+White background
+
+Large spacing
+
+Thin, elegant typography
+
+No loud colors
+
+Minimal shadows
+
+The layout should feel calm, premium, and confident
+
+📌 CARD 2 — “10x Your Shortlist Chances” Card (New Layout)
+Title (top section):
+
+“10x Your Shortlist Chances ”
+
+Required Bullet Points (short, premium style):
+
+• Insider Hiring Signals Most Candidates Never Learn
+
+• A Portfolio That Proves You Can Solve Real Product Problems
+
+• A Resume Engineered to Outperform 90% of Applicants
+
+Card 2 Visual Style:
+
+Also premium, minimal, and clean
+
+More text-forward than visual-forward
+
+Use spacious layout and subtle lines
+
+
+
+No clutter, no heavy icons, no distractions
+
+📌 Global Requirements For Both Cards
+
+Apple-like clean design
+
+White/light backgrounds
+
+Ample white space
+
+
+Smooth hierarchy: Title → Visual → Bullets → Subtext
+
+No heavy gradients or bright colors
+
+Keep all text punchy and clean
+
+Mobile-friendly and scannable

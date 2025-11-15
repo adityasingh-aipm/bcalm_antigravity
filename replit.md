@@ -16,26 +16,36 @@ Production-ready landing page for "Bcalm's AI Product Manager Launchpad" - a 30-
 - Implemented quick links navigation bar in hero section for smooth scrolling to all major sections
 - Added proper section IDs for anchor navigation (#career-support, #about, #curriculum, #why-bcalm, #reviews, #instructors, #pricing)
 - Enhanced accessibility with aria-expanded attributes on curriculum toggles and proper anchor tags
-- **Enhanced hero section with premium keyword highlighting and two-line layout:**
-  - Main heading split into two lines: "Become Interview-Ready for" / "AI Product Roles in Just 30 Days"
-  - Only TWO key phrases highlighted: "AI Product" and "30 Days" (simplified from three for cleaner focus)
-  - Highlighted keywords use bold font-weight with brand violet gradient (from-primary to-violet-400) and subtle glow effect
+- **Enhanced hero section with differentiated keyword highlighting in single-line title:**
+  - Main heading: "Become Interview-ready for AI Product in 30 Days" (single line for clarity)
+  - **"AI Product"** highlighted with violet gradient (from-primary to-violet-400) with subtle glow - emphasizes the topic
+  - **"30 Days"** highlighted with warm amber gradient (from-amber-400 to-orange-500) with glow - emphasizes urgency/speed
+  - Two-color approach creates visual hierarchy: cool violet for product/tech + warm amber for time/benefit
   - Non-highlighted text remains clean with normal font-weight for visual contrast
-  - Updated subtitle to crisp, targeted message: "Designed for Non-Tech Students & Graduates"
-  - Two-line layout creates balanced visual hierarchy with both highlights on the impactful second line
-- **Added "Why Choose This Program" credibility section in first fold with micro-headings and selective highlighting:**
-  - Positioned between CTA buttons and quick links for instant trust-building
-  - Three glassmorphic cards with two-part structure: bold micro-heading + body sentence with selective highlights
-  - **Card 1 - Expert Instructor:** "Learn From the Leader Behind 500+ PM Interviews" heading; highlights "500+ PM interviews" and "30–40 PM offers"
-  - **Card 2 - Shortlisting:** "10x Your Shortlist Chances" heading; highlights "insider hiring criteria", "AI PM portfolio", and "10x more shortlists"
-  - **Card 3 - Cohort Quality:** "Selective, High-Quality Cohort" heading; highlights "handpick a limited cohort", "personal attention", and "high-caliber peer group"
-  - Unique gradient icon badges for each card (Award/amber, Zap/violet, Users/emerald)
-  - Micro-headings: text-base md:text-lg, font-bold, mb-3 for improved scannability
-  - Selective highlighting: font-semibold text-white on proof-words only
-  - Responsive design: 3-column grid on desktop, vertical stack on mobile
-  - Staggered Framer Motion animations (delays 0.4s, 0.5s, 0.6s) with hover-elevate effects
-  - Premium glassmorphic styling (bg-white/5, backdrop-blur-md, border-white/10) maintains hero's clean aesthetic
-  - Improved scannability - readers' eyes jump directly to key proof-words
+  - Updated subtitle: "Designed for Non-Tech Students & Graduates"
+  - Apple/Stripe-inspired differentiated highlighting guides eye naturally through message
+- **Redesigned "Why Choose This Program" with 2 Apple-style white cards (complete visual overhaul):**
+  - Positioned between CTA buttons and quick links in first fold
+  - Complete redesign from dark glassmorphic aesthetic → clean white minimal Apple-style cards
+  - **Card 1 - Instructor Card:** "Learn From a Product Leader Who Turned ₹3.2L Into ₹2.4Cr"
+    - Large centered instructor portrait (w-40 h-40 md:w-48 h-48, rounded-full, soft shadow)
+    - LinkedIn section with icon and hyperlink (https://www.linkedin.com/in/rakesh-malloju-b648ab92/)
+    - Career transformation grid showing 5 offer letter thumbnails (₹3.2L → ₹15L → ₹45L → ₹1Cr → ₹2.4Cr)
+    - Senior Director credential at $7B YC Company
+    - White background (bg-white), thin elegant typography (font-light)
+    - Ample padding (p-8 md:p-10) for spacious Apple aesthetic
+  - **Card 2 - Shortlist Card:** "10x Your Shortlist Chances"
+    - Text-forward with three punchy bullet points
+    - "Insider Hiring Signals Most Candidates Never Learn"
+    - "A Portfolio That Proves You Can Solve Real Product Problems"
+    - "A Resume Engineered to Outperform 90% of Applicants"
+    - White background, centered vertical layout, spacious design
+    - Clean typography (text-base md:text-lg, text-gray-700)
+  - Layout: 2-column grid on large screens (lg:grid-cols-2), vertical stack on mobile
+  - Clean white backgrounds, minimal shadows (shadow-sm), rounded corners (rounded-xl)
+  - No heavy gradients, no loud colors, no clutter - pure Apple-inspired minimalism
+  - High contrast with dark hero background creates premium visual separation
+  - Mobile-responsive with maintained spacing and readability
 - **Optimized page spacing using tiered system based on hellopm.co benchmark:**
   - Most content sections: py-24 → py-16 (64px), mb-16 → mb-10 (40px)
   - Action-oriented sections (Pricing, CTA): py-24 → py-12 (48px) for focused momentum
@@ -82,7 +92,7 @@ Preferred communication style: Simple, everyday language.
 9. **CTASection** (py-12, mb-8) - Final enrollment call-to-action with compact spacing for momentum
 10. **Footer** - Branding, legal links, social media, and contact information
 
-**Generated Assets**: 10 AI-generated images including hero background, 3 instructor headshots, and 6 student testimonial avatars stored in `attached_assets/generated_images/`.
+**Generated Assets**: 16 AI-generated images including hero background, instructor portrait for "Why Choose This Program" card, 5 offer letter thumbnails showing career progression, 3 instructor headshots for Instructors section, and 6 student testimonial avatars stored in `attached_assets/generated_images/`.
 
 ### Backend Architecture
 
