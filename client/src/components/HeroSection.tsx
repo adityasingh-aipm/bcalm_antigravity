@@ -98,8 +98,13 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
                   <div className="mb-4 p-3 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-400/30">
                     <Award className="h-6 w-6 text-amber-300" />
                   </div>
+                  <h4 className="text-base md:text-lg font-bold text-white mb-3">
+                    Learn From the Leader Behind 500+ PM Interviews
+                  </h4>
                   <p className="text-sm text-white/85 leading-relaxed">
-                    Learn from the Product Leader who has interviewed 500+ candidates and knows exactly what gets you hired.
+                    Get trained by a Product Leader who has conducted{" "}
+                    <span className="font-semibold text-white">500+ PM interviews</span> and shaped the decisions behind{" "}
+                    <span className="font-semibold text-white">30–40 PM offers</span>.
                   </p>
                 </div>
               </motion.div>
@@ -116,8 +121,14 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
                   <div className="mb-4 p-3 rounded-full bg-gradient-to-br from-violet-500/20 to-purple-500/20 border border-violet-400/30">
                     <Zap className="h-6 w-6 text-violet-300" />
                   </div>
+                  <h4 className="text-base md:text-lg font-bold text-white mb-3">
+                    10x Your Shortlist Chances
+                  </h4>
                   <p className="text-sm text-white/85 leading-relaxed">
-                    Get 10x more shortlists with a resume and portfolio engineered using insider hiring criteria from real AI PM recruiters.
+                    Use{" "}
+                    <span className="font-semibold text-white">insider hiring criteria</span> to craft a resume and{" "}
+                    <span className="font-semibold text-white">AI PM portfolio</span> that gets you{" "}
+                    <span className="font-semibold text-white">10x more shortlists</span> than typical applicants.
                   </p>
                 </div>
               </motion.div>
@@ -134,8 +145,14 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
                   <div className="mb-4 p-3 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-emerald-400/30">
                     <Users className="h-6 w-6 text-emerald-300" />
                   </div>
+                  <h4 className="text-base md:text-lg font-bold text-white mb-3">
+                    Selective, High-Quality Cohort
+                  </h4>
                   <p className="text-sm text-white/85 leading-relaxed">
-                    We handpick a small group of highly motivated students so every learner gets personal attention, deeper mentorship, and a high-quality peer group.
+                    We{" "}
+                    <span className="font-semibold text-white">handpick a limited cohort</span> so every student gets{" "}
+                    <span className="font-semibold text-white">personal attention</span>, deeper mentorship, and a{" "}
+                    <span className="font-semibold text-white">high-caliber peer group</span>.
                   </p>
                 </div>
               </motion.div>
