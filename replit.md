@@ -23,16 +23,19 @@ Production-ready landing page for "Bcalm's AI Product Manager Launchpad" - a 30-
   - Non-highlighted text remains clean with normal font-weight for visual contrast
   - Updated subtitle to crisp, targeted message: "Designed for Non-Tech Students & Graduates"
   - Two-line layout creates balanced visual hierarchy with both highlights on the impactful second line
-- **Added "Why Choose This Program" credibility section in first fold:**
+- **Added "Why Choose This Program" credibility section in first fold with micro-headings and selective highlighting:**
   - Positioned between CTA buttons and quick links for instant trust-building
-  - Three glassmorphic cards with unique gradient icon badges (Award/amber, Zap/violet, Users/emerald)
-  - Card 1: Expert instructor credential (500+ interviews) with Award icon
-  - Card 2: 10x shortlist promise with Zap icon  
-  - Card 3: Small cohort exclusivity with Users icon
+  - Three glassmorphic cards with two-part structure: bold micro-heading + body sentence with selective highlights
+  - **Card 1 - Expert Instructor:** "Learn From the Leader Behind 500+ PM Interviews" heading; highlights "500+ PM interviews" and "30–40 PM offers"
+  - **Card 2 - Shortlisting:** "10x Your Shortlist Chances" heading; highlights "insider hiring criteria", "AI PM portfolio", and "10x more shortlists"
+  - **Card 3 - Cohort Quality:** "Selective, High-Quality Cohort" heading; highlights "handpick a limited cohort", "personal attention", and "high-caliber peer group"
+  - Unique gradient icon badges for each card (Award/amber, Zap/violet, Users/emerald)
+  - Micro-headings: text-base md:text-lg, font-bold, mb-3 for improved scannability
+  - Selective highlighting: font-semibold text-white on proof-words only
   - Responsive design: 3-column grid on desktop, vertical stack on mobile
   - Staggered Framer Motion animations (delays 0.4s, 0.5s, 0.6s) with hover-elevate effects
   - Premium glassmorphic styling (bg-white/5, backdrop-blur-md, border-white/10) maintains hero's clean aesthetic
-  - Fits naturally in first fold, supporting main hero message without cluttering
+  - Improved scannability - readers' eyes jump directly to key proof-words
 - **Optimized page spacing using tiered system based on hellopm.co benchmark:**
   - Most content sections: py-24 → py-16 (64px), mb-16 → mb-10 (40px)
   - Action-oriented sections (Pricing, CTA): py-24 → py-12 (48px) for focused momentum
