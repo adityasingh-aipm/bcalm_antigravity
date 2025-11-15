@@ -39,11 +39,8 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
           className="text-center"
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal text-white mb-6 leading-tight">
-            Become{" "}
-            <span className="font-bold bg-gradient-to-r from-primary via-primary to-violet-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(106,61,240,0.5)]">
-              Interview-Ready
-            </span>{" "}
-            for{" "}
+            Become Interview-Ready for
+            <br />
             <span className="font-bold bg-gradient-to-r from-primary via-primary to-violet-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(106,61,240,0.5)]">
               AI Product
             </span>{" "}
