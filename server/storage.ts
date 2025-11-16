@@ -49,18 +49,21 @@ export class MemStorage implements IStorage {
   async initialize(): Promise<void> {
     const adminEmail = "admin@bcalm.org";
     const adminPassword = "admin123";
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
     
-    const adminUser: ResourcesUser = {
-      id: randomUUID(),
+    const existingAdmin = await this.getResourcesUserByEmail(adminEmail);
+    if (existingAdmin) {
+      console.log("Admin user already exists:", adminEmail);
+      return;
+    }
+    
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    await this.createResourcesUser({
       name: "Admin User",
       email: adminEmail,
       password: hashedPassword,
       isAdmin: true,
-      createdAt: new Date(),
-    };
+    });
     
-    this.resourcesUsers.set(adminUser.id, adminUser);
     console.log("Admin user initialized:", adminEmail);
   }
 
