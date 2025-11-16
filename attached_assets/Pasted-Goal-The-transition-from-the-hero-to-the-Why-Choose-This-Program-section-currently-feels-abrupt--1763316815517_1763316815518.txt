@@ -1,0 +1,248 @@
+Goal:
+The transition from the hero to the “Why Choose This Program” section currently feels abrupt, weak, and “template-ish.”
+We want this fold to feel as premium, modern, and intentional as the hero, with smooth visual rhythm and clearer hierarchy.
+
+Implement the following layout, spacing, typography, and visual style changes.
+
+1️⃣ Section Structure & Spacing
+
+Current issue:
+Large empty gap after the CTAs, then a small, weak heading and bulky white cards with heavy shadows.
+
+Change to:
+
+Keep the hero exactly as it is.
+
+Immediately below the hero CTAs, add the “Why” section with consistent container width.
+
+Layout rules:
+
+Wrap this section in the same container as the hero content:
+max-width: 1080px; margin: 0 auto; padding-left/right: 16–24px.
+
+Vertical spacing:
+
+Space between the bottom of the “Schedule a Call” button and the section heading: 48–64px (not huge).
+
+Space between section heading and first card: 24–32px.
+
+Space between cards: 16–24px.
+
+2️⃣ Section Heading: Stronger & More Confident
+
+Current: “Why Choose This Program” (small, light, generic).
+
+Change heading text to (choose one and use it consistently):
+
+“Why Bcalm Works”
+or
+
+“Why Students Love This Program”
+
+Heading style:
+
+Font-size: 22–24px on mobile, 26–28px on desktop.
+
+Font-weight: 600.
+
+Color: #ffffff if on dark background, or #111111 if on light background (see section background below).
+
+Centered alignment is fine, but keep it consistent with hero alignment.
+
+Add a short subtitle below the heading:
+
+Example:
+Built from real hiring experience, real product journeys, and real outcomes.
+
+Font-size: 14–16px
+
+Color: slightly muted (#d0d0d0 on dark or #555555 on light)
+
+Margin-bottom: 16–24px
+
+3️⃣ Background Transition for the Section
+
+Current: Cards sit on the same dark background as hero, making the white blocks feel harsh and disconnected.
+
+Change to:
+
+Option A (recommended):
+
+Keep the overall page background dark, but place the “Why” section content on a slightly lighter/different-tinted background block.
+
+Option B:
+
+Switch to a very light tinted background just for the “Why” fold:
+
+.why-section {
+  background: #050818;  /* slightly lighter/different tone than hero */
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+
+The key: soft transition, not dark → blinding white.
+
+4️⃣ Redesign the Cards (Modern, Soft, Not Bulky)
+
+Current cards issues:
+
+Plain white blocks with heavy shadows
+
+Very rounded corners
+
+Text-heavy bullets with weak hierarchy
+
+Feel “template-ish” and visually older than the hero
+
+New card style (for BOTH cards):
+
+Background: light tinted, not pure white. Use something like:
+background: #f8f7ff;
+
+Border-radius: 16px (match hero buttons if possible).
+
+Shadow: either very subtle or none. If used:
+box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+
+Border: 1px solid rgba(0,0,0,0.04) (optional).
+
+Padding: 20–24px on mobile, 24–32px desktop.
+
+Full-width on mobile with consistent horizontal margin to match hero text.
+
+Vertical spacing between cards: 16–20px.
+
+5️⃣ Card Content Layout & Typography
+Card 1: “Learn From a Product Leader”
+
+Structure inside the card:
+
+Small icon at the top (e.g. 👨‍🏫 or a simple vector icon)
+
+Title
+
+Short bullet list (max 3 bullets)
+
+Title:
+
+Text: “Learn From a Product Leader”
+
+Font-size: 18–20px
+
+Font-weight: 600
+
+Margin-bottom: 8–12px
+
+Bullets: (rewrite to be concise, 1 line each)
+
+Example:
+
+Built large-scale products across Zepto, Apollo247, Toppr & Housing.com
+
+Grew income from ₹3 LPA to ₹2 Cr+ in 10 years
+
+Currently Senior Director of Product at Zepto, a YC-backed $7B company
+
+Rules:
+
+Use simple • bullets or icons
+
+Line-height: 1.4–1.6
+
+Font-size: 14–15px
+
+No long paragraphs. Keep it skim-friendly.
+
+Card 2: “10x Your Shortlist Chances”
+
+Title:
+
+Text: “10x Your Shortlist Chances”
+
+Same font size & weight as Card 1 title.
+
+Bullets example:
+
+Insider hiring signals most candidates never learn
+
+A Portfolio That Proves You Can Solve Real Product Problems
+
+A Resume Engineered to Outperform 90% of Applicants
+
+Same typography rules as Card 1.
+
+6️⃣ Maintain Consistent Alignment and Container Width
+
+The left and right edges of:
+
+the hero headline
+
+the CTAs
+
+the section heading
+
+the cards
+
+should all align within the same container width.
+
+Implementation detail:
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px; /* or 24px on desktop */
+}
+
+
+Use .container around both the hero content and the “Why” section content.
+
+7️⃣ Vertical Rhythm (Spacing Guide)
+
+Use a subtle, consistent rhythm so the page feels calm and intentional:
+
+Space between hero buttons and “Why” heading: 48–64px
+
+Space between “Why” heading and subtitle: 8–12px
+
+Space between subtitle and first card: 24px
+
+Space between cards: 16–20px
+
+Space below second card and next section: 48–64px
+
+8️⃣ Responsiveness
+
+On mobile (like the screenshot):
+
+Cards should stack vertically full-width.
+
+Text sizes:
+
+Section heading: 22–24px
+
+Card titles: 18px
+
+Body: 14–15px
+
+Preserve generous padding so nothing feels cramped.
+
+On desktop:
+
+You may place the two cards side-by-side in a 2-column grid with gap: 24px, but keep the same styling and typography.
+
+9️⃣ High-Level Feel Check
+
+The section should feel like:
+
+A natural continuation of the hero (same brand, same vibe).
+
+Calm, premium, modern.
+
+Easy to skim in 3 seconds:
+
+“Okay, who is teaching me?”
+
+“Okay, why is this program effective?”
+
+No heavy shadows, no random big gaps, no weak headings.
