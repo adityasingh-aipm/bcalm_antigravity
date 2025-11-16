@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { motion } from "framer-motion";
 
-interface NavbarProps {
-  onJoinWaitlist: () => void;
-  onScheduleCall: () => void;
-}
-
-export default function Navbar({ onJoinWaitlist, onScheduleCall }: NavbarProps) {
+export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -32,21 +27,14 @@ export default function Navbar({ onJoinWaitlist, onScheduleCall }: NavbarProps) 
             Bcalm
           </div>
           
-          <div className="hidden md:flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              onClick={onScheduleCall}
-              data-testid="button-nav-schedule"
+          <Link href="/resources">
+            <a 
+              className="text-foreground font-medium transition-colors hover:text-primary hover:underline decoration-2 underline-offset-4"
+              data-testid="link-free-resources"
             >
-              Schedule a Call
-            </Button>
-            <Button 
-              onClick={onJoinWaitlist}
-              data-testid="button-nav-waitlist"
-            >
-              Join Waitlist
-            </Button>
-          </div>
+              Free Resources
+            </a>
+          </Link>
         </div>
       </div>
     </motion.nav>

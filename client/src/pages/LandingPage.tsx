@@ -34,10 +34,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen">
-      <Navbar 
-        onJoinWaitlist={() => setWaitlistOpen(true)} 
-        onScheduleCall={() => setScheduleOpen(true)} 
-      />
+      <Navbar />
       
       <HeroSection 
         onJoinWaitlist={() => setWaitlistOpen(true)} 
