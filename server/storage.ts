@@ -1,14 +1,7 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { 
-  type ResourcesUser, 
-  type InsertResourcesUser,
-  type Resource,
-  type InsertResource,
-  type DownloadLog,
-  type InsertDownloadLog
-} from "@shared/resourcesSchema";
-import { randomUUID } from "crypto";
+import { type User, type InsertUser, type ResourcesUser, type InsertResourcesUser, type Resource, type InsertResource, type DownloadLog, type InsertDownloadLog, users, resourcesUsers, resources, downloadLogs } from "@shared/schema";
 import bcrypt from "bcrypt";
+import { db } from "./db";
+import { eq, sql } from "drizzle-orm";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -33,19 +26,7 @@ export interface IStorage {
   }>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-  private resourcesUsers: Map<string, ResourcesUser>;
-  private resources: Map<string, Resource>;
-  private downloadLogs: Map<string, DownloadLog>;
-
-  constructor() {
-    this.users = new Map();
-    this.resourcesUsers = new Map();
-    this.resources = new Map();
-    this.downloadLogs = new Map();
-  }
-
+export class DatabaseStorage implements IStorage {
   async initialize(): Promise<void> {
     const adminEmail = "admin@bcalm.org";
     const adminPassword = "admin123";
@@ -68,102 +49,64 @@ export class MemStorage implements IStorage {
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async getResourcesUserByEmail(email: string): Promise<ResourcesUser | undefined> {
-    return Array.from(this.resourcesUsers.values()).find(
-      (user) => user.email === email,
-    );
+    const [user] = await db.select().from(resourcesUsers).where(eq(resourcesUsers.email, email));
+    return user || undefined;
   }
 
   async createResourcesUser(insertUser: InsertResourcesUser): Promise<ResourcesUser> {
-    const id = randomUUID();
-    const user: ResourcesUser = {
-      ...insertUser,
-      id,
-      isAdmin: insertUser.isAdmin ?? false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    this.resourcesUsers.set(id, user);
+    const [user] = await db.insert(resourcesUsers).values(insertUser).returning();
     return user;
   }
 
   async getAllResources(): Promise<Resource[]> {
-    return Array.from(this.resources.values()).filter((r) => r.isActive);
+    return await db.select().from(resources).where(eq(resources.isActive, true));
   }
 
   async getResourceById(id: string): Promise<Resource | undefined> {
-    return this.resources.get(id);
+    const [resource] = await db.select().from(resources).where(eq(resources.id, id));
+    return resource || undefined;
   }
 
   async createResource(insertResource: InsertResource): Promise<Resource> {
-    const id = randomUUID();
-    const resource: Resource = {
-      ...insertResource,
-      id,
-      filePath: insertResource.filePath ?? null,
-      fileSize: insertResource.fileSize ?? null,
-      isActive: true,
-      uploadedDate: new Date(),
-      updatedAt: new Date(),
-    };
-    this.resources.set(id, resource);
+    const [resource] = await db.insert(resources).values(insertResource).returning();
     return resource;
   }
 
   async updateResource(id: string, updateData: Partial<InsertResource>): Promise<Resource | undefined> {
-    const resource = this.resources.get(id);
-    if (!resource) {
-      return undefined;
-    }
-
-    const updatedResource: Resource = {
-      ...resource,
-      ...updateData,
-      updatedAt: new Date(),
-    };
-    this.resources.set(id, updatedResource);
-    return updatedResource;
+    const [resource] = await db
+      .update(resources)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(resources.id, id))
+      .returning();
+    return resource || undefined;
   }
 
   async deleteResource(id: string): Promise<boolean> {
-    const resource = this.resources.get(id);
-    if (!resource) {
-      return false;
-    }
-
-    const updatedResource: Resource = {
-      ...resource,
-      isActive: false,
-      updatedAt: new Date(),
-    };
-    this.resources.set(id, updatedResource);
-    return true;
+    const [resource] = await db
+      .update(resources)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(eq(resources.id, id))
+      .returning();
+    return !!resource;
   }
 
   async logDownload(insertLog: InsertDownloadLog): Promise<DownloadLog> {
-    const id = randomUUID();
-    const log: DownloadLog = {
-      ...insertLog,
-      id,
-      downloadedAt: new Date(),
-    };
-    this.downloadLogs.set(id, log);
+    const [log] = await db.insert(downloadLogs).values(insertLog).returning();
     return log;
   }
 
@@ -174,19 +117,21 @@ export class MemStorage implements IStorage {
   }> {
     const activeResources = await this.getAllResources();
     const totalResources = activeResources.length;
-    const totalDownloads = this.downloadLogs.size;
+
+    const allDownloads = await db.select().from(downloadLogs);
+    const totalDownloads = allDownloads.length;
 
     const downloadCounts = new Map<string, number>();
-    Array.from(this.downloadLogs.values()).forEach((log) => {
+    allDownloads.forEach((log) => {
       downloadCounts.set(log.resourceId, (downloadCounts.get(log.resourceId) || 0) + 1);
     });
 
     let mostDownloaded: { resourceId: string; title: string; downloads: number } | null = null;
     let maxDownloads = 0;
 
-    Array.from(downloadCounts.entries()).forEach(([resourceId, count]) => {
+    for (const [resourceId, count] of downloadCounts.entries()) {
       if (count > maxDownloads) {
-        const resource = this.resources.get(resourceId);
+        const resource = await this.getResourceById(resourceId);
         if (resource) {
           mostDownloaded = {
             resourceId,
@@ -196,7 +141,7 @@ export class MemStorage implements IStorage {
           maxDownloads = count;
         }
       }
-    });
+    }
 
     return {
       totalResources,
@@ -206,4 +151,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { storage } from "../storage";
 import { authenticateToken, requireAdmin, generateToken, type AuthRequest } from "../middleware/auth";
 import { upload } from "../middleware/upload";
-import { insertResourcesUserSchema, insertResourceSchema } from "@shared/resourcesSchema";
+import { insertResourcesUserSchema, insertResourceSchema } from "@shared/schema";
 import fs from "fs";
 import path from "path";
 
