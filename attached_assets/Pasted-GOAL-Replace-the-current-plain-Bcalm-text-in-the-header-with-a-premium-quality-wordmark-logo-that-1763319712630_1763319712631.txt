@@ -1,0 +1,129 @@
+GOAL:
+Replace the current plain “Bcalm” text in the header with a premium-quality wordmark logo that feels modern, calm, trustworthy, and brand-defining — similar in aesthetic to Apple, Notion, Stripe, or Linear.
+
+This logo is text-only, but with deliberate typography, spacing, and refinement (not simply “text in a font”).
+No colored letters. No gimmicks. This is the premium option.
+
+1️⃣ Font Selection (Very Important)
+
+Use a clean, modern, premium sans-serif — NOT a default system font.
+
+Approved fonts (pick one & use consistently across brand):
+
+Inter (variable weight preferred)
+
+Manrope
+
+SF Pro Display (if license allows; closest to Apple)
+
+Plus Jakarta Sans
+
+Satoshi (if available)
+
+General Sans
+
+Use the same font family everywhere on the site for consistency.
+
+2️⃣ Logo Typography Settings
+
+Implement “Bcalm” with the following properties:
+
+Weight: 600 (semi-bold, not bold)
+
+Letter spacing (tracking): 0.5px to 1px
+
+Word spacing: default
+
+Case: Title case → Bcalm (not uppercase)
+
+Color: #111111 (rich dark grey, not pure black)
+
+This should feel confident but not loud.
+
+3️⃣ Micro-adjustments for Logo Refinement
+
+Apply these details so it looks like a designed mark:
+
+a. Slightly tighten spacing between the B and c
+
+Reduce kerning between B and c by –1px or –2px (visually tuned)
+This makes the wordmark feel more polished and balanced.
+
+b. Slightly increase spacing between “calm” letters
+
+Apply +0.5–1px tracking to c a l m
+
+This creates a visual “breath” after the strong B.
+
+c. Very subtle rounding
+
+If the font supports a “rounded” variant or stylistic set:
+
+Use mildly rounded terminals (not bubble-like or childish)
+This aligns with the emotional meaning of calm.
+
+4️⃣ Monochrome Brand Rule
+
+The logo must always be in one solid color:
+
+Default: #111111
+
+Dark mode: #ffffff
+
+Never mix colors inside the wordmark.
+This is what gives it premium strength and long-term brand coherence.
+
+All brand color usage should happen around the logo, not inside it.
+
+5️⃣ Spacing & Placement in Header
+Header left-side placement:
+
+Add extra left padding so the wordmark has room to “breathe.”
+
+Vertical alignment: perfectly centered with the Free Resources CTA.
+
+Minimum padding:
+
+Desktop: padding-left: 24px;
+
+Mobile: padding-left: 16px;
+
+Size:
+
+Desktop font-size: 20px
+
+Tablet: 18px
+
+Mobile: 17px
+
+The logo must never wrap.
+Ensure white-space: nowrap.
+
+6️⃣ Optional Accent Version (Secondary Use Only)
+
+Implement the following secondary (not primary) variation for use in internal decks or banners (NOT in header):
+
+Add a thin, short purple underline under the B only:
+
+Color: brand purple #6c47ff
+
+Width: equal to B’s width
+
+Thickness: 2px
+
+Offset: 2–3px below baseline
+
+This version must NOT appear in the site header —
+header uses the pure monochrome primary wordmark only.
+
+7️⃣ Final Deliverables
+
+Replace “Bcalm” in the header with the premium wordmark using the rules above.
+
+Ensure it displays crisply on all screen sizes (no shifting or pixelation).
+
+Ensure the Free Resources pill CTA aligns vertically with it perfectly.
+
+Add white-space: nowrap; to avoid wrapping on small screens.
+
+Confirm the logo sits inside the fixed header bar and never overlaps the hero section.
