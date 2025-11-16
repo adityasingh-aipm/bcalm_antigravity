@@ -8,6 +8,7 @@ import {
   type InsertDownloadLog
 } from "@shared/resourcesSchema";
 import { randomUUID } from "crypto";
+import bcrypt from "bcrypt";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -43,6 +44,24 @@ export class MemStorage implements IStorage {
     this.resourcesUsers = new Map();
     this.resources = new Map();
     this.downloadLogs = new Map();
+  }
+
+  async initialize(): Promise<void> {
+    const adminEmail = "admin@bcalm.org";
+    const adminPassword = "admin123";
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
+    
+    const adminUser: ResourcesUser = {
+      id: randomUUID(),
+      name: "Admin User",
+      email: adminEmail,
+      password: hashedPassword,
+      isAdmin: true,
+      createdAt: new Date(),
+    };
+    
+    this.resourcesUsers.set(adminUser.id, adminUser);
+    console.log("Admin user initialized:", adminEmail);
   }
 
   async getUser(id: string): Promise<User | undefined> {

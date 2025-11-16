@@ -14,8 +14,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import { Upload, Edit, Trash2, FileText, Video, ExternalLink, TrendingUp, FolderOpen, Download } from "lucide-react";
+import { Upload, Edit, Trash2, FileText, Video, ExternalLink, TrendingUp, FolderOpen, Download, LogIn } from "lucide-react";
 import type { Resource } from "@shared/resourcesSchema";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 const uploadSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -43,9 +51,54 @@ export default function ResourcesAdminDashboard() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { toast } = useToast();
   
   const getToken = () => localStorage.getItem("resources_token");
+
+  const loginForm = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const loginMutation = useMutation({
+    mutationFn: async (data: LoginFormData) => {
+      const response = await fetch("/api/resources/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Login failed");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      localStorage.setItem("resources_token", data.token);
+      setIsLoggedIn(true);
+      toast({
+        title: "Login Successful",
+        description: "Welcome to the admin dashboard",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLogin = (data: LoginFormData) => {
+    loginMutation.mutate(data);
+  };
 
   const { data: resources, isLoading } = useQuery<Resource[]>({
     queryKey: ["/api/resources"],
@@ -262,14 +315,67 @@ export default function ResourcesAdminDashboard() {
     });
   };
 
-  if (!getToken()) {
+  if (!getToken() && !isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle>Admin Access Required</CardTitle>
-            <CardDescription>Please log in with an admin account to access this dashboard</CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <LogIn className="h-5 w-5" />
+              Admin Login
+            </CardTitle>
+            <CardDescription>Access the resources dashboard with your admin credentials</CardDescription>
           </CardHeader>
+          <CardContent>
+            <Form {...loginForm}>
+              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="email"
+                          placeholder="admin@bcalm.org"
+                          data-testid="input-email"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Password</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="password"
+                          placeholder="Enter your password"
+                          data-testid="input-password"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loginMutation.isPending}
+                  data-testid="button-admin-login"
+                >
+                  {loginMutation.isPending ? "Logging in..." : "Login"}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
         </Card>
       </div>
     );
