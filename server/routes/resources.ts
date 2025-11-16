@@ -139,10 +139,14 @@ router.get("/download/:resourceId", authenticateToken, async (req: AuthRequest, 
     }
 
     if (resource.type === "link") {
-      await storage.logDownload({
-        userId: req.user!.userId,
-        resourceId: resource.id,
-      });
+      try {
+        await storage.logDownload({
+          userId: req.user!.userId,
+          resourceId: resource.id,
+        });
+      } catch (logError) {
+        console.error("Failed to log link download:", logError);
+      }
       return res.json({ url: resource.filePath });
     }
 
@@ -153,6 +157,7 @@ router.get("/download/:resourceId", authenticateToken, async (req: AuthRequest, 
     const filePath = path.join(process.cwd(), resource.filePath);
     
     if (!fs.existsSync(filePath)) {
+      console.error("File not found on disk:", filePath);
       return res.status(404).json({ error: "File not found on server" });
     }
 
@@ -160,24 +165,34 @@ router.get("/download/:resourceId", authenticateToken, async (req: AuthRequest, 
     const filename = resource.originalFileName || path.basename(filePath);
     const mimeType = resource.mimeType || "application/octet-stream";
 
-    await storage.logDownload({
-      userId: req.user!.userId,
-      resourceId: resource.id,
-    });
+    console.log(`Streaming file: ${filename} (${stats.size} bytes)`);
 
     res.setHeader("Content-Type", mimeType);
     res.setHeader("Content-Length", stats.size);
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
 
     const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-
+    
     fileStream.on("error", (error) => {
       console.error("File stream error:", error);
       if (!res.headersSent) {
         res.status(500).json({ error: "Failed to stream file" });
       }
     });
+
+    fileStream.on("end", async () => {
+      console.log(`File stream completed: ${filename}`);
+      try {
+        await storage.logDownload({
+          userId: req.user!.userId,
+          resourceId: resource.id,
+        });
+      } catch (logError) {
+        console.error("Failed to log download (file already sent):", logError);
+      }
+    });
+
+    fileStream.pipe(res);
   } catch (error) {
     console.error("Download error:", error);
     if (!res.headersSent) {
