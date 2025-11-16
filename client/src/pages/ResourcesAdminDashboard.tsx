@@ -14,7 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
-import { Upload, Edit, Trash2, FileText, Video, ExternalLink, TrendingUp, FolderOpen, Download, LogIn } from "lucide-react";
+import { Upload, Edit, Trash2, FileText, Video, ExternalLink, TrendingUp, FolderOpen, Download, LogIn, LogOut } from "lucide-react";
 import type { Resource } from "@shared/resourcesSchema";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
@@ -98,6 +98,16 @@ export default function ResourcesAdminDashboard() {
 
   const handleLogin = (data: LoginFormData) => {
     loginMutation.mutate(data);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("resources_token");
+    setIsLoggedIn(false);
+    queryClient.clear();
+    toast({
+      title: "Logged Out",
+      description: "You have been logged out successfully",
+    });
   };
 
   const { data: resources, isLoading } = useQuery<Resource[]>({
@@ -387,10 +397,16 @@ export default function ResourcesAdminDashboard() {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-bold">Resources Admin Dashboard</h1>
-            <Button onClick={() => setShowUploadDialog(true)} data-testid="button-upload-resource">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Resource
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setShowUploadDialog(true)} data-testid="button-upload-resource">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Resource
+              </Button>
+              <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
