@@ -163,20 +163,28 @@ export default function ResourcesPage() {
     }
 
     try {
+      console.log("Starting download for:", resourceId);
       const response = await fetch(`/api/resources/download/${resourceId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      console.log("Response status:", response.status);
+      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
-        throw new Error("Download failed");
+        const errorText = await response.text();
+        console.error("Download failed:", errorText);
+        throw new Error(`Download failed: ${response.status}`);
       }
 
       const contentType = response.headers.get("content-type");
+      console.log("Content-Type:", contentType);
       
       if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
+        console.log("JSON response:", data);
         if (data.url) {
           window.open(data.url, "_blank");
           toast({
@@ -186,30 +194,43 @@ export default function ResourcesPage() {
         }
       } else {
         const blob = await response.blob();
+        console.log("Blob size:", blob.size, "bytes");
+        
         const contentDisposition = response.headers.get("content-disposition");
-        let filename = `resource-${resourceId}`;
+        console.log("Content-Disposition:", contentDisposition);
+        
+        let filename = `resource-${resourceId}.pdf`;
         
         if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-          if (filenameMatch) {
+          const filenameMatch = contentDisposition.match(/filename="([^"]+)"/);
+          if (filenameMatch && filenameMatch[1]) {
             filename = filenameMatch[1];
           }
         }
+        
+        console.log("Final filename:", filename);
         
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
+        console.log("Triggering download click");
         a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          console.log("Cleanup completed");
+        }, 100);
+        
         toast({
           title: "Download started",
           description: "Your file is being downloaded",
         });
       }
     } catch (error) {
+      console.error("Download error:", error);
       toast({
         title: "Download failed",
         description: error instanceof Error ? error.message : "Failed to download resource",
