@@ -51,6 +51,7 @@ export default function ResourcesAdminDashboard() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedEditFile, setSelectedEditFile] = useState<File | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { toast } = useToast();
   
@@ -201,30 +202,56 @@ export default function ResourcesAdminDashboard() {
   });
 
   const editMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: EditFormData }) => {
+    mutationFn: async ({ id, data, file }: { id: string; data: EditFormData; file?: File }) => {
       const token = getToken();
       if (!token) throw new Error("Not authenticated");
       
-      const response = await fetch(`/api/resources/admin/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
+      if (file) {
+        const formData = new FormData();
+        if (data.title) formData.append("title", data.title);
+        if (data.description) formData.append("description", data.description);
+        if (data.category) formData.append("category", data.category);
+        if (data.type) formData.append("type", data.type);
+        formData.append("file", file);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Update failed");
+        const response = await fetch(`/api/resources/admin/${id}`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Update failed");
+        }
+
+        return response.json();
+      } else {
+        const response = await fetch(`/api/resources/admin/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Update failed");
+        }
+
+        return response.json();
       }
-
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/resources"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/resources/admin/stats"] });
       setShowEditDialog(false);
       setSelectedResource(null);
+      setSelectedEditFile(null);
       editForm.reset();
       toast({
         title: "Success",
@@ -284,7 +311,7 @@ export default function ResourcesAdminDashboard() {
 
   const handleEdit = (data: EditFormData) => {
     if (selectedResource) {
-      editMutation.mutate({ id: selectedResource.id, data });
+      editMutation.mutate({ id: selectedResource.id, data, file: selectedEditFile || undefined });
     }
   };
 
@@ -296,6 +323,7 @@ export default function ResourcesAdminDashboard() {
 
   const openEditDialog = (resource: Resource) => {
     setSelectedResource(resource);
+    setSelectedEditFile(null);
     editForm.reset({
       title: resource.title,
       description: resource.description,
@@ -701,6 +729,29 @@ export default function ResourcesAdminDashboard() {
                 </Select>
               </div>
             </div>
+
+            {editForm.watch("type") !== "link" && (
+              <div>
+                <Label htmlFor="edit-file">Replace File (Optional)</Label>
+                <Input
+                  id="edit-file"
+                  type="file"
+                  onChange={(e) => setSelectedEditFile(e.target.files?.[0] || null)}
+                  accept=".pdf,.doc,.docx,.mp4,.mov,.avi"
+                  data-testid="input-edit-file"
+                />
+                {selectedEditFile && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Selected: {selectedEditFile.name}
+                  </p>
+                )}
+                {!selectedEditFile && selectedResource?.filePath && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Current file: {selectedResource.filePath.split('/').pop()}
+                  </p>
+                )}
+              </div>
+            )}
 
             {editForm.watch("type") === "link" && (
               <div>

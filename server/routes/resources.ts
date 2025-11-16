@@ -208,17 +208,38 @@ router.post("/admin/upload", authenticateToken, requireAdmin, upload.single("fil
   }
 });
 
-router.put("/admin/:resourceId", authenticateToken, requireAdmin, async (req: AuthRequest, res: Response) => {
+router.put("/admin/:resourceId", authenticateToken, requireAdmin, upload.single("file"), async (req: AuthRequest, res: Response) => {
   try {
     const { resourceId } = req.params;
     const { title, description, category, type, filePath } = req.body;
+
+    const existingResource = await storage.getResourceById(resourceId);
+    if (!existingResource) {
+      if (req.file && req.file.path) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(404).json({ error: "Resource not found" });
+    }
 
     const updateData: Partial<typeof insertResourceSchema._type> = {};
     if (title) updateData.title = title;
     if (description) updateData.description = description;
     if (category) updateData.category = category;
     if (type) updateData.type = type;
-    if (filePath) updateData.filePath = filePath;
+
+    if (req.file) {
+      if (existingResource.filePath && existingResource.filePath.startsWith("uploads/")) {
+        try {
+          fs.unlinkSync(existingResource.filePath);
+        } catch (err) {
+          console.error("Failed to delete old file:", err);
+        }
+      }
+      updateData.filePath = req.file.path;
+      updateData.fileSize = req.file.size;
+    } else if (filePath && type === "link") {
+      updateData.filePath = filePath;
+    }
 
     const updatedResource = await storage.updateResource(resourceId, updateData);
 
@@ -229,6 +250,13 @@ router.put("/admin/:resourceId", authenticateToken, requireAdmin, async (req: Au
     res.json(updatedResource);
   } catch (error) {
     console.error("Update error:", error);
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+      } catch (err) {
+        console.error("Failed to cleanup uploaded file:", err);
+      }
+    }
     res.status(500).json({ error: "Failed to update resource" });
   }
 });
