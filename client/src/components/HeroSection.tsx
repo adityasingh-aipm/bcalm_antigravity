@@ -31,7 +31,7 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
         }}
       />
       
-      <div className="relative z-10 container mx-auto px-4 py-20 max-w-6xl">
+      <div className="relative z-10 container mx-auto px-4 py-20" style={{ maxWidth: '1080px' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
