@@ -129,7 +129,7 @@ export class DatabaseStorage implements IStorage {
     let mostDownloaded: { resourceId: string; title: string; downloads: number } | null = null;
     let maxDownloads = 0;
 
-    for (const [resourceId, count] of downloadCounts.entries()) {
+    for (const [resourceId, count] of Array.from(downloadCounts.entries())) {
       if (count > maxDownloads) {
         const resource = await this.getResourceById(resourceId);
         if (resource) {

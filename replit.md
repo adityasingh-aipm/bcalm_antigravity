@@ -16,11 +16,19 @@ The frontend is built with React 18 and TypeScript, using Vite for development a
 
 ### Backend Architecture
 
-The backend utilizes Express.js with TypeScript on Node.js. It integrates custom Vite middleware for development with HMR. The API follows a RESTful pattern. Data storage is currently an in-memory solution (`MemStorage`) for development, with a clear interface for future database integration.
+The backend utilizes Express.js with TypeScript on Node.js. It integrates custom Vite middleware for development with HMR. The API follows a RESTful pattern. Data storage uses PostgreSQL via `DatabaseStorage` implementation, with a clear `IStorage` interface for abstraction. Authentication is handled via JWT tokens for the Free Resources system, with bcrypt for password hashing.
 
 ### Data Storage
 
-The application is configured with Drizzle ORM for PostgreSQL, using Neon Database (serverless PostgreSQL) via `@neondatabase/serverless`. A simple user schema is defined with `id`, `username`, and `password` fields, leveraging PostgreSQL's `gen_random_uuid()` and Zod for schema validation. Drizzle Kit is set up for migrations. The system is designed to seamlessly transition from in-memory storage to a production database by configuring the `DATABASE_URL` environment variable.
+**Production Database:** The application uses PostgreSQL (Neon serverless) via Drizzle ORM for all persistent data. Database schema includes:
+- `users`: Basic user accounts (id, username, password)
+- `resources_users`: Free resources authentication (id, email, password, name, isAdmin, timestamps)
+- `resources`: Educational resources (id, title, description, category, type, filePath, fileSize, originalFileName, mimeType, isActive, timestamps)
+- `download_logs`: Download tracking (id, userId, resourceId, downloadedAt)
+
+**File Storage:** Uploaded files are stored in `uploads/resources/` directory on disk, with metadata (originalFileName, mimeType) stored in PostgreSQL for proper download handling.
+
+**Database Operations:** All CRUD operations use Drizzle ORM through the `DatabaseStorage` class. Migrations are managed via `npm run db:push`. Admin user (admin@bcalm.org) is auto-initialized on first startup.
 
 ### Form Handling & Validation
 
