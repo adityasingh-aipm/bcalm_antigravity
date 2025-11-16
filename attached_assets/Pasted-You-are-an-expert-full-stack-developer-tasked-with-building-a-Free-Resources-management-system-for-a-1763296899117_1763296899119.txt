@@ -1,0 +1,149 @@
+You are an expert full-stack developer tasked with building a Free Resources management system for a Bcalm product management website. The website is built on Replit using React 18 with TypeScript, Vite, Tailwind CSS, Shadcn UI, Express.js backend, and Drizzle ORM.
+
+## Project Requirements
+
+### Feature 1: Public Resources Page (/resources)
+- Landing page displaying 3 categories of free resources:
+  1. Free Prompt Library for PMs (PDFs/Documents)
+  2. Top 20 Books for PMs (PDFs/Documents)
+  3. Top Product Management Videos and Articles (Videos/Links)
+- Beautiful card-based grid layout using Shadcn UI components
+- User signup/login system (email + password) to access downloads
+- Download button that triggers file download for authenticated users
+- Unauthenticated users see "Sign up to Download" button that opens signup modal
+- Display resource metadata: title, description, file type, file size, upload date
+- Smooth animations using Framer Motion
+- Fully responsive design (mobile, tablet, desktop)
+
+### Feature 2: Admin Dashboard (/admin/resources)
+- Admin login with JWT authentication
+- Resource management interface showing table of all resources
+- Admin can:
+  - Upload new resources (PDF, DOC, Video files up to 500MB)
+  - Edit resource details (title, description, category, type)
+  - Delete resources (soft delete - marks as inactive)
+  - View download statistics (total downloads per resource, most downloaded resource)
+- Upload form with validation using React Hook Form + Zod:
+  - Title (required, min 3 chars)
+  - Description (required, min 10 chars)
+  - Category dropdown (prompts, books, videos)
+  - Type dropdown (pdf, doc, video, link)
+  - File input (optional - for external links)
+- Dashboard stats cards showing:
+  - Total resources count
+  - Total downloads count
+  - Most downloaded resource name
+- Resources table with columns: Title, Category, Type, File Size, Uploaded Date, Actions
+- Action buttons: Edit, Delete (with confirmation dialog)
+- Loading states and error handling throughout
+
+### Feature 3: Backend API Endpoints
+Build all necessary Express.js endpoints:
+
+**Authentication:**
+- POST /api/resources/auth/signup - User registration
+- POST /api/resources/auth/login - User login
+
+**Resources (Public):**
+- GET /api/resources - Fetch all active resources
+- GET /api/resources/download/:resourceId - Download resource (authenticated only)
+
+**Admin:**
+- POST /api/resources/admin/upload - Upload new resource (admin only)
+- PUT /api/resources/admin/:resourceId - Update resource (admin only)
+- DELETE /api/resources/admin/:resourceId - Delete resource (admin only)
+- GET /api/resources/admin/stats - Get download statistics (admin only)
+
+Middleware:
+- JWT authentication middleware for protected routes
+- Admin-only middleware to verify admin status
+- File upload middleware using multer (handle PDFs, DOCs, Videos)
+
+### Feature 4: Database Schema
+Create Drizzle ORM tables:
+
+1. **resources_users** table:
+   - id (primary key)
+   - email (unique)
+   - password (hashed with bcrypt)
+   - name
+   - is_admin (boolean)
+   - created_at, updated_at (timestamps)
+
+2. **resources** table:
+   - id (primary key)
+   - title
+   - description
+   - category (prompts, books, videos)
+   - type (pdf, doc, video, link)
+   - file_path
+   - file_size
+   - is_active (boolean, for soft deletes)
+   - uploaded_date, updated_at (timestamps)
+
+3. **download_logs** table:
+   - id (primary key)
+   - user_id (foreign key)
+   - resource_id (foreign key)
+   - downloaded_at (timestamp)
+
+## Technical Requirements
+
+**Frontend:**
+- Use React 18 with TypeScript
+- Shadcn UI components: Button, Input, Card, Dialog, Select, Textarea
+- React Hook Form + Zod for all form validation
+- TanStack Query (React Query) for data fetching and state management
+- Framer Motion for animations
+- Tailwind CSS for styling
+- Wouter for routing
+
+**Backend:**
+- Express.js with TypeScript
+- Drizzle ORM for database queries
+- Multer for file uploads
+- JWT (jsonwebtoken) for authentication
+- Bcrypt for password hashing
+- CORS enabled
+
+**Storage:**
+- Store uploaded files in `/uploads/resources` directory on Replit
+- Serve static files from this directory
+
+## Code Quality
+- Full TypeScript typing (no `any` types)
+- Proper error handling and validation
+- Loading and error states in UI
+- Responsive design that works on all devices
+- Accessibility best practices
+- Comments for complex logic
+- Consistent code style matching your existing project
+
+## Integration Requirements
+- Integrate into existing Replit Express server
+- Add route handler: `app.use('/api/resources', resourcesRouter)`
+- Add static file serving: `app.use('/uploads/resources', express.static(...))`
+- Add routes to Wouter: `/resources` and `/admin/resources`
+- Use existing database connection and Drizzle setup
+- Add environment variable: `JWT_SECRET` to .env
+- Install dependencies: multer, bcrypt, jsonwebtoken
+
+## Deliverables
+1. Complete backend routes file (resources.ts)
+2. Frontend ResourcesPage component (ResourcesPage.tsx)
+3. Frontend Admin Dashboard component (ResourcesAdminDashboard.tsx)
+4. Drizzle ORM schema definitions (resourcesSchema.ts)
+5. All files properly integrated and ready to run
+6. Error-free, production-ready code
+
+## Success Criteria
+✓ Users can sign up and download resources
+✓ Admin can log in and manage resources
+✓ Files upload and download correctly
+✓ Download stats are tracked and displayed
+✓ All components are responsive and animated
+✓ Code is fully typed with TypeScript
+✓ All validations work properly
+✓ System handles errors gracefully
+
+Begin implementation now. Create all necessary files and integrate them into the existing Replit project.
