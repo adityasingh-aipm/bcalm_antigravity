@@ -27,13 +27,14 @@ Production-ready landing page for "Bcalm's AI Product Manager Launchpad" - a 30-
 - **Redesigned "Why Choose This Program" with 2 Apple-style white cards (complete visual overhaul):**
   - Positioned between CTA buttons and quick links in first fold
   - Complete redesign from dark glassmorphic aesthetic → clean white minimal Apple-style cards
-  - **Card 1 - Instructor Card:** "Learn From a Product Leader Who Turned ₹3.2L Into ₹2.4Cr"
-    - Large centered instructor portrait (w-40 h-40 md:w-48 h-48, rounded-full, soft shadow)
-    - LinkedIn section with icon and hyperlink (https://www.linkedin.com/in/rakesh-malloju-b648ab92/)
-    - Career transformation grid showing 5 offer letter thumbnails (₹3.2L → ₹15L → ₹45L → ₹1Cr → ₹2.4Cr)
-    - Senior Director credential at $7B YC Company
+  - **Card 1 - Instructor Card:** "Learn From a Product Leader"
+    - Text-forward design with three key bullet points:
+      - "Built large scale products across Zepto, Apollo247, Toppr, Housing.com"
+      - "Journey from 3 LPA to > 2 Cr in 10 Years"
+      - "Currently Senior Director of Product at Zepto, YC and a $7B company"
     - White background (bg-white), thin elegant typography (font-light)
     - Ample padding (p-8 md:p-10) for spacious Apple aesthetic
+    - Centered vertical layout matching Card 2
   - **Card 2 - Shortlist Card:** "10x Your Shortlist Chances"
     - Text-forward with three punchy bullet points
     - "Insider Hiring Signals Most Candidates Never Learn"
@@ -92,7 +93,7 @@ Preferred communication style: Simple, everyday language.
 9. **CTASection** (py-12, mb-8) - Final enrollment call-to-action with compact spacing for momentum
 10. **Footer** - Branding, legal links, social media, and contact information
 
-**Generated Assets**: 16 AI-generated images including hero background, instructor portrait for "Why Choose This Program" card, 5 offer letter thumbnails showing career progression, 3 instructor headshots for Instructors section, and 6 student testimonial avatars stored in `attached_assets/generated_images/`.
+**Generated Assets**: 10 AI-generated images including hero background, 3 instructor headshots for Instructors section, and 6 student testimonial avatars stored in `attached_assets/generated_images/`.
 
 ### Backend Architecture
 

@@ -1,15 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GraduationCap, Rocket } from "lucide-react";
-import { SiLinkedin } from "react-icons/si";
 import { motion } from "framer-motion";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
-import instructorPhoto from "@assets/generated_images/Professional_instructor_portrait_photo_dbebf830.png";
-import offerLetter1 from "@assets/generated_images/Offer_letter_₹3.2L_thumbnail_b5356143.png";
-import offerLetter2 from "@assets/generated_images/Offer_letter_₹15L_thumbnail_6ded10e1.png";
-import offerLetter3 from "@assets/generated_images/Offer_letter_₹45L_thumbnail_2105022e.png";
-import offerLetter4 from "@assets/generated_images/Offer_letter_₹1Cr_thumbnail_e0fc7401.png";
-import offerLetter5 from "@assets/generated_images/Offer_letter_₹2.4Cr_thumbnail_275967fb.png";
 
 interface HeroSectionProps {
   onJoinWaitlist: () => void;
@@ -100,98 +93,23 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
                 className="bg-white rounded-xl shadow-sm overflow-hidden"
                 data-testid="card-instructor"
               >
-                <div className="p-8 md:p-10">
+                <div className="p-8 md:p-10 h-full flex flex-col justify-center">
                   {/* Title */}
-                  <h4 className="text-xl md:text-2xl font-light text-gray-900 mb-8 text-center leading-tight">
-                    Learn From a Product Leader Who Turned ₹3.2L Into ₹2.4Cr
+                  <h4 className="text-xl md:text-2xl font-light text-gray-900 mb-10 text-center leading-tight">
+                    Learn From a Product Leader
                   </h4>
-                  
-                  {/* Instructor Photo */}
-                  <div className="flex justify-center mb-8">
-                    <div className="relative">
-                      <img 
-                        src={instructorPhoto} 
-                        alt="Instructor Portrait" 
-                        className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover shadow-md"
-                        data-testid="img-instructor-photo"
-                      />
-                    </div>
-                  </div>
                   
                   {/* Bullet Points */}
                   <div className="space-y-6">
-                    {/* Bullet 1: LinkedIn */}
-                    <div>
-                      <p className="text-base text-gray-700 mb-2">
-                        • A LinkedIn Presence Built on Clarity and Trust
-                      </p>
-                      <a 
-                        href="https://www.linkedin.com/in/rakesh-malloju-b648ab92/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 transition-colors"
-                        data-testid="link-instructor-linkedin"
-                      >
-                        <SiLinkedin className="h-4 w-4" />
-                        <span className="border-b border-blue-600/30 hover:border-blue-700">View LinkedIn Profile</span>
-                      </a>
-                    </div>
-                    
-                    {/* Bullet 2: Career Transformation */}
-                    <div>
-                      <p className="text-base text-gray-700 mb-4">
-                        • A Career Transformation Driven by a Repeatable System
-                      </p>
-                      <div className="grid grid-cols-5 gap-2">
-                        <div className="relative group" data-testid="offer-letter-1">
-                          <img 
-                            src={offerLetter1} 
-                            alt="₹3.2L Offer" 
-                            className="w-full rounded-md shadow-sm hover:shadow-md transition-shadow"
-                          />
-                          <div className="text-xs text-center mt-1 text-gray-600 font-medium">₹3.2L</div>
-                        </div>
-                        <div className="relative group" data-testid="offer-letter-2">
-                          <img 
-                            src={offerLetter2} 
-                            alt="₹15L Offer" 
-                            className="w-full rounded-md shadow-sm hover:shadow-md transition-shadow"
-                          />
-                          <div className="text-xs text-center mt-1 text-gray-600 font-medium">₹15L</div>
-                        </div>
-                        <div className="relative group" data-testid="offer-letter-3">
-                          <img 
-                            src={offerLetter3} 
-                            alt="₹45L Offer" 
-                            className="w-full rounded-md shadow-sm hover:shadow-md transition-shadow"
-                          />
-                          <div className="text-xs text-center mt-1 text-gray-600 font-medium">₹45L</div>
-                        </div>
-                        <div className="relative group" data-testid="offer-letter-4">
-                          <img 
-                            src={offerLetter4} 
-                            alt="₹1Cr Offer" 
-                            className="w-full rounded-md shadow-sm hover:shadow-md transition-shadow"
-                          />
-                          <div className="text-xs text-center mt-1 text-gray-600 font-medium">₹1Cr</div>
-                        </div>
-                        <div className="relative group" data-testid="offer-letter-5">
-                          <img 
-                            src={offerLetter5} 
-                            alt="₹2.4Cr Offer" 
-                            className="w-full rounded-md shadow-sm hover:shadow-md transition-shadow"
-                          />
-                          <div className="text-xs text-center mt-1 text-gray-600 font-medium">₹2.4Cr</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Bullet 3: Senior Director */}
-                    <div>
-                      <p className="text-base text-gray-700">
-                        • Senior Director at a $7B YC Company
-                      </p>
-                    </div>
+                    <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                      • Built large scale products across Zepto, Apollo247, Toppr, Housing.com
+                    </p>
+                    <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                      • Journey from 3 LPA to &gt; 2 Cr in 10 Years
+                    </p>
+                    <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                      • Currently Senior Director of Product at Zepto, YC and a $7B company
+                    </p>
                   </div>
                 </div>
               </motion.div>
