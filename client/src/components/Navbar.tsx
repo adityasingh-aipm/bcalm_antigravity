@@ -27,13 +27,12 @@ export default function Navbar() {
             Bcalm
           </div>
           
-          <Link href="/resources">
-            <a 
-              className="text-foreground font-medium transition-colors hover:text-primary hover:underline decoration-2 underline-offset-4"
-              data-testid="link-free-resources"
-            >
-              Free Resources
-            </a>
+          <Link 
+            href="/resources"
+            className="text-foreground font-medium transition-colors hover:text-primary hover:underline decoration-2 underline-offset-4"
+            data-testid="link-free-resources"
+          >
+            Free Resources
           </Link>
         </div>
       </div>
