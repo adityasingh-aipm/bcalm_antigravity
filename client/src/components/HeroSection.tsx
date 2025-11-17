@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { GraduationCap, Rocket, User, Target } from "lucide-react";
+import { User, Target } from "lucide-react";
 import { motion } from "framer-motion";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
 
@@ -53,7 +52,7 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             Designed for Non-Tech Students & Graduates
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button 
               size="lg" 
               className="text-base"
@@ -72,6 +71,71 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
               Schedule a Call
             </Button>
           </div>
+
+          {/* Social Proof Pill */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mb-3"
+          >
+            <div
+              className="mx-auto px-4 py-2.5 text-center"
+              style={{
+                maxWidth: '600px',
+                background: 'rgba(131, 88, 255, 0.08)',
+                borderRadius: '9999px',
+                backdropFilter: 'blur(10px)'
+              }}
+              data-testid="pill-social-proof"
+            >
+              <p className="text-sm leading-relaxed" style={{ color: '#111111' }}>
+                🧑‍🎓 Trusted by <span className="font-semibold">200+</span> students from IITs, BITS, NITs, and IIITs
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Next Cohort Highlight Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mb-12"
+          >
+            <div
+              className="mx-auto flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4"
+              style={{
+                maxWidth: '600px',
+                background: '#111827',
+                borderRadius: '16px',
+                padding: '16px 20px',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+              }}
+              data-testid="card-cohort-highlight"
+            >
+              <div className="flex-shrink-0 text-2xl">📅</div>
+              <div className="flex-1 text-center sm:text-left">
+                <p
+                  className="text-xs uppercase tracking-wide mb-1"
+                  style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+                >
+                  Next Cohort
+                </p>
+                <p
+                  className="text-base sm:text-lg font-semibold mb-1"
+                  style={{ color: '#ffffff' }}
+                >
+                  Starts: December 2, 2025
+                </p>
+                <p
+                  className="text-xs sm:text-sm"
+                  style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                >
+                  Limited seats • Applications reviewed on a rolling basis
+                </p>
+              </div>
+            </div>
+          </motion.div>
 
           {/* Why Bcalm Works Section - Premium Redesign */}
           <motion.div
@@ -174,7 +238,7 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.7 }}
-            className="flex flex-wrap gap-3 justify-center items-center mb-8"
+            className="flex flex-wrap gap-3 justify-center items-center"
             style={{ marginTop: '56px' }}
           >
             {quickLinks.map((link, index) => (
@@ -187,22 +251,6 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
                 {link.name}
               </a>
             ))}
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center"
-          >
-            <Badge variant="secondary" className="bg-white/15 backdrop-blur-md text-white border-white/20 px-4 py-2 text-sm flex items-center gap-2">
-              <GraduationCap className="h-4 w-4" />
-              200+ students from IITs, BITS, NITs, and IIITs already registered!
-            </Badge>
-            <Badge variant="secondary" className="bg-white/15 backdrop-blur-md text-white border-white/20 px-4 py-2 text-sm flex items-center gap-2">
-              <Rocket className="h-4 w-4" />
-              Next Cohort Starts: December 2, 2025
-            </Badge>
           </motion.div>
         </motion.div>
       </div>
