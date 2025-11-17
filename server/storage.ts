@@ -31,6 +31,7 @@ export interface IStorage {
   createAssessmentAttempt(attempt: InsertAssessmentAttempt): Promise<AssessmentAttempt>;
   getAssessmentAttempt(id: string): Promise<AssessmentAttempt | undefined>;
   getLatestIncompleteAttempt(userId: string): Promise<AssessmentAttempt | undefined>;
+  deleteAssessmentAttempt(id: string): Promise<boolean>;
   saveAssessmentAnswer(answer: InsertAssessmentAnswer): Promise<AssessmentAnswer>;
   getAttemptAnswers(attemptId: string): Promise<AssessmentAnswer[]>;
   completeAssessmentAttempt(attemptId: string, totalScore: number, readinessBand: string, scoresJson: string): Promise<AssessmentAttempt | undefined>;
@@ -217,6 +218,12 @@ export class DatabaseStorage implements IStorage {
       .orderBy(sql`${assessmentAttempts.createdAt} DESC`)
       .limit(1);
     return attempt || undefined;
+  }
+
+  async deleteAssessmentAttempt(id: string): Promise<boolean> {
+    await db.delete(assessmentAnswers).where(eq(assessmentAnswers.attemptId, id));
+    const result = await db.delete(assessmentAttempts).where(eq(assessmentAttempts.id, id));
+    return true;
   }
 
   async saveAssessmentAnswer(answer: InsertAssessmentAnswer): Promise<AssessmentAnswer> {

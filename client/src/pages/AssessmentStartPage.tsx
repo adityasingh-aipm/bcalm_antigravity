@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 export default function AssessmentStartPage() {
   const { token, isAuthenticated } = useAuth();
@@ -12,6 +13,17 @@ export default function AssessmentStartPage() {
   const { data: resumeData } = useQuery<{ hasIncomplete: boolean; attempt?: any; answeredCount?: number }>({
     queryKey: ["/api/assessment/resume"],
     enabled: isAuthenticated,
+  });
+
+  const clearIncompleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("DELETE", "/api/assessment/attempts/incomplete", {});
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/assessment/resume"] });
+      setLocation("/ai-pm-readiness/questions");
+    },
   });
 
   useEffect(() => {
@@ -30,6 +42,10 @@ export default function AssessmentStartPage() {
 
   const handleResume = () => {
     setLocation("/ai-pm-readiness/questions");
+  };
+
+  const handleStartFresh = () => {
+    clearIncompleteMutation.mutate();
   };
 
   if (resumeData?.hasIncomplete) {
@@ -60,10 +76,11 @@ export default function AssessmentStartPage() {
               <Button
                 size="lg"
                 variant="outline"
-                onClick={() => setLocation("/ai-pm-readiness")}
-                data-testid="button-start-new"
+                onClick={handleStartFresh}
+                disabled={clearIncompleteMutation.isPending}
+                data-testid="button-start-fresh"
               >
-                Start Fresh
+                {clearIncompleteMutation.isPending ? "Clearing..." : "Start Fresh"}
               </Button>
             </div>
           </motion.div>

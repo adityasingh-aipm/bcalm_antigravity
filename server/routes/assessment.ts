@@ -21,10 +21,14 @@ router.post("/attempts", authenticateToken, async (req: AuthRequest, res) => {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    const existingIncomplete = await storage.getLatestIncompleteAttempt(req.user.userId);
-    
-    if (existingIncomplete) {
-      return res.json(existingIncomplete);
+    const forceNew = req.body?.forceNew === true;
+
+    if (!forceNew) {
+      const existingIncomplete = await storage.getLatestIncompleteAttempt(req.user.userId);
+      
+      if (existingIncomplete) {
+        return res.json(existingIncomplete);
+      }
     }
 
     const attempt = await storage.createAssessmentAttempt({
@@ -36,6 +40,25 @@ router.post("/attempts", authenticateToken, async (req: AuthRequest, res) => {
   } catch (error) {
     console.error("Error creating assessment attempt:", error);
     res.status(500).json({ error: "Failed to create attempt" });
+  }
+});
+
+router.delete("/attempts/incomplete", authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const existingIncomplete = await storage.getLatestIncompleteAttempt(req.user.userId);
+    
+    if (existingIncomplete) {
+      await storage.deleteAssessmentAttempt(existingIncomplete.id);
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error clearing incomplete attempt:", error);
+    res.status(500).json({ error: "Failed to clear attempt" });
   }
 });
 
