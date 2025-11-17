@@ -37,22 +37,22 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
           transition={{ duration: 0.6 }}
           className="text-center"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal text-white mb-6 leading-tight">
-            Become Interview-ready for{" "}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal text-white leading-tight max-w-4xl mx-auto" style={{ marginBottom: '24px' }}>
+            Become interview-ready for{" "}
             <span className="font-bold bg-gradient-to-r from-primary via-primary to-violet-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(106,61,240,0.5)]">
-              AI Product
+              AI Product roles
             </span>{" "}
             in{" "}
             <span className="font-bold bg-gradient-to-r from-amber-400 via-orange-400 to-orange-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]">
-              30 Days
+              30 days
             </span>
           </h1>
           
-          <p className="text-lg md:text-xl text-white/90 mb-8 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed" style={{ marginBottom: '20px' }}>
             Designed for Non-Tech Students & Graduates
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center" style={{ marginBottom: '14px' }}>
             <Button 
               size="lg" 
               className="text-base"
@@ -77,21 +77,21 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-3"
+            style={{ marginBottom: '12px' }}
           >
             <div
-              className="mx-auto px-4 py-2.5 text-center flex items-center justify-center gap-2"
+              className="mx-auto text-center flex items-center justify-center gap-2"
               style={{
                 maxWidth: '600px',
-                background: 'rgba(131, 88, 255, 0.15)',
+                background: '#f5f3ff',
                 borderRadius: '9999px',
-                backdropFilter: 'blur(10px)'
+                padding: '8px 16px'
               }}
               data-testid="pill-social-proof"
             >
-              <GraduationCap className="h-4 w-4 flex-shrink-0" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
-              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
-                Trusted by <span className="font-semibold">200+</span> students from IITs, BITS, NITs, and IIITs
+              <GraduationCap className="h-4 w-4 flex-shrink-0" style={{ color: '#6c47ff' }} />
+              <p className="text-xs sm:text-sm leading-relaxed" style={{ color: '#111111' }}>
+                Trusted by <span className="font-semibold">200+ students</span> from IITs, BITS, NITs, and IIITs
               </p>
             </div>
           </motion.div>
@@ -101,38 +101,48 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="mb-12"
           >
             <div
-              className="mx-auto flex flex-col sm:flex-row items-center sm:items-start gap-3 sm:gap-4"
+              className="mx-auto flex items-start gap-3"
               style={{
                 maxWidth: '600px',
-                background: '#111827',
+                background: '#0b1020',
                 borderRadius: '16px',
-                padding: '16px 20px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)'
+                padding: '14px 16px',
+                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.35)',
+                marginBottom: '28px'
               }}
               data-testid="card-cohort-highlight"
             >
-              <Calendar className="flex-shrink-0 h-6 w-6" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
-              <div className="flex-1 text-center sm:text-left">
+              <Calendar className="flex-shrink-0 mt-1" style={{ width: '18px', height: '18px', color: 'rgba(255, 255, 255, 0.9)' }} />
+              <div className="flex-1">
                 <p
-                  className="text-xs uppercase tracking-wide mb-1"
-                  style={{ color: 'rgba(255, 255, 255, 0.6)' }}
+                  className="uppercase mb-1"
+                  style={{ 
+                    fontSize: '10px', 
+                    letterSpacing: '0.12em', 
+                    color: '#9ca3af'
+                  }}
                 >
                   Next Cohort
                 </p>
                 <p
-                  className="text-base sm:text-lg font-semibold mb-1"
-                  style={{ color: '#ffffff' }}
+                  className="font-semibold mb-1"
+                  style={{ 
+                    fontSize: '14px',
+                    color: '#ffffff' 
+                  }}
                 >
                   Starts: December 2, 2025
                 </p>
                 <p
-                  className="text-xs sm:text-sm"
-                  style={{ color: 'rgba(255, 255, 255, 0.7)' }}
+                  style={{ 
+                    fontSize: '11px',
+                    color: '#9ca3af',
+                    marginTop: '4px'
+                  }}
                 >
-                  Limited seats • Applications reviewed on a rolling basis
+                  Limited seats · Applications reviewed on a rolling basis
                 </p>
               </div>
             </div>
@@ -143,7 +153,6 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            style={{ marginTop: '56px' }}
           >
             {/* Section Heading & Subtitle */}
             <div className="text-center mb-6">
