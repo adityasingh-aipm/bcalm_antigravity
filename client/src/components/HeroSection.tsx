@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { User, Target } from "lucide-react";
+import { User, Target, GraduationCap, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
 
@@ -80,17 +80,18 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             className="mb-3"
           >
             <div
-              className="mx-auto px-4 py-2.5 text-center"
+              className="mx-auto px-4 py-2.5 text-center flex items-center justify-center gap-2"
               style={{
                 maxWidth: '600px',
-                background: 'rgba(131, 88, 255, 0.08)',
+                background: 'rgba(131, 88, 255, 0.15)',
                 borderRadius: '9999px',
                 backdropFilter: 'blur(10px)'
               }}
               data-testid="pill-social-proof"
             >
-              <p className="text-sm leading-relaxed" style={{ color: '#111111' }}>
-                🧑‍🎓 Trusted by <span className="font-semibold">200+</span> students from IITs, BITS, NITs, and IIITs
+              <GraduationCap className="h-4 w-4 flex-shrink-0" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
+              <p className="text-sm leading-relaxed" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>
+                Trusted by <span className="font-semibold">200+</span> students from IITs, BITS, NITs, and IIITs
               </p>
             </div>
           </motion.div>
@@ -113,7 +114,7 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
               }}
               data-testid="card-cohort-highlight"
             >
-              <div className="flex-shrink-0 text-2xl">📅</div>
+              <Calendar className="flex-shrink-0 h-6 w-6" style={{ color: 'rgba(255, 255, 255, 0.9)' }} />
               <div className="flex-1 text-center sm:text-left">
                 <p
                   className="text-xs uppercase tracking-wide mb-1"
