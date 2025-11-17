@@ -1,0 +1,222 @@
+
+**GOAL**
+The hero is strong, but currently feels visually heavy in the middle and slightly noisy because all elements (CTAs, social proof, cohort card) have similar weight.
+
+We want to:
+
+1. Clarify **visual hierarchy** (what’s most important).
+2. Reduce the feeling of “4 big blocks in a column.”
+3. Make the **cohort card** clearly the key informational highlight.
+4. Make the **social proof** lighter and calmer (secondary).
+5. Smooth typography & spacing so the hero scroll feels premium and effortless.
+
+---
+
+### 1️⃣ Hero Headline & Copy Tweaks
+
+**Current:**
+“Become Interview-ready for AI Product in 30 Days”
+
+**Update headline copy to avoid awkward hyphen and improve rhythm:**
+
+Use either:
+
+* **“Become interview-ready for AI Product roles in 30 days”**
+  (preferred: adds “roles” and keeps line breaks cleaner)
+
+Implement:
+
+* Keep main hero heading font size and weight as currently used.
+* Adjust max-width / line-height so **“interview-ready”** stays on one line (avoid line break after “Interview-”).
+
+---
+
+### 2️⃣ CTA Block (Buttons)
+
+Keep both buttons as they are, but adjust spacing:
+
+* Space between headline/subheadline and **Join the Waitlist**: ~16–20px.
+* Space between **Join the Waitlist** and **Schedule a Call**: ~8–12px.
+
+Goal: CTAs feel like **one pair**.
+
+---
+
+### 3️⃣ Social Proof Pill — Make It Lighter & Secondary
+
+**Current:** big dark-ish purple rounded block, visually heavy like a third button.
+
+**Change to a lighter, calmer chip-style element.**
+
+**Content:**
+
+> 🧑‍🎓 **Trusted by 200+ students**
+> from IITs, BITS, NITs, and IIITs
+
+**Design requirements:**
+
+* Place **below the two CTAs**, with `margin-top: 12–16px`.
+* Full-width within container, but visually lighter.
+
+**Styles:**
+
+* Background: `#f5f3ff` (or similar very soft purple tint).
+* Text color: `#111111` or `#1f2933`.
+* “200+ students” in `font-weight: 600`.
+* Layout:
+
+  * Icon on the left (🧑‍🎓), text stacked in two lines.
+* Border-radius: `9999px` (pill).
+* Padding: `8px 14px` (mobile), `10px 18px` (desktop).
+* No shadow or only **very subtle shadow**.
+
+**Example (Tailwind-style):**
+
+```html
+<div class="mt-4 w-full">
+  <div class="flex items-center justify-center w-full px-4 py-2 rounded-full bg-purple-50 text-gray-900 text-xs sm:text-sm text-center">
+    <span class="mr-2">🧑‍🎓</span>
+    <span>
+      <span class="font-semibold">Trusted by 200+ students</span>
+      <span class="hidden sm:inline"> from IITs, BITS, NITs, and IIITs</span>
+      <span class="sm:hidden block"> from IITs, BITS, NITs & IIITs</span>
+    </span>
+  </div>
+</div>
+```
+
+---
+
+### 4️⃣ Cohort Highlight Card — Make It the Informational Anchor
+
+The cohort info is critical. It should stand out **more than the social proof**, but less “button-like” than the primary CTA.
+
+**Content structure:**
+
+* Label: `NEXT COHORT`
+* Main line: `Starts: December 2, 2025`
+* Subtext: `Limited seats · Applications reviewed on a rolling basis`
+
+**Design requirements:**
+
+* Place **below the social proof pill** with `margin-top: 10–14px`.
+* Full-width card with strong contrast against hero background.
+* Keep the calendar icon at the top left or aligned left.
+
+**Styles:**
+
+* Background: slightly lighter or more solid than hero:
+
+  * e.g. `#0b1020` or `#111827`.
+* Text color: `#ffffff` for main text; `#9ca3af` for label & subtext.
+* Border-radius: `16px` (not fully pill-shaped; distinguish from pill).
+* Padding: `14–18px` mobile, `18–22px` desktop.
+* Very soft shadow: `0 12px 30px rgba(0,0,0,0.35)` or keep current if already subtle.
+
+**Typography inside:**
+
+* Label “NEXT COHORT”: uppercase, small:
+
+  * `font-size: 10–11px`
+  * `letter-spacing: 0.12em`
+  * `color: #9ca3af`
+* Main date line:
+
+  * `font-size: 14–16px` on mobile, `16–18px` desktop
+  * `font-weight: 600`
+* Subtext:
+
+  * `font-size: 11–13px`
+  * `color: #9ca3af`
+  * `margin-top: 4px`
+
+**Example (Tailwind-style):**
+
+```html
+<div class="mt-3 w-full">
+  <div class="flex items-start gap-3 rounded-2xl bg-[#0b1020] text-white px-4 py-3">
+    <div class="mt-1 text-lg">📅</div>
+    <div class="flex flex-col">
+      <span class="text-[10px] tracking-[0.2em] uppercase text-gray-400">
+        Next Cohort
+      </span>
+      <span class="text-sm sm:text-base font-semibold mt-1">
+        Starts: December 2, 2025
+      </span>
+      <span class="text-[11px] sm:text-xs text-gray-400 mt-1">
+        Limited seats · Applications reviewed on a rolling basis
+      </span>
+    </div>
+  </div>
+</div>
+```
+
+---
+
+### 5️⃣ Vertical Rhythm & Spacing into “Why Bcalm Works”
+
+**Goal:** Cohort card should feel like the **footer of the hero**, and “Why Bcalm Works” like the **start of a new section**.
+
+Adjust spacing:
+
+* Space between cohort card and “Why Bcalm Works”: **24–32px** (more than the spacing between elements inside the hero).
+* Ensure “Why Bcalm Works” heading sits within the same horizontal container as hero content.
+
+This gives a clear rhythm:
+
+Hero Content → CTAs → light social proof → strong cohort highlight → **breathing space** → next section.
+
+---
+
+### 6️⃣ Shape & Contrast Consistency
+
+* **Buttons (Join / Schedule):** keep as solid pills with gradient/flat fill as they are.
+* **Social proof pill:** lighter color, pill radius, minimal shadow.
+* **Cohort card:** rectangular/soft-rounded panel (16px), darker, more solid feel.
+
+This shape system helps users visually distinguish:
+
+* Actions (buttons)
+* Trust label (pill)
+* Key info (card)
+
+---
+
+### 7️⃣ Responsive Behavior
+
+On **mobile** (the current screenshot):
+
+* Ensure all elements stay within side paddings (no edge collision).
+* All text wraps naturally (no clipping / horizontal scroll).
+* Minimum touch-friendly spacing between interactive elements (~8–12px vertical).
+
+On **desktop**:
+
+* You may slightly widen the content container but keep the same vertical order.
+* Increase hero max-width but maintain consistent left/right alignment across hero and “Why Bcalm Works”.
+
+---
+
+### 8️⃣ Clean-Up & Final QA Checklist
+
+After implementing:
+
+* Check on a typical mobile viewport (e.g. 390×844):
+
+  * Does my eye go: **headline → Join the Waitlist → Next cohort date → social proof → scroll**?
+* Confirm:
+
+  * The social proof pill feels **light & secondary**, not like a third CTA.
+  * The cohort card is clearly readable and visually anchored.
+  * There’s a distinct, comfortable gap before “Why Bcalm Works”.
+
+---
+
+**This set of changes should make the hero feel:**
+
+* Premium and calm
+* Clear in what matters
+* High-conversion but not pushy
+* Visually lighter in the middle, with a strong, confident “cohort anchor” before users scroll.
+
+Please implement exactly per spec above.
