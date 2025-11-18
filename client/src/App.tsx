@@ -10,6 +10,7 @@ import AssessmentLandingPage from "@/pages/AssessmentLandingPage";
 import AssessmentStartPage from "@/pages/AssessmentStartPage";
 import AssessmentQuestionsPage from "@/pages/AssessmentQuestionsPage";
 import AssessmentResultsPage from "@/pages/AssessmentResultsPage";
+import ShareResultsPage from "@/pages/ShareResultsPage";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/ai-pm-readiness" component={AssessmentLandingPage} />
       <Route path="/ai-pm-readiness/start" component={AssessmentStartPage} />
       <Route path="/ai-pm-readiness/questions" component={AssessmentQuestionsPage} />
+      <Route path="/ai-pm-readiness/share/:shareToken" component={ShareResultsPage} />
       <Route path="/ai-pm-readiness/results/:attemptId" component={AssessmentResultsPage} />
       <Route component={NotFound} />
     </Switch>

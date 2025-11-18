@@ -1,12 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { TrendingUp, BookOpen, Target } from "lucide-react";
+import { TrendingUp, BookOpen, Target, Share2, Copy, Check } from "lucide-react";
+import { SiLinkedin, SiWhatsapp } from "react-icons/si";
 
 const DIMENSION_INFO: Record<string, { description: string; how_bcalm_helps: string }> = {
   "Product & Problem Thinking": {
@@ -47,6 +49,8 @@ export default function AssessmentResultsPage() {
   const { attemptId } = useParams<{ attemptId: string }>();
   const { isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
 
   const { data: result, isLoading } = useQuery<{ attempt: any; user: any; answerCount: number }>({
     queryKey: ["/api/assessment/results", attemptId],
@@ -58,6 +62,54 @@ export default function AssessmentResultsPage() {
       setLocation("/resources?redirect=/ai-pm-readiness");
     }
   }, [isAuthenticated, setLocation]);
+
+  const shareUrl = result?.attempt?.shareToken
+    ? `${window.location.origin}/ai-pm-readiness/share/${result.attempt.shareToken}`
+    : "";
+
+  const getBandEmoji = (band: string) => {
+    if (band === "Internship Ready") return "🏆";
+    if (band === "On Track") return "📈";
+    if (band === "Building Foundation") return "📚";
+    return "🌱";
+  };
+
+  const shareText = result
+    ? `I just completed the Bcalm AI PM Readiness Check and scored ${result.attempt.readinessBand} ${getBandEmoji(result.attempt.readinessBand)}!\n\nWant to see where you stand across 8 AI PM skills?\nTake the free assessment:`
+    : "";
+
+  const handleCopyLink = async () => {
+    if (!shareUrl) return;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      toast({
+        title: "Link copied!",
+        description: "Share link copied to clipboard",
+      });
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy link",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleLinkedInShare = () => {
+    if (!shareUrl) return;
+    const text = encodeURIComponent(shareText);
+    const url = encodeURIComponent(shareUrl);
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank");
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!shareUrl) return;
+    const text = encodeURIComponent(`${shareText}\n${shareUrl}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
 
   if (!isAuthenticated || isLoading || !result) {
     return (
@@ -132,7 +184,7 @@ export default function AssessmentResultsPage() {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button size="lg" onClick={() => setLocation("/#curriculum")} data-testid="button-view-curriculum">
               <BookOpen className="h-4 w-4 mr-2" />
               See How Bcalm Helps
@@ -141,6 +193,53 @@ export default function AssessmentResultsPage() {
               Join the Waitlist
             </Button>
           </div>
+
+          {shareUrl && (
+            <Card className="mb-12" style={{ background: "#f8f7ff", borderColor: "#e5e5e5" }}>
+              <CardContent className="p-6">
+                <div className="text-center mb-4">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <Share2 className="h-5 w-5" style={{ color: "#6c47ff" }} />
+                    <h3 className="text-lg font-semibold" style={{ color: "#111111" }}>
+                      Share Your Readiness Profile
+                    </h3>
+                  </div>
+                  <p className="text-sm" style={{ color: "#9ca3af" }}>
+                    Inspire your peers to discover their AI PM strengths
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    variant="outline"
+                    onClick={handleLinkedInShare}
+                    className="gap-2"
+                    data-testid="button-share-linkedin"
+                  >
+                    <SiLinkedin className="h-4 w-4" />
+                    Share to LinkedIn
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleWhatsAppShare}
+                    className="gap-2"
+                    data-testid="button-share-whatsapp"
+                  >
+                    <SiWhatsapp className="h-4 w-4" />
+                    Share to WhatsApp
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleCopyLink}
+                    className="gap-2"
+                    data-testid="button-copy-link"
+                  >
+                    {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                    {copied ? "Copied!" : "Copy Link"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="mb-8">
             <CardHeader>
