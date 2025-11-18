@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { User, Target, GraduationCap, Calendar } from "lucide-react";
+import { GraduationCap, Calendar, User, Target } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
 
 interface HeroSectionProps {
@@ -8,19 +9,9 @@ interface HeroSectionProps {
   onScheduleCall: () => void;
 }
 
-const quickLinks = [
-  { name: "Career Support", href: "#career-support" },
-  { name: "About", href: "#about" },
-  { name: "Curriculum", href: "#curriculum" },
-  { name: "Why Bcalm", href: "#why-bcalm" },
-  { name: "Reviews", href: "#reviews" },
-  { name: "Instructors", href: "#instructors" },
-  { name: "Pricing", href: "#pricing" },
-];
-
 export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSectionProps) {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20">
+    <section className="relative overflow-hidden pt-20">
       <div 
         className="absolute inset-0 z-0"
         style={{
@@ -30,257 +21,225 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
         }}
       />
       
-      <div className="relative z-10 container mx-auto px-4 py-20" style={{ maxWidth: '1080px' }}>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-normal text-white leading-tight max-w-4xl mx-auto" style={{ marginBottom: '24px' }}>
-            Become interview-ready for{" "}
-            <span className="font-bold bg-gradient-to-r from-primary via-primary to-violet-400 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(106,61,240,0.5)]">
-              AI Product roles
-            </span>{" "}
-            in{" "}
-            <span className="font-bold bg-gradient-to-r from-amber-400 via-orange-400 to-orange-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(251,146,60,0.5)]">
-              30 days
-            </span>
-          </h1>
-          
-          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed" style={{ marginBottom: '20px' }}>
-            Designed for Non-Tech Students & Graduates
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-3 justify-center" style={{ marginBottom: '10px' }}>
-            <Button 
-              size="lg" 
-              className="text-base"
-              onClick={onJoinWaitlist}
-              data-testid="button-join-waitlist"
-            >
-              Join the Waitlist
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-base bg-white/10 backdrop-blur-md border-white/30 text-white"
-              onClick={onScheduleCall}
-              data-testid="button-schedule-call"
-            >
-              Schedule a Call
-            </Button>
-          </div>
-          
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            className="text-center"
-            style={{ marginBottom: '14px' }}
-          >
-            <p className="text-sm text-white/70">
-              Not sure if you're ready yet?{" "}
-              <a
-                href="/ai-pm-readiness"
-                className="text-white/90 hover:text-white underline underline-offset-4"
-                data-testid="link-readiness-check"
-              >
-                Take the AI PM Readiness Check →
-              </a>
-            </p>
-          </motion.div>
-
-          {/* Social Proof Pill */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            style={{ marginBottom: '12px' }}
-          >
-            <div
-              className="mx-auto text-center flex items-center justify-center gap-2"
-              style={{
-                maxWidth: '600px',
-                background: '#f5f3ff',
-                borderRadius: '9999px',
-                padding: '8px 16px'
-              }}
-              data-testid="pill-social-proof"
-            >
-              <GraduationCap className="h-4 w-4 flex-shrink-0" style={{ color: '#6c47ff' }} />
-              <p className="text-xs sm:text-sm leading-relaxed" style={{ color: '#111111' }}>
-                Trusted by <span className="font-semibold">200+ students</span> from IITs, BITS, NITs, and IIITs
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Next Cohort Highlight Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            <div
-              className="mx-auto flex items-start gap-3"
-              style={{
-                maxWidth: '600px',
-                background: '#0b1020',
-                borderRadius: '16px',
-                padding: '14px 16px',
-                boxShadow: '0 12px 30px rgba(0, 0, 0, 0.35)',
-                marginBottom: '28px'
-              }}
-              data-testid="card-cohort-highlight"
-            >
-              <Calendar className="flex-shrink-0 mt-1" style={{ width: '18px', height: '18px', color: 'rgba(255, 255, 255, 0.9)' }} />
-              <div className="flex-1">
-                <p
-                  className="uppercase mb-1"
-                  style={{ 
-                    fontSize: '10px', 
-                    letterSpacing: '0.12em', 
-                    color: '#9ca3af'
-                  }}
-                >
-                  Next Cohort
-                </p>
-                <p
-                  className="font-semibold mb-1"
-                  style={{ 
-                    fontSize: '14px',
-                    color: '#ffffff' 
-                  }}
-                >
-                  Starts: December 2, 2025
-                </p>
-                <p
-                  style={{ 
-                    fontSize: '11px',
-                    color: '#9ca3af',
-                    marginTop: '4px'
-                  }}
-                >
-                  Limited seats · Applications reviewed on a rolling basis
-                </p>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Why Bcalm Works Section - Premium Redesign */}
+      <div className="relative z-10 container mx-auto px-4" style={{ maxWidth: '1080px' }}>
+        {/* FOLD 1 - HERO */}
+        <div className="py-16 md:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
           >
-            {/* Section Heading & Subtitle */}
-            <div className="text-center mb-6">
-              <h3 className="text-2xl md:text-[28px] font-semibold text-white mb-3">
-                Why Bcalm Works
-              </h3>
-              <p className="text-sm md:text-base" style={{ color: '#d0d0d0' }}>
-                Built from real hiring experience, real product journeys, and real outcomes.
-              </p>
+            {/* Headline with subtle glow */}
+            <div className="relative mb-4">
+              <div 
+                className="absolute inset-0 blur-3xl opacity-30"
+                style={{
+                  background: 'radial-gradient(circle at center, rgba(108, 71, 255, 0.4) 0%, transparent 70%)',
+                  transform: 'scale(1.2)',
+                }}
+              />
+              <h1 
+                className="relative text-4xl md:text-5xl lg:text-6xl font-normal text-white leading-tight max-w-4xl mx-auto"
+              >
+                Become interview-ready for{" "}
+                <span className="font-bold bg-gradient-to-r from-primary via-primary to-violet-400 bg-clip-text text-transparent">
+                  AI Product roles
+                </span>{" "}
+                in{" "}
+                <span className="font-bold bg-gradient-to-r from-amber-400 via-orange-400 to-orange-500 bg-clip-text text-transparent">
+                  30 days
+                </span>
+              </h1>
             </div>
             
-            {/* Cards Container */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 max-w-[1080px] mx-auto" style={{ marginTop: '28px' }}>
-              {/* Card 1: Learn From a Product Leader */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4 }}
-                className="rounded-2xl"
-                style={{
-                  background: '#f8f7ff',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
-                  padding: '24px 28px'
-                }}
-                data-testid="card-instructor"
+            {/* Subheadline */}
+            <p 
+              className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed"
+              style={{ marginBottom: '20px' }}
+            >
+              Designed for non-tech students & recent graduates
+            </p>
+            
+            {/* Primary CTA */}
+            <div className="mb-3">
+              <Button 
+                size="lg" 
+                className="w-full sm:w-auto px-8 text-base"
+                onClick={onJoinWaitlist}
+                data-testid="button-join-waitlist"
               >
-                {/* Icon */}
-                <div className="mb-3">
-                  <User className="w-6 h-6" style={{ color: '#6c47ff' }} />
-                </div>
-                
-                {/* Title */}
-                <h4 className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#111111' }}>
-                  Learn From a Product Leader
-                </h4>
-                
-                {/* Bullets */}
-                <div className="space-y-3">
-                  <p className="text-sm md:text-[15px]" style={{ color: '#333333', lineHeight: '1.5' }}>
-                    • Built large-scale products across Zepto, Apollo247, Toppr & Housing.com
-                  </p>
-                  <p className="text-sm md:text-[15px]" style={{ color: '#333333', lineHeight: '1.5' }}>
-                    • Grew income from ₹3 LPA to ₹2 Cr+ in 10 years
-                  </p>
-                  <p className="text-sm md:text-[15px]" style={{ color: '#333333', lineHeight: '1.5' }}>
-                    • Currently Senior Director of Product at Zepto, a YC-backed $7B company
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Card 2: 10x Your Shortlist Chances */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
-                className="rounded-2xl"
-                style={{
-                  background: '#f8f7ff',
-                  border: '1px solid rgba(0,0,0,0.04)',
-                  boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
-                  padding: '24px 28px'
-                }}
-                data-testid="card-shortlist"
-              >
-                {/* Icon */}
-                <div className="mb-3">
-                  <Target className="w-6 h-6" style={{ color: '#6c47ff' }} />
-                </div>
-                
-                {/* Title */}
-                <h4 className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#111111' }}>
-                  10x Your Shortlist Chances
-                </h4>
-                
-                {/* Bullets */}
-                <div className="space-y-3">
-                  <p className="text-sm md:text-[15px]" style={{ color: '#333333', lineHeight: '1.5' }}>
-                    • Insider hiring signals most candidates never learn
-                  </p>
-                  <p className="text-sm md:text-[15px]" style={{ color: '#333333', lineHeight: '1.5' }}>
-                    • A Portfolio That Proves You Can Solve Real Product Problems
-                  </p>
-                  <p className="text-sm md:text-[15px]" style={{ color: '#333333', lineHeight: '1.5' }}>
-                    • A Resume Engineered to Outperform 90% of Applicants
-                  </p>
-                </div>
-              </motion.div>
+                Join the Waitlist
+              </Button>
             </div>
+            
+            {/* Social Proof */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mb-2"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: 'rgba(245, 243, 255, 0.15)' }}>
+                <GraduationCap className="h-4 w-4 flex-shrink-0 text-white/90" />
+                <p className="text-xs sm:text-sm text-white/80">
+                  Trusted by <span className="font-semibold text-white">200+ students</span> from IITs, BITS, NITs & IIITs
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Cohort Info Line */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mb-2"
+            >
+              <div className="inline-flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-white/70" />
+                <p className="text-sm text-white/70">
+                  Next cohort starts: <span className="text-white/90 font-medium">December 2, 2025</span>
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Secondary Inline Links */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="mb-12"
+            >
+              <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
+                <button
+                  onClick={onScheduleCall}
+                  className="text-gray-400 hover:text-gray-300 transition-colors"
+                  data-testid="link-schedule-call"
+                >
+                  Schedule a call
+                </button>
+                <span className="text-gray-500">·</span>
+                <Link href="/ai-pm-readiness">
+                  <a className="text-gray-400 hover:text-gray-300 transition-colors" data-testid="link-readiness-check">
+                    Take the AI PM Readiness Check →
+                  </a>
+                </Link>
+              </div>
+            </motion.div>
           </motion.div>
+        </div>
+
+        {/* FOLD 2 - WHY BCALM WORKS */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          className="pb-16"
+        >
+          {/* Section Heading */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">
+              Why Bcalm Works
+            </h2>
+            <p className="text-sm md:text-base text-gray-400">
+              Built from real hiring experience, real product journeys, and real outcomes.
+            </p>
+          </div>
           
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="flex flex-wrap gap-3 justify-center items-center"
-            style={{ marginTop: '56px' }}
-          >
-            {quickLinks.map((link, index) => (
-              <a
-                key={index}
-                href={link.href}
-                className="text-sm text-white/80 hover:text-white transition-colors border-b border-transparent hover:border-white/60 pb-1 cursor-pointer"
-                data-testid={`link-quick-${link.name.toLowerCase().replace(/\s+/g, '-')}`}
-              >
-                {link.name}
-              </a>
-            ))}
-          </motion.div>
+          {/* Two Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            {/* Card 1: Instructor */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="rounded-2xl p-6"
+              style={{
+                background: '#f8f7ff',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+              }}
+              data-testid="card-instructor"
+            >
+              <div className="mb-4">
+                <User className="w-6 h-6" style={{ color: '#6c47ff' }} />
+              </div>
+              
+              <h3 className="text-xl font-semibold mb-4" style={{ color: '#111111' }}>
+                Learn from a Product Leader
+              </h3>
+              
+              <ul className="space-y-3" style={{ color: '#4a5568' }}>
+                <li className="text-sm md:text-base flex gap-2">
+                  <span className="text-purple-600 font-bold">•</span>
+                  <span>Built large-scale products at Zepto, Apollo 247, Toppr & Housing.com</span>
+                </li>
+                <li className="text-sm md:text-base flex gap-2">
+                  <span className="text-purple-600 font-bold">•</span>
+                  <span>Grew his career from ₹3.2 LPA → ₹2.4 Cr PA</span>
+                </li>
+                <li className="text-sm md:text-base flex gap-2">
+                  <span className="text-purple-600 font-bold">•</span>
+                  <span>Senior Director of Product at a $7B YC-backed company</span>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* Card 2: Shortlist */}
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="rounded-2xl p-6"
+              style={{
+                background: '#f8f7ff',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+              }}
+              data-testid="card-shortlist"
+            >
+              <div className="mb-4">
+                <Target className="w-6 h-6" style={{ color: '#6c47ff' }} />
+              </div>
+              
+              <h3 className="text-xl font-semibold mb-4" style={{ color: '#111111' }}>
+                10x Your Shortlist Chances
+              </h3>
+              
+              <ul className="space-y-3" style={{ color: '#4a5568' }}>
+                <li className="text-sm md:text-base flex gap-2">
+                  <span className="text-purple-600 font-bold">•</span>
+                  <span>Learn how to craft a resume tailored for AI/PM roles, not generic applications</span>
+                </li>
+                <li className="text-sm md:text-base flex gap-2">
+                  <span className="text-purple-600 font-bold">•</span>
+                  <span>Build a portfolio that proves you can solve real product problems</span>
+                </li>
+                <li className="text-sm md:text-base flex gap-2">
+                  <span className="text-purple-600 font-bold">•</span>
+                  <span>Use insider hiring signals most candidates never see to stand out in shortlisting</span>
+                </li>
+              </ul>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* FOLD 3 - QUICKLINKS */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.8 }}
+          className="pb-12"
+        >
+          <div className="flex flex-wrap gap-3 justify-center items-center border-t border-white/10 pt-6">
+            <a href="#curriculum" className="text-sm text-white/70 hover:text-white transition-colors" data-testid="link-quick-curriculum">Curriculum</a>
+            <span className="text-white/30">·</span>
+            <a href="#instructors" className="text-sm text-white/70 hover:text-white transition-colors" data-testid="link-quick-instructor">Instructor</a>
+            <span className="text-white/30">·</span>
+            <a href="#career-support" className="text-sm text-white/70 hover:text-white transition-colors" data-testid="link-quick-outcomes">Outcomes</a>
+            <span className="text-white/30">·</span>
+            <a href="#reviews" className="text-sm text-white/70 hover:text-white transition-colors" data-testid="link-quick-reviews">Reviews</a>
+            <span className="text-white/30">·</span>
+            <a href="#pricing" className="text-sm text-white/70 hover:text-white transition-colors" data-testid="link-quick-pricing">Pricing</a>
+          </div>
         </motion.div>
       </div>
     </section>
