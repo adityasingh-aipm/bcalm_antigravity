@@ -135,6 +135,7 @@ export default function ResourcesPage() {
 
       if (result.token) {
         localStorage.setItem("resources_token", result.token);
+        localStorage.setItem("resources_user", JSON.stringify(result.user));
         setToken(result.token);
         setShowAuthDialog(false);
         toast({
@@ -172,6 +173,7 @@ export default function ResourcesPage() {
 
   const logout = () => {
     localStorage.removeItem("resources_token");
+    localStorage.removeItem("resources_user");
     setToken(null);
     toast({
       title: "Logged out",
