@@ -41,19 +41,6 @@ export default function ShareResultsPage() {
     }
   };
 
-  const getBandEmoji = (band: string) => {
-    switch (band) {
-      case "Internship Ready":
-        return "🏆";
-      case "On Track":
-        return "📈";
-      case "Building Foundation":
-        return "📚";
-      default:
-        return "🌱";
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -108,7 +95,7 @@ export default function ShareResultsPage() {
                 {getBandIcon(shareData.readinessBand)}
               </div>
               <h2 className="text-2xl md:text-3xl font-semibold text-white mb-2">
-                {shareData.readinessBand} {getBandEmoji(shareData.readinessBand)}
+                {shareData.readinessBand}
               </h2>
               <p className="text-white/90 text-sm md:text-base">
                 Score Range: {shareData.scoreRange} / 120

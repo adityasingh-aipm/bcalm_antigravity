@@ -67,15 +67,8 @@ export default function AssessmentResultsPage() {
     ? `${window.location.origin}/ai-pm-readiness/share/${result.attempt.shareToken}`
     : "";
 
-  const getBandEmoji = (band: string) => {
-    if (band === "Internship Ready") return "🏆";
-    if (band === "On Track") return "📈";
-    if (band === "Building Foundation") return "📚";
-    return "🌱";
-  };
-
   const shareText = result
-    ? `I just completed the Bcalm AI PM Readiness Check and scored ${result.attempt.readinessBand} ${getBandEmoji(result.attempt.readinessBand)}!\n\nWant to see where you stand across 8 AI PM skills?\nTake the free assessment:`
+    ? `I just completed the Bcalm AI PM Readiness Check and scored ${result.attempt.readinessBand}!\n\nWant to see where you stand across 8 AI PM skills?\nTake the free assessment:`
     : "";
 
   const handleCopyLink = async () => {
