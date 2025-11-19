@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
 import rakeshImage from "@assets/rakesh_malloju.png";
 import adityaImage from "@assets/image_1763560763518.png";
-import aaravImage from "@assets/generated_images/Male_startup_founder_headshot_77d82d0a.png";
+import abhishekImage from "@assets/image_1763561082510.png";
 
 const instructors = [
   {
@@ -21,10 +21,10 @@ const instructors = [
     initials: "AS"
   },
   {
-    name: "Aarav Patel",
-    title: "Head of Product",
-    company: "AI Startup",
-    image: aaravImage,
+    name: "Abhishek Paul",
+    title: "Founder",
+    company: "Locofy",
+    image: abhishekImage,
     initials: "AP"
   }
 ];
