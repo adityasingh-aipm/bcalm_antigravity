@@ -55,10 +55,10 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
           </p>
           
           {/* Primary CTA - Full width on mobile */}
-          <div className="-mx-4 md:mx-auto md:max-w-md mb-3 md:mb-4">
+          <div className="md:max-w-md md:mx-auto mb-3 md:mb-4">
             <Button 
               size="lg" 
-              className="w-full text-base rounded-none md:rounded-lg"
+              className="w-screen -ml-4 md:w-full md:ml-0 text-base rounded-none md:rounded-lg"
               onClick={onJoinWaitlist}
               data-testid="button-join-waitlist"
             >

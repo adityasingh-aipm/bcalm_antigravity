@@ -123,4 +123,36 @@ A comprehensive assessment system that evaluates student preparedness for AI Pro
 - State Management: React Query for server state, local state for UI
 - Error Handling: Proper loading states, error boundaries, and user feedback
 - Privacy: Only first name + initial exposed publicly, full data requires authentication
+
+### Landing Page Redesign - Three-Fold Structure (November 2025)
+
+The landing page hero has been redesigned with a three-fold structure for improved conversion and user experience:
+
+**Fold 1 - Hero Section:**
+- **Gradient Glow**: Subtle radial gradient blur behind headline for premium visual anchor
+- **Element Order**: Headline → Subheadline → Primary CTA → Social proof → Cohort info → Secondary links
+- **Updated Copy**: "Become interview-ready for AI Product roles in 30 days" with "Designed for non-tech students & recent graduates"
+- **Primary CTA**: Full-width on mobile (375px edge-to-edge, sharp corners), centered on desktop (448px, rounded corners)
+- **Social Proof**: Light styling with icon, "Trusted by 200+ students from IITs, BITS, NITs & IIITs" - appears AFTER CTA
+- **Cohort Info**: Simple text line with calendar icon, "Next cohort starts: December 2, 2025" (not a card)
+- **Secondary Links**: Inline text links with subtle grey styling - "Schedule a call · Take the AI PM Readiness Check"
+- **Spacing**: Mobile-first vertical rhythm (16/20px headline-sub, 12/16px CTA-social, 8/12px between others, 32/40px gap to next section)
+
+**Fold 2 - Why Bcalm Works:**
+- New `WhyBcalmWorksSection` component with heading and subtitle
+- **Card 1 - Instructor**: "Learn from a Product Leader" with 3 credentials bullets (Rakesh Malloju from Zepto, 8+ years experience, real AI PM career coach)
+- **Card 2 - Shortlist**: "10x Your Shortlist Chances" with 3 outcome bullets (portfolio projects, optimized resume, insider signals)
+- **Responsive Layout**: Side-by-side on desktop, stacked vertically on mobile
+
+**Fold 3 - Sticky Quicklinks:**
+- New `StickyQuicklinks` component that becomes sticky (fixed position) when scrolling
+- **Navigation Links**: Overview, Curriculum, Instructor, Outcomes, Reviews, Pricing, FAQ
+- **Anchors**: Links to section IDs (#about, #curriculum, #instructors, #career-support, #reviews, #pricing, #why-bcalm)
+- **Mobile**: Horizontally scrollable on narrow screens, fixed at top when sticky
+
+**Technical Implementation:**
+- Responsive CTA using `w-screen -ml-4 md:w-full md:ml-0` for true full-width on mobile
+- Framer Motion animations for smooth hero element transitions
+- Tailwind responsive breakpoints (md: 768px) for mobile-first design
+- Tested and verified at 375px mobile and 1024px desktop viewports
 - Testing: E2E tests with Playwright covering full flow including public share page
