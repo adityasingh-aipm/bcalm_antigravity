@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { trackEvent, trackPageView, getUtmParams, getPagePath } from "@/lib/analytics";
+import { trackEvent, getUtmParams, getPagePath } from "@/lib/analytics";
 import { ChevronLeft } from "lucide-react";
 import type { AssessmentQuestion } from "@shared/schema";
 
@@ -34,11 +34,6 @@ export default function AssessmentQuestionsPage() {
   const hasTrackedDropRef = useRef(false); // Prevent duplicate tracking
 
   console.log("✅ AssessmentQuestionsPage mounted");
-
-  useEffect(() => {
-    console.log("📍 Page view effect running");
-    trackPageView();
-  }, []);
 
   const { data: questions, isLoading: loadingQuestions } = useQuery<AssessmentQuestion[]>({
     queryKey: ["/api/assessment/questions"],
