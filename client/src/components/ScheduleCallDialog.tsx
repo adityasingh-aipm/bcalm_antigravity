@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "lucide-react";
+import { Calendar, Loader2 } from "lucide-react";
+
+// TypeScript declaration for Calendly API
+declare global {
+  interface Window {
+    Calendly?: {
+      initPopupWidget: (options: { url: string }) => void;
+    };
+  }
+}
 
 interface ScheduleCallDialogProps {
   open: boolean;
@@ -15,10 +24,10 @@ interface ScheduleCallDialogProps {
 }
 
 export default function ScheduleCallDialog({ open, onOpenChange }: ScheduleCallDialogProps) {
+  const [isCalendlyReady, setIsCalendlyReady] = useState(false);
+
   const openCalendly = () => {
-    // @ts-ignore - Calendly is loaded via script
     if (window.Calendly) {
-      // @ts-ignore
       window.Calendly.initPopupWidget({
         url: 'https://calendly.com/aditya-singh-bcalm/30min'
       });
@@ -30,6 +39,9 @@ export default function ScheduleCallDialog({ open, onOpenChange }: ScheduleCallD
     const script = document.createElement('script');
     script.src = 'https://assets.calendly.com/assets/external/widget.js';
     script.async = true;
+    script.onload = () => {
+      setIsCalendlyReady(true);
+    };
     document.body.appendChild(script);
 
     const link = document.createElement('link');
@@ -38,8 +50,13 @@ export default function ScheduleCallDialog({ open, onOpenChange }: ScheduleCallD
     document.head.appendChild(link);
 
     return () => {
-      document.body.removeChild(script);
-      document.head.removeChild(link);
+      // Defensive cleanup
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+      if (document.head.contains(link)) {
+        document.head.removeChild(link);
+      }
     };
   }, []);
 
@@ -66,10 +83,20 @@ export default function ScheduleCallDialog({ open, onOpenChange }: ScheduleCallD
           <Button
             onClick={openCalendly}
             className="w-full"
+            disabled={!isCalendlyReady}
             data-testid="button-open-calendly"
           >
-            <Calendar className="mr-2 h-4 w-4" />
-            Select a Time Slot
+            {isCalendlyReady ? (
+              <>
+                <Calendar className="mr-2 h-4 w-4" />
+                Select a Time Slot
+              </>
+            ) : (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading booking...
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>
