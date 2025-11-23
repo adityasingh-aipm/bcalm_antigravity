@@ -57,11 +57,10 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
           </p>
           
           {/* CTAs - Side by side on desktop, stacked on mobile */}
-          <div className="flex flex-col md:flex-row gap-3 md:gap-4 md:max-w-2xl md:mx-auto mb-3 md:mb-4">
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4 md:max-w-lg md:mx-auto mb-3 md:mb-4">
             {/* Primary CTA - WhatsApp Contact */}
             <Button 
-              size="lg" 
-              className="w-screen -ml-4 md:w-full md:ml-0 text-base rounded-none md:rounded-lg text-white hover:text-white border-0"
+              className="w-3/4 md:w-3/4 text-base rounded-none md:rounded-lg text-white hover:text-white border-0 py-3 md:py-4"
               style={{
                 backgroundColor: '#25D366',
               }}
@@ -79,11 +78,10 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             </Button>
 
             {/* Secondary CTA - Free Resources */}
-            <Link href="/resources" className="block w-screen -ml-4 md:w-full md:ml-0">
+            <Link href="/resources" className="block w-3/4 md:w-3/4">
               <Button 
-                size="lg" 
                 variant="outline"
-                className="w-full text-base rounded-none md:rounded-lg bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white hover:border-white/30"
+                className="w-full text-base rounded-none md:rounded-lg bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white hover:border-white/30 py-3 md:py-4"
                 data-testid="button-download-resources"
               >
                 <Download className="mr-2 h-5 w-5" />
