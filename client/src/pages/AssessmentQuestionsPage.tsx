@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiRequest, queryClient } from "@/lib/queryClient";
+import { trackEvent } from "@/lib/analytics";
 import { ChevronLeft } from "lucide-react";
 import type { AssessmentQuestion } from "@shared/schema";
 
@@ -36,6 +37,7 @@ export default function AssessmentQuestionsPage() {
     },
     onSuccess: (data: any) => {
       setAttemptId(data.id);
+      trackEvent("assessment_started");
     },
   });
 
@@ -54,6 +56,7 @@ export default function AssessmentQuestionsPage() {
       return await response.json();
     },
     onSuccess: (data: any) => {
+      trackEvent("assessment_completed", { score: data.totalScore });
       queryClient.invalidateQueries({ queryKey: ["/api/assessment/resume"] });
       setLocation(`/ai-pm-readiness/results/${data.id}`);
     },

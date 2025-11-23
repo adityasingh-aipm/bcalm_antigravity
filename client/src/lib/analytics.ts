@@ -12,15 +12,23 @@ function getUserId(): string {
 export async function trackEvent(eventName: string, data: Record<string, any> = {}) {
   try {
     const userId = getUserId();
-    await supabase.from("events").insert([
-      {
-        user_id: userId,
-        event_name: eventName,
-        event_data: data
-      }
-    ]);
+    const eventData = {
+      user_id: userId,
+      event_name: eventName,
+      event_data: data
+    };
+    
+    console.log('📊 Tracking event:', eventName, data);
+    
+    const { error } = await supabase.from("events").insert([eventData]);
+    
+    if (error) {
+      console.error("❌ Supabase tracking error:", error);
+    } else {
+      console.log('✅ Event tracked successfully:', eventName);
+    }
   } catch (error) {
-    console.error("Error tracking event:", error);
+    console.error("❌ Error tracking event:", error);
   }
 }
 

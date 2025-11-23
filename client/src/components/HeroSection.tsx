@@ -3,6 +3,7 @@ import { GraduationCap, Calendar, Download } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { trackEvent } from "@/lib/analytics";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
 
 interface HeroSectionProps {
@@ -70,7 +71,12 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
               onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = '#25D366';
               }}
-              onClick={() => window.open('https://wa.me/919398354912?text=Hi%2C%20I%27m%20interested%20in%20the%20AI%20PM%20Launchpad%20program', '_blank')}
+              onClick={() => {
+                trackEvent("whatsapp_clicked", {
+                  device: navigator.userAgent
+                });
+                window.open('https://wa.me/919398354912?text=Hi%2C%20I%27m%20interested%20in%20the%20AI%20PM%20Launchpad%20program', '_blank');
+              }}
               data-testid="button-contact-whatsapp"
             >
               <SiWhatsapp className="mr-2 h-5 w-5" />
@@ -129,7 +135,13 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
           >
             <p className="text-sm text-white/60">
               <button
-                onClick={onScheduleCall}
+                onClick={() => {
+                  trackEvent("schedule_call_clicked", {
+                    page: window.location.pathname,
+                    utm: Object.fromEntries(new URLSearchParams(window.location.search))
+                  });
+                  onScheduleCall();
+                }}
                 className="hover:text-white/80 transition-colors underline-offset-4 hover:underline"
                 data-testid="button-schedule-call"
               >
