@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Calendar } from "lucide-react";
+import { GraduationCap, Calendar, Download } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
 
 interface HeroSectionProps {
@@ -66,6 +67,21 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
               <SiWhatsapp className="mr-2 h-5 w-5" />
               Contact on WhatsApp
             </Button>
+          </div>
+
+          {/* Secondary CTA - Download Free Resources */}
+          <div className="md:max-w-md md:mx-auto mb-3 md:mb-4">
+            <Link href="/resources">
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="w-screen -ml-4 md:w-full md:ml-0 text-base rounded-none md:rounded-lg bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white hover:border-white/30"
+                data-testid="button-download-resources"
+              >
+                <Download className="mr-2 h-5 w-5" />
+                Download Free Resources
+              </Button>
+            </Link>
           </div>
 
           {/* Social Proof - Light styling, after CTA */}
