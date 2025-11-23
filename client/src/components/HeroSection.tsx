@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { GraduationCap, Calendar } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import { motion } from "framer-motion";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
 
@@ -59,10 +60,11 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             <Button 
               size="lg" 
               className="w-screen -ml-4 md:w-full md:ml-0 text-base rounded-none md:rounded-lg"
-              onClick={onJoinWaitlist}
-              data-testid="button-join-waitlist"
+              onClick={() => window.open('https://wa.me/919398354912?text=Hi%2C%20I%27m%20interested%20in%20the%20AI%20PM%20Launchpad%20program', '_blank')}
+              data-testid="button-contact-whatsapp"
             >
-              Join the Waitlist
+              <SiWhatsapp className="mr-2 h-5 w-5" />
+              Contact on WhatsApp
             </Button>
           </div>
 

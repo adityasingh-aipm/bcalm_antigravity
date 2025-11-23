@@ -132,7 +132,7 @@ The landing page hero has been redesigned with a three-fold structure for improv
 - **Gradient Glow**: Subtle radial gradient blur behind headline for premium visual anchor
 - **Element Order**: Headline → Subheadline → Primary CTA → Social proof → Cohort info → Secondary links
 - **Updated Copy**: "Become interview-ready for AI Product roles in 30 days" with "Designed for non-tech students & recent graduates"
-- **Primary CTA**: Full-width on mobile (375px edge-to-edge, sharp corners), centered on desktop (448px, rounded corners)
+- **Primary CTA**: "Contact on WhatsApp" button with WhatsApp icon, opens wa.me link to 919398354912 with pre-filled message. Full-width on mobile (375px edge-to-edge, sharp corners), centered on desktop (448px, rounded corners)
 - **Social Proof**: Light styling with icon, "Trusted by 200+ students from IITs, BITS, NITs & IIITs" - appears AFTER CTA
 - **Cohort Info**: Simple text line with calendar icon, "Next cohort starts: December 2, 2025" (not a card)
 - **Secondary Links**: Inline text links with subtle grey styling - "Schedule a call · Take the AI PM Readiness Check"
