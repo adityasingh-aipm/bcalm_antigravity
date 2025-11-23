@@ -53,7 +53,7 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
           
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-4 md:mb-5">
-            Designed for non-tech students & recent graduates
+            Designed for non-tech professionals and students
           </p>
           
           {/* CTAs - Side by side on desktop, stacked on mobile */}
