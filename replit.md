@@ -54,7 +54,17 @@ A comprehensive analytics tracking system for multi-channel campaigns with UTM p
 - **Data Captured**: Page details, UTM parameters, referrer, user info, assessment scores.
 - **Session Management**: `first_page_launch` tracks once per session using `sessionStorage`.
 - **UTM Behavior**: UTMs are page-specific and not carried over during internal navigation. `navigationSource` tracks internal page flow.
-- **Database Storage**: All events are stored in a Supabase `analytics_events` table.
+- **Database Storage**: All events are stored in a Supabase `events` table with schema:
+  ```sql
+  CREATE TABLE events (
+    id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    user_id TEXT NOT NULL,
+    event_name TEXT NOT NULL,
+    event_data JSONB DEFAULT '{}'::jsonb
+  );
+  ```
+- **Supabase Configuration**: Client configured in `client/src/lib/supabase.ts` using environment variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 
 ## External Dependencies
 
