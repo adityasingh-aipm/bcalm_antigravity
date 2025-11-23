@@ -152,7 +152,7 @@ The landing page hero has been redesigned with a three-fold structure for improv
 - Three instructor profiles with avatars, name, title, company, and college
 - **Rakesh Malloju**: Senior Director of Product at Zepto, IIM Calcutta
 - **Aditya Singh**: Product Manager at Apollo247, IIT Delhi
-- **Akhil Joy**: Product Design Leader at Topmate.io, MGU
+- **Akhil Joy**: Head of Design (UI/UX) at Swiggy, Uber, Zepto, MGU
 - Three-column grid on desktop, stacked on mobile
 - Hover elevation effect on cards
 

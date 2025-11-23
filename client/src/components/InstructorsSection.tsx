@@ -24,8 +24,8 @@ const instructors = [
   },
   {
     name: "Akhil Joy",
-    title: "Product Design Leader",
-    company: "Topmate.io",
+    title: "Head of Design (UI/UX)",
+    company: "Swiggy, Uber, Zepto",
     college: "MGU",
     image: akhilImage,
     initials: "AJ"
