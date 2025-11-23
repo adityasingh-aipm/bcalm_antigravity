@@ -150,9 +150,9 @@ The landing page hero has been redesigned with a three-fold structure for improv
 **Instructors Section** (positioned immediately after Why Bcalm Works):
 - Heading: "Learn Directly from AI Product Leaders"
 - Three instructor profiles with avatars, name, title, company, and college
-- **Rakesh Malloju**: Senior Director of Product at Zepto, IIM Calcutta
-- **Aditya Singh**: Product Manager at Apollo247, IIT Delhi
-- **Akhil Joy**: Head of Design (UI/UX) at Swiggy, Uber, Zepto, MGU
+- **Rakesh Malloju**: Senior Director of Product at Zepto, Musigma, IIM Calcutta (LinkedIn profile linked)
+- **Aditya Singh**: Product Manager at Apollo247, IIT Delhi (LinkedIn profile linked)
+- **Akhil Joy**: Head of Design (UI/UX) at Swiggy, Uber, Zepto, MGU (LinkedIn profile linked)
 - Three-column grid on desktop, stacked on mobile
 - Hover elevation effect on cards
 

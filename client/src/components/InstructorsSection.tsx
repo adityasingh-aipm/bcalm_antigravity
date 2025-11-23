@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
+import { Linkedin } from "lucide-react";
 import rakeshImage from "@assets/rakesh_malloju.png";
 import adityaImage from "@assets/image_1763560763518.png";
 import akhilImage from "@assets/image_1763636682683.png";
@@ -9,8 +10,9 @@ const instructors = [
   {
     name: "Rakesh Malloju",
     title: "Senior Director of Product",
-    company: "Zepto",
+    company: "Zepto, Musigma",
     college: "IIM Calcutta",
+    linkedinUrl: "https://www.linkedin.com/in/rakesh-malloju-b648ab92/",
     image: rakeshImage,
     initials: "RM"
   },
@@ -19,6 +21,7 @@ const instructors = [
     title: "Product Manager",
     company: "Apollo247",
     college: "IIT Delhi",
+    linkedinUrl: "https://www.linkedin.com/in/aditya-singh-361910195/",
     image: adityaImage,
     initials: "AS"
   },
@@ -27,6 +30,7 @@ const instructors = [
     title: "Head of Design (UI/UX)",
     company: "Swiggy, Uber, Zepto",
     college: "MGU",
+    linkedinUrl: "https://www.linkedin.com/in/akhil-joy-design/",
     image: akhilImage,
     initials: "AJ"
   }
@@ -67,9 +71,20 @@ export default function InstructorsSection() {
                       <AvatarImage src={instructor.image} alt={instructor.name} />
                       <AvatarFallback>{instructor.initials}</AvatarFallback>
                     </Avatar>
-                    <h3 className="text-xl font-semibold text-foreground mb-1">
-                      {instructor.name}
-                    </h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="text-xl font-semibold text-foreground">
+                        {instructor.name}
+                      </h3>
+                      <a 
+                        href={instructor.linkedinUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-primary hover:text-primary/80 transition-colors"
+                        data-testid={`link-linkedin-${instructor.name.replace(/\s+/g, '-').toLowerCase()}`}
+                      >
+                        <Linkedin className="h-5 w-5" />
+                      </a>
+                    </div>
                     <p className="text-sm text-muted-foreground mb-1">
                       {instructor.title}
                     </p>
