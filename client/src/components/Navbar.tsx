@@ -11,14 +11,13 @@ export default function Navbar() {
       }}
     >
       <div className="container mx-auto max-w-6xl">
-        <div className="flex items-center justify-between" style={{ padding: '16px 24px' }}>
-          <Link href="/">
+        <div className="flex items-center justify-between px-4 md:px-6">
+          <Link href="/" className="py-4">
             <img 
               src={bcalmLogo} 
               alt="Bcalm - AI Product Manager Launchpad"
-              className="select-none cursor-pointer h-8 md:h-12"
+              className="select-none cursor-pointer h-9 md:h-11 w-auto"
               style={{
-                width: 'auto',
                 objectFit: 'contain',
                 objectPosition: 'left center'
               }}
