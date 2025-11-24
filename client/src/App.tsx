@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -6,27 +6,84 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { trackInitialLanding } from "@/lib/analytics";
 import LandingPage from "@/pages/LandingPage";
-import ResourcesPage from "@/pages/ResourcesPage";
-import ResourcesAdminDashboard from "@/pages/ResourcesAdminDashboard";
-import AssessmentLandingPage from "@/pages/AssessmentLandingPage";
-import AssessmentStartPage from "@/pages/AssessmentStartPage";
-import AssessmentQuestionsPage from "@/pages/AssessmentQuestionsPage";
-import AssessmentResultsPage from "@/pages/AssessmentResultsPage";
-import ShareResultsPage from "@/pages/ShareResultsPage";
-import NotFound from "@/pages/not-found";
+
+const ResourcesPage = lazy(() => import("@/pages/ResourcesPage"));
+const ResourcesAdminDashboard = lazy(() => import("@/pages/ResourcesAdminDashboard"));
+const AssessmentLandingPage = lazy(() => import("@/pages/AssessmentLandingPage"));
+const AssessmentStartPage = lazy(() => import("@/pages/AssessmentStartPage"));
+const AssessmentQuestionsPage = lazy(() => import("@/pages/AssessmentQuestionsPage"));
+const AssessmentResultsPage = lazy(() => import("@/pages/AssessmentResultsPage"));
+const ShareResultsPage = lazy(() => import("@/pages/ShareResultsPage"));
+const NotFound = lazy(() => import("@/pages/not-found"));
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <p style={{ color: "#9ca3af" }}>Loading...</p>
+    </div>
+  );
+}
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
-      <Route path="/resources" component={ResourcesPage} />
-      <Route path="/admin/resources" component={ResourcesAdminDashboard} />
-      <Route path="/ai-pm-readiness" component={AssessmentLandingPage} />
-      <Route path="/ai-pm-readiness/start" component={AssessmentStartPage} />
-      <Route path="/ai-pm-readiness/questions" component={AssessmentQuestionsPage} />
-      <Route path="/ai-pm-readiness/share/:shareToken" component={ShareResultsPage} />
-      <Route path="/ai-pm-readiness/results/:attemptId" component={AssessmentResultsPage} />
-      <Route component={NotFound} />
+      <Route path="/resources">
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ResourcesPage />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/admin/resources">
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ResourcesAdminDashboard />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/ai-pm-readiness">
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <AssessmentLandingPage />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/ai-pm-readiness/start">
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <AssessmentStartPage />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/ai-pm-readiness/questions">
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <AssessmentQuestionsPage />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/ai-pm-readiness/share/:shareToken">
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <ShareResultsPage />
+          </Suspense>
+        )}
+      </Route>
+      <Route path="/ai-pm-readiness/results/:attemptId">
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <AssessmentResultsPage />
+          </Suspense>
+        )}
+      </Route>
+      <Route>
+        {() => (
+          <Suspense fallback={<LoadingFallback />}>
+            <NotFound />
+          </Suspense>
+        )}
+      </Route>
     </Switch>
   );
 }
