@@ -258,7 +258,6 @@ export default function PrivacyPolicy() {
           </p>
           <div className="bg-secondary/50 p-4 rounded-md border border-border">
             <p className="text-foreground"><strong>Email:</strong> privacy@bcalm.org</p>
-            <p className="text-foreground mt-2"><strong>Response Time:</strong> 15-30 days depending on the nature of your request</p>
           </div>
         </section>
 
