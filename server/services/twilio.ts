@@ -17,7 +17,7 @@ async function getCredentials() {
     throw new Error('X_REPLIT_TOKEN not found for repl/depl');
   }
 
-  connectionSettings = await fetch(
+  const response = await fetch(
     'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names=twilio',
     {
       headers: {
@@ -25,7 +25,19 @@ async function getCredentials() {
         'X_REPLIT_TOKEN': xReplitToken
       }
     }
-  ).then(res => res.json()).then(data => data.items?.[0]);
+  );
+  
+  const data = await response.json();
+  console.log('Twilio connector response items count:', data.items?.length);
+  
+  connectionSettings = data.items?.[0];
+  
+  if (connectionSettings) {
+    console.log('Twilio settings keys:', Object.keys(connectionSettings.settings || {}));
+    console.log('Account SID first 5 chars:', connectionSettings.settings?.account_sid?.substring(0, 5));
+    console.log('API Key first 5 chars:', connectionSettings.settings?.api_key?.substring(0, 5));
+    console.log('Has phone number:', !!connectionSettings.settings?.phone_number);
+  }
 
   if (!connectionSettings || (!connectionSettings.settings.account_sid || !connectionSettings.settings.api_key || !connectionSettings.settings.api_key_secret)) {
     throw new Error('Twilio not connected');
