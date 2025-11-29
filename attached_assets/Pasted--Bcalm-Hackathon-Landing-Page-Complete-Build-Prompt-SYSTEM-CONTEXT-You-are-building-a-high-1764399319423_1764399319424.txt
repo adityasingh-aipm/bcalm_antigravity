@@ -1,0 +1,253 @@
+# Bcalm Hackathon Landing Page - Complete Build Prompt
+
+## SYSTEM CONTEXT
+You are building a high-converting hackathon landing page for Bcalm (bcalm.org/hackathon) using React 18 with TypeScript, Vite, Tailwind CSS, and Shadcn UI. The page targets Business Analysts, Data Analysts, and college final-year students with a paid LinkedIn campaign.
+
+## PROJECT SPECIFICATIONS
+
+### Hackathon Details
+- **Name**: Think Beyond Data and Analysis
+- **Theme**: How can folks use AI and start building 10x solutions which will then 10x their careers
+- **Format**: Weekly Saturday 4-hour online hackathons
+- **Prizes**: Job referrals at top product companies + free lifetime access to Bcalm premium course
+- **Target Audience**: Business Analysts, Data Analysts, College Students (Final Year), aspiring Product Managers
+- **URL**: bcalm.org/hackathon
+
+### Registration Form Fields
+1. Full Name (required)
+2. Phone Number (required, with OTP verification)
+3. Gmail (required)
+4. Company Name or College Name (required)
+
+### Post-Registration Flow
+- User submits form → OTP sent to phone
+- After OTP verification → Show success message
+- Send confirmation email immediately with subject: "Welcome to Bcalm Hackathon - 'Think Beyond Data and Analysis'"
+- Email body: Thank them for registering, mention rules will be sent soon, include hackathon date/time
+
+---
+
+## PAGE STRUCTURE & COPY
+
+### 1. HEADER/NAVIGATION
+- Bcalm logo (left)
+- Navigation: Home | Hackathons | Why Bcalm? | Contact
+- "Register Now" button (top right, purple/gradient)
+
+### 2. HERO SECTION
+**Headline**: "Think Beyond Data and Analysis"
+**Subheadline**: "Turn Your 10x Ideas Into 10x Careers"
+**Body Copy**: 
+"You analyze data. You find patterns. But can you build products that matter? In this 4-hour hackathon, you'll solve real product challenges using AI—and we'll connect winners directly with hiring managers at top companies. This isn't about coding. It's about product thinking. It's about showing the world you belong in the Product world."
+
+**CTA Button**: "Register for This Saturday's Hackathon" (prominent, centered, purple gradient)
+
+### 3. WHAT IS THIS HACKATHON? SECTION
+**Headline**: "4 Hours. Real Problems. Real Opportunities."
+
+**3 Feature Cards**:
+1. **Icon**: Lightbulb
+   **Title**: Solve Real Product Challenges
+   **Body**: Apply AI and strategic thinking to real-world problems. No generic assignments—real scenarios from actual product teams.
+
+2. **Icon**: Trophy
+   **Title**: Winners Get Direct Referrals
+   **Body**: Top performers get job referrals to companies actively hiring Product Managers, with interviews conducted by hiring managers who've hired 200+ PMs.
+
+3. **Icon**: Rocket
+   **Title**: Free Premium Course Access
+   **Body**: Win and unlock lifetime access to Bcalm's premium AI Product Manager course (normally paid). Learn from someone who's been on both sides of the hiring table.
+
+### 4. HOW IT WORKS SECTION
+**Headline**: "Here's Your Path to Winning"
+
+**Timeline (4 Steps)**:
+1. **Register** → Join via OTP verification (instant)
+2. **Receive Challenge** → Saturday morning, you get the real product challenge
+3. **Build & Solve** → 4 hours to think, analyze, and present your solution
+4. **Win & Connect** → Top 3 get direct referrals + free course access
+
+### 5. WHY JOIN? SECTION
+**Headline**: "Why Should You Compete?"
+
+**3 Main Reasons**:
+1. **Direct Access to Hiring Managers**: Not recruiters. Actual people making PM hiring decisions. They see your strategic thinking in real-time.
+
+2. **Prove PM Skills Without Experience**: You don't need years in the role. Show product thinking, data analysis, and AI fluency. That's what matters.
+
+3. **Two Prizes That Actually Matter**: A job referral is worth 10x more than a certificate. Free course access teaches you what hiring managers actually look for.
+
+### 6. WHAT WINNERS SAY SECTION
+**Headline**: "See What Winners Achieved"
+(Show 2-3 testimonial cards without names - just background + outcome)
+
+Example testimonial structures:
+
+**Card 1**:
+- **Background**: Final Year Student, BITS Pilani
+- **Outcome**: Got PM interview at Flipkart → Used Bcalm premium course to prep → Offer received
+
+**Card 2**:
+- **Background**: Data Analyst, 2 years exp, Tech Company
+- **Outcome**: Placed Top 3 in hackathon → Job referral led to PM role at Amazon → Now taking Bcalm for deeper PM skills
+
+**Card 3**:
+- **Background**: Business Analyst, EdTech startup
+- **Outcome**: Won hackathon → Direct referral to Myntra's PM team → Interview scheduled this month
+
+### 7. REGISTRATION FORM SECTION
+**Headline**: "You're 2 Minutes Away From Competing"
+**Subheadline**: "Register now. Next hackathon is this Saturday."
+
+**Form Layout** (mobile-first, stacked):
+- Input: Full Name
+- Input: Phone Number → Trigger OTP modal
+  - OTP Modal: "We've sent a 6-digit code to your phone"
+  - Input: 6-digit OTP
+  - Resend option after 30 seconds
+- Input: Gmail address
+- Dropdown: Company Name / College Name (with autocomplete)
+- Checkbox: "I agree to receive updates about Bcalm"
+- CTA Button: "Confirm Registration" (disabled until all fields filled + OTP verified)
+
+**Post-Submission**:
+- Success screen shows: "You're Registered! 🎉"
+- Message: "Check your email for next steps. Challenge details will be sent this Friday."
+- Countdown timer: "Next hackathon starts in: [X] days [X] hours"
+
+### 8. FAQ SECTION
+**Headline**: "Questions? We've Got Answers"
+
+FAQs:
+1. **Do I need PM experience to participate?** - No. We're looking for strategic thinking and creativity. You'll be surprised what data analysts and BA's can do.
+
+2. **How are winners judged?** - Framework clarity, AI application, business impact, and presentation. The person leading it has hired 200+ PMs—they know what matters.
+
+3. **What happens after I register?** - We'll send you the challenge details on Friday. Saturday 10 AM IST, the hackathon starts. 4 hours to submit your solution.
+
+4. **Is this online?** - Yes, completely online. Work from anywhere. Submission is a document (PDF/Google Doc) + 5-min video walkthrough.
+
+5. **How will I know if I won?** - Results announced within 48 hours. Winners contacted directly via email and phone.
+
+6. **Can I form a team?** - For now, individual submissions only. (Adjust if team-based)
+
+### 9. FOOTER
+- Links: Privacy | Terms | Contact
+- Social: LinkedIn, Twitter, Instagram icons
+- WhatsApp contact button for instant questions
+- Email: support@bcalm.org
+
+---
+
+## DESIGN SYSTEM
+
+### Color Palette
+- **Primary**: #7C3AED (Purple - Bcalm brand)
+- **Secondary**: #0EA5E9 (Blue)
+- **Accent**: #EC4899 (Pink - for CTAs)
+- **Background**: #FFFFFF
+- **Text**: #1F2937 (Dark gray)
+- **Light Text**: #6B7280 (Medium gray)
+- **Border**: #E5E7EB (Light gray)
+
+### Typography
+- **Headlines (H1)**: 3rem / 2.5rem mobile, bold, dark text
+- **Headlines (H2/H3)**: 1.875rem / 1.5rem mobile, bold
+- **Body**: 1rem, line-height 1.6, light text
+- **Small**: 0.875rem, medium gray
+
+### Components
+- Buttons: 16px padding, 8px border-radius, hover state (darken 10%)
+- Cards: 12px border-radius, subtle shadow, 1px border
+- Inputs: 12px border-radius, 12px padding, focus ring (purple)
+- Mobile-first: All sections stack vertically on mobile
+
+### Spacing
+- Section padding: 80px vertical / 20px horizontal (mobile: 40px / 16px)
+- Card gaps: 24px
+- Element spacing: 12px, 16px, 20px increments
+
+---
+
+## TECHNICAL REQUIREMENTS
+
+### Frontend Stack
+- React 18 with TypeScript
+- Vite (build tool)
+- Tailwind CSS (styling)
+- Shadcn UI (component library)
+- React Hook Form (form management)
+- Axios (API calls)
+
+### Features to Implement
+1. **OTP Verification**:
+   - Phone input with validation
+   - Modal popup for OTP entry
+   - 6-digit code input with auto-focus
+   - Resend button (30-second cooldown)
+   - Error handling for invalid OTPs
+
+2. **Form Validation**:
+   - Name: Min 3 characters, letters only
+   - Phone: 10 digits, Indian numbers (+91 optional)
+   - Gmail: Valid email format, must end with @gmail.com
+   - Company/College: Required, autocomplete suggestions
+
+3. **Success State**:
+   - Show confirmation message
+   - Display countdown to next hackathon
+   - Option to share on LinkedIn
+   - Form clears after submission
+
+4. **UTM Tracking**:
+   - Capture ?utm_source=linkedin&utm_campaign=hackathon params
+   - Store with registration data
+
+5. **Responsive Design**:
+   - Mobile-first approach
+   - Fully functional on iPhone SE to iPad
+   - Touch-friendly buttons (min 44px height)
+   - Optimized font sizes for mobile
+
+### Backend Integration Points
+- **POST /api/register**: Register user (name, phone, email, company)
+- **POST /api/send-otp**: Trigger OTP to phone number
+- **POST /api/verify-otp**: Verify OTP and confirm registration
+- **GET /api/hackathon-status**: Get next hackathon date/time
+- **POST /api/send-confirmation-email**: Send thank-you email
+
+---
+
+## CONTENT TONE & VOICE
+
+- **Direct & Honest**: No fluff. Be real about what winning means.
+- **Conversational**: Write like you're talking to a smart friend, not a corporation.
+- **Action-Oriented**: Every section should push toward registration.
+- **Show Proof**: Use testimonials and specific outcomes (not generic praise).
+- **Leverage Unique Angle**: Emphasize that the founder has hired 200+ PMs—this is different from other hackathons.
+
+---
+
+## IMPLEMENTATION CHECKLIST
+
+- [ ] Set up React + TypeScript + Vite + Tailwind + Shadcn UI
+- [ ] Create responsive hero section with headline and CTA
+- [ ] Build 3-column feature cards section
+- [ ] Implement 4-step timeline component
+- [ ] Create registration form with all fields
+- [ ] Integrate OTP flow (modal + verification)
+- [ ] Build success screen with countdown
+- [ ] Add FAQ accordion component
+- [ ] Implement mobile-first responsive design
+- [ ] Add form validation and error messages
+- [ ] Create API integration layer (mock for testing)
+- [ ] Add UTM parameter tracking
+- [ ] Set up WhatsApp contact button
+- [ ] Test on mobile devices
+- [ ] Optimize images and performance
+- [ ] Add analytics tracking (Google Analytics)
+
+---
+
+## DELIVERABLE
+A production-ready single-page application at bcalm.org/hackathon that converts LinkedIn traffic into signups by clearly showing the value prop (job referrals + course access) and making registration frictionless.
