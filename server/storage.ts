@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type ResourcesUser, type InsertResourcesUser, type Resource, type InsertResource, type DownloadLog, type InsertDownloadLog, type AssessmentQuestion, type InsertAssessmentQuestion, type AssessmentAttempt, type InsertAssessmentAttempt, type AssessmentAnswer, type InsertAssessmentAnswer, users, resourcesUsers, resources, downloadLogs, assessmentQuestions, assessmentAttempts, assessmentAnswers } from "@shared/schema";
+import { type User, type InsertUser, type ResourcesUser, type InsertResourcesUser, type Resource, type InsertResource, type DownloadLog, type InsertDownloadLog, type AssessmentQuestion, type InsertAssessmentQuestion, type AssessmentAttempt, type InsertAssessmentAttempt, type AssessmentAnswer, type InsertAssessmentAnswer, type HackathonRegistration, type InsertHackathonRegistration, users, resourcesUsers, resources, downloadLogs, assessmentQuestions, assessmentAttempts, assessmentAnswers, hackathonRegistrations } from "@shared/schema";
 import bcrypt from "bcrypt";
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
@@ -35,6 +35,14 @@ export interface IStorage {
   saveAssessmentAnswer(answer: InsertAssessmentAnswer): Promise<AssessmentAnswer>;
   getAttemptAnswers(attemptId: string): Promise<AssessmentAnswer[]>;
   completeAssessmentAttempt(attemptId: string, totalScore: number, readinessBand: string, scoresJson: string): Promise<AssessmentAttempt | undefined>;
+  
+  // Hackathon Registration Methods
+  createHackathonRegistration(registration: InsertHackathonRegistration): Promise<HackathonRegistration>;
+  getHackathonRegistrationById(id: string): Promise<HackathonRegistration | undefined>;
+  getHackathonRegistrationByPhone(phone: string): Promise<HackathonRegistration | undefined>;
+  getHackathonRegistrationByEmail(email: string): Promise<HackathonRegistration | undefined>;
+  updateHackathonOtp(id: string, otpCode: string, expiresAt: Date): Promise<HackathonRegistration | undefined>;
+  verifyHackathonRegistration(id: string): Promise<HackathonRegistration | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -284,6 +292,53 @@ export class DatabaseStorage implements IStorage {
       .from(assessmentAttempts)
       .where(eq(assessmentAttempts.shareToken, shareToken));
     return attempt || undefined;
+  }
+
+  async createHackathonRegistration(registration: InsertHackathonRegistration): Promise<HackathonRegistration> {
+    const [newRegistration] = await db.insert(hackathonRegistrations).values(registration).returning();
+    return newRegistration;
+  }
+
+  async getHackathonRegistrationById(id: string): Promise<HackathonRegistration | undefined> {
+    const [registration] = await db
+      .select()
+      .from(hackathonRegistrations)
+      .where(eq(hackathonRegistrations.id, id));
+    return registration || undefined;
+  }
+
+  async getHackathonRegistrationByPhone(phone: string): Promise<HackathonRegistration | undefined> {
+    const [registration] = await db
+      .select()
+      .from(hackathonRegistrations)
+      .where(eq(hackathonRegistrations.phone, phone));
+    return registration || undefined;
+  }
+
+  async getHackathonRegistrationByEmail(email: string): Promise<HackathonRegistration | undefined> {
+    const [registration] = await db
+      .select()
+      .from(hackathonRegistrations)
+      .where(eq(hackathonRegistrations.email, email));
+    return registration || undefined;
+  }
+
+  async updateHackathonOtp(id: string, otpCode: string, expiresAt: Date): Promise<HackathonRegistration | undefined> {
+    const [updated] = await db
+      .update(hackathonRegistrations)
+      .set({ otpCode, otpExpiresAt: expiresAt })
+      .where(eq(hackathonRegistrations.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async verifyHackathonRegistration(id: string): Promise<HackathonRegistration | undefined> {
+    const [updated] = await db
+      .update(hackathonRegistrations)
+      .set({ isVerified: true, otpCode: null, otpExpiresAt: null })
+      .where(eq(hackathonRegistrations.id, id))
+      .returning();
+    return updated || undefined;
   }
 }
 

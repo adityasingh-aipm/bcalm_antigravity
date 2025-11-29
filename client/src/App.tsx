@@ -15,6 +15,7 @@ import AssessmentResultsPage from "@/pages/AssessmentResultsPage";
 import ShareResultsPage from "@/pages/ShareResultsPage";
 import NotFound from "@/pages/not-found";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import HackathonPage from "@/pages/HackathonPage";
 
 function Router() {
   return (
@@ -28,6 +29,7 @@ function Router() {
       <Route path="/ai-pm-readiness/share/:shareToken" component={ShareResultsPage} />
       <Route path="/ai-pm-readiness/results/:attemptId" component={AssessmentResultsPage} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
+      <Route path="/hackathon" component={HackathonPage} />
       <Route component={NotFound} />
     </Switch>
   );

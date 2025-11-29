@@ -143,3 +143,38 @@ export type InsertAssessmentAttempt = z.infer<typeof insertAssessmentAttemptSche
 
 export type AssessmentAnswer = typeof assessmentAnswers.$inferSelect;
 export type InsertAssessmentAnswer = z.infer<typeof insertAssessmentAnswerSchema>;
+
+// Hackathon Registration Schema
+export const hackathonRegistrations = pgTable("hackathon_registrations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  fullName: text("full_name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  companyOrCollege: text("company_or_college").notNull(),
+  otpCode: text("otp_code"),
+  otpExpiresAt: timestamp("otp_expires_at"),
+  isVerified: boolean("is_verified").notNull().default(false),
+  utmSource: text("utm_source"),
+  utmMedium: text("utm_medium"),
+  utmCampaign: text("utm_campaign"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const insertHackathonRegistrationSchema = createInsertSchema(hackathonRegistrations, {
+  fullName: z.string().min(3, "Name must be at least 3 characters"),
+  phone: z.string().regex(/^[6-9]\d{9}$/, "Please enter a valid 10-digit Indian phone number"),
+  email: z.string().email("Invalid email address").refine(
+    (email) => email.endsWith("@gmail.com"),
+    "Please use a Gmail address"
+  ),
+  companyOrCollege: z.string().min(2, "Company/College name is required"),
+}).omit({
+  id: true,
+  otpCode: true,
+  otpExpiresAt: true,
+  isVerified: true,
+  createdAt: true,
+});
+
+export type HackathonRegistration = typeof hackathonRegistrations.$inferSelect;
+export type InsertHackathonRegistration = z.infer<typeof insertHackathonRegistrationSchema>;
