@@ -65,8 +65,7 @@ router.post("/register", async (req: Request, res: Response) => {
 
     res.json({ 
       id: registration.id, 
-      message: "OTP sent successfully",
-      otpForDev: process.env.NODE_ENV === "development" ? otp : undefined
+      message: "OTP sent successfully"
     });
   } catch (error) {
     console.error("Registration error:", error);
@@ -138,8 +137,7 @@ router.post("/resend-otp", async (req: Request, res: Response) => {
 
     res.json({ 
       success: true, 
-      message: "OTP resent successfully",
-      otpForDev: process.env.NODE_ENV === "development" ? otp : undefined
+      message: "OTP resent successfully"
     });
   } catch (error) {
     console.error("Resend OTP error:", error);

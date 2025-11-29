@@ -3,8 +3,6 @@
 
 import twilio from 'twilio';
 
-let connectionSettings: any;
-
 async function getCredentials() {
   const hostname = process.env.REPLIT_CONNECTORS_HOSTNAME;
   const xReplitToken = process.env.REPL_IDENTITY 
@@ -30,7 +28,7 @@ async function getCredentials() {
   const data = await response.json();
   console.log('Twilio connector response items count:', data.items?.length);
   
-  connectionSettings = data.items?.[0];
+  const connectionSettings = data.items?.[0];
   
   if (connectionSettings) {
     console.log('Twilio settings keys:', Object.keys(connectionSettings.settings || {}));
