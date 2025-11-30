@@ -1,95 +1,20 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Check, GraduationCap, BarChart3, BookOpen } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { motion } from "framer-motion";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
-import { trackEvent, trackPageView, getUtmParams, getPagePath } from "@/lib/analytics";
-
-const authSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  name: z.string().min(2, "Name must be at least 2 characters").optional(),
-});
-
-type AuthFormData = z.infer<typeof authSchema>;
+import { trackPageView } from "@/lib/analytics";
+import { AuthModal } from "@/components/AuthModal";
 
 export default function AssessmentLandingPage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [, setLocation] = useLocation();
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     trackPageView();
   }, []);
-
-  const form = useForm<AuthFormData>({
-    resolver: zodResolver(isLogin ? authSchema.omit({ name: true }) : authSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      name: "",
-    },
-  });
-
-  const handleAuth = async (data: AuthFormData) => {
-    try {
-      const endpoint = isLogin ? "/api/resources/auth/login" : "/api/resources/auth/signup";
-      const response = await apiRequest("POST", endpoint, data);
-      const result = await response.json();
-
-      if (result.token) {
-        localStorage.setItem("resources_token", result.token);
-        localStorage.setItem("resources_user", JSON.stringify(result.user));
-        setShowAuthDialog(false);
-        
-        // Track signup/login events with UTM params and page path
-        const utmParams = getUtmParams();
-        const pagePath = getPagePath();
-        
-        if (isLogin) {
-          trackEvent("user_login", { 
-            email: data.email,
-            pagePath: pagePath,
-            utm: utmParams,
-            navigationSource: null
-          });
-        } else {
-          trackEvent("user_signup", { 
-            name: data.name || "", 
-            email: data.email,
-            pagePath: pagePath,
-            utm: utmParams,
-            navigationSource: null
-          });
-        }
-        
-        toast({
-          title: isLogin ? "Logged in successfully" : "Account created successfully",
-          description: `Welcome, ${result.user.name}!`,
-        });
-        form.reset();
-        
-        setLocation("/ai-pm-readiness/start");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Authentication failed",
-        variant: "destructive",
-      });
-    }
-  };
 
   const handleStart = () => {
     if (user) {
@@ -97,6 +22,11 @@ export default function AssessmentLandingPage() {
     } else {
       setShowAuthDialog(true);
     }
+  };
+
+  const handleAuthSuccess = () => {
+    refreshUser();
+    setLocation("/ai-pm-readiness/start");
   };
 
   return (
@@ -138,10 +68,7 @@ export default function AssessmentLandingPage() {
             <p className="mt-4 text-sm" style={{ color: "#9ca3af" }}>
               Already have an account?{" "}
               <button
-                onClick={() => {
-                  setIsLogin(true);
-                  setShowAuthDialog(true);
-                }}
+                onClick={() => setShowAuthDialog(true)}
                 className="text-primary hover:underline"
                 data-testid="link-login"
               >
@@ -151,83 +78,11 @@ export default function AssessmentLandingPage() {
           )}
         </motion.div>
 
-        <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-          <DialogContent data-testid="dialog-auth">
-            <DialogHeader>
-              <DialogTitle>{isLogin ? "Sign In" : "Create Account"}</DialogTitle>
-              <DialogDescription>
-                {isLogin
-                  ? "Sign in to take the AI PM Readiness Check"
-                  : "Create an account to take the assessment and save your results"}
-              </DialogDescription>
-            </DialogHeader>
-
-            <form onSubmit={form.handleSubmit(handleAuth)} className="space-y-4">
-              {!isLogin && (
-                <div>
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    {...form.register("name")}
-                    placeholder="Your full name"
-                    data-testid="input-name"
-                  />
-                  {form.formState.errors.name && (
-                    <p className="text-sm text-destructive mt-1">{form.formState.errors.name.message}</p>
-                  )}
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...form.register("email")}
-                  placeholder="your@email.com"
-                  data-testid="input-email"
-                />
-                {form.formState.errors.email && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.email.message}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...form.register("password")}
-                  placeholder="••••••••"
-                  data-testid="input-password"
-                />
-                {form.formState.errors.password && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.password.message}</p>
-                )}
-              </div>
-
-              <DialogFooter>
-                <div className="flex flex-col w-full gap-4">
-                  <Button type="submit" className="w-full" data-testid="button-submit-auth">
-                    {isLogin ? "Sign In" : "Create Account"}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      form.reset();
-                    }}
-                    className="w-full"
-                    data-testid="button-toggle-auth-mode"
-                  >
-                    {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
-                  </Button>
-                </div>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
+        <AuthModal
+          open={showAuthDialog}
+          onOpenChange={setShowAuthDialog}
+          onSuccess={handleAuthSuccess}
+        />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

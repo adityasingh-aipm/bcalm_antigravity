@@ -16,7 +16,45 @@ The frontend is built with React 18, TypeScript, and Vite. It uses Wouter for ro
 
 ### Backend
 
-The backend uses Express.js with TypeScript on Node.js, integrating Vite middleware for development. It follows a RESTful API pattern. Data is stored in PostgreSQL, abstracted via an `IStorage` interface and implemented using `DatabaseStorage`. Authentication for the Free Resources system uses JWT tokens with bcrypt for password hashing.
+The backend uses Express.js with TypeScript on Node.js, integrating Vite middleware for development. It follows a RESTful API pattern. Data is stored in PostgreSQL, abstracted via an `IStorage` interface and implemented using `DatabaseStorage`.
+
+### Authentication System (Supabase OTP)
+
+Authentication uses Supabase email OTP (passwordless) with a 3-step modal flow:
+1. **Email View**: User enters email, triggers `signInWithOtp()` which sends a 6-digit code
+2. **OTP View**: User enters the 6-digit code, triggers `verifyOtp()` for verification
+3. **Profile View** (new users only): Collects Name, College/Company, and Role
+
+**Key Components:**
+- `client/src/components/AuthModal.tsx` - Main auth modal with state machine
+- `client/src/lib/supabase.ts` - Supabase client configuration
+- `client/src/hooks/use-auth.ts` - Auth state management hook
+
+**Backend Token Exchange:**
+After Supabase authentication, the frontend calls `/api/resources/auth/supabase` to exchange the Supabase session for a backend JWT token. This ensures backward compatibility with existing download endpoints.
+
+**Supabase Profiles Table Setup:**
+Create this table in your Supabase dashboard (SQL Editor):
+```sql
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  full_name TEXT,
+  college_company TEXT,
+  role TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can read/write their own profile
+CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+```
+
+**Role Options:** Student, Recent Graduate, Product Manager, Product Analyst, Developer, QA
 
 ### Data Storage
 

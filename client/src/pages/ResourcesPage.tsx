@@ -2,26 +2,13 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest, queryClient } from "@/lib/queryClient";
-import { trackEvent, trackPageView, getUtmParams, getPagePath } from "@/lib/analytics";
+import { trackPageView } from "@/lib/analytics";
+import { useAuth } from "@/hooks/use-auth";
 import { motion } from "framer-motion";
 import { Download, FileText, Video, ExternalLink, Book, Lightbulb } from "lucide-react";
 import type { Resource } from "@shared/resourcesSchema";
-
-const authSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  name: z.string().min(2, "Name must be at least 2 characters").optional(),
-});
-
-type AuthFormData = z.infer<typeof authSchema>;
+import { AuthModal } from "@/components/AuthModal";
 
 function ResourceCard({ resource, onDownload }: { resource: Resource; onDownload: (id: string) => void }) {
   const getIcon = () => {
@@ -111,9 +98,8 @@ function ResourceCard({ resource, onDownload }: { resource: Resource; onDownload
 
 export default function ResourcesPage() {
   const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
   const { toast } = useToast();
-  const [token, setToken] = useState<string | null>(localStorage.getItem("resources_token"));
+  const { token, logout, refreshUser } = useAuth();
 
   useEffect(() => {
     trackPageView();
@@ -123,61 +109,12 @@ export default function ResourcesPage() {
     queryKey: ["/api/resources"],
   });
 
-  const form = useForm<AuthFormData>({
-    resolver: zodResolver(isLogin ? authSchema.omit({ name: true }) : authSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      name: "",
-    },
-  });
-
-  const handleAuth = async (data: AuthFormData) => {
-    try {
-      const endpoint = isLogin ? "/api/resources/auth/login" : "/api/resources/auth/signup";
-      const response = await apiRequest("POST", endpoint, data);
-      const result = await response.json();
-
-      if (result.token) {
-        localStorage.setItem("resources_token", result.token);
-        localStorage.setItem("resources_user", JSON.stringify(result.user));
-        setToken(result.token);
-        setShowAuthDialog(false);
-        
-        // Track signup/login events with UTM params and page path
-        const utmParams = getUtmParams();
-        const pagePath = getPagePath();
-        
-        if (isLogin) {
-          trackEvent("user_login", { 
-            email: data.email,
-            pagePath: pagePath,
-            utm: utmParams,
-            navigationSource: null
-          });
-        } else {
-          trackEvent("user_signup", { 
-            name: data.name || "", 
-            email: data.email,
-            pagePath: pagePath,
-            utm: utmParams,
-            navigationSource: null
-          });
-        }
-        
-        toast({
-          title: isLogin ? "Logged in successfully" : "Account created successfully",
-          description: `Welcome, ${result.user.name}!`,
-        });
-        form.reset();
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Authentication failed",
-        variant: "destructive",
-      });
-    }
+  const handleAuthSuccess = () => {
+    refreshUser();
+    toast({
+      title: "Welcome!",
+      description: "You can now download resources",
+    });
   };
 
   const handleDownload = (resourceId: string) => {
@@ -185,7 +122,7 @@ export default function ResourcesPage() {
       setShowAuthDialog(true);
       toast({
         title: "Authentication required",
-        description: "Please sign up or log in to download resources",
+        description: "Please sign in to download resources",
       });
       return;
     }
@@ -198,10 +135,8 @@ export default function ResourcesPage() {
     });
   };
 
-  const logout = () => {
-    localStorage.removeItem("resources_token");
-    localStorage.removeItem("resources_user");
-    setToken(null);
+  const handleLogout = async () => {
+    await logout();
     toast({
       title: "Logged out",
       description: "You have been logged out successfully",
@@ -232,7 +167,7 @@ export default function ResourcesPage() {
               </p>
             </motion.div>
             {token ? (
-              <Button variant="outline" onClick={logout} data-testid="button-logout">
+              <Button variant="outline" onClick={handleLogout} data-testid="button-logout">
                 Logout
               </Button>
             ) : (
@@ -277,83 +212,11 @@ export default function ResourcesPage() {
         </div>
       </div>
 
-      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <DialogContent data-testid="dialog-auth">
-          <DialogHeader>
-            <DialogTitle>{isLogin ? "Sign In" : "Create Account"}</DialogTitle>
-            <DialogDescription>
-              {isLogin
-                ? "Sign in to download free resources"
-                : "Create an account to access all free resources"}
-            </DialogDescription>
-          </DialogHeader>
-
-          <form onSubmit={form.handleSubmit(handleAuth)} className="space-y-4">
-            {!isLogin && (
-              <div>
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  {...form.register("name")}
-                  placeholder="Your full name"
-                  data-testid="input-name"
-                />
-                {form.formState.errors.name && (
-                  <p className="text-sm text-destructive mt-1">{form.formState.errors.name.message}</p>
-                )}
-              </div>
-            )}
-
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                {...form.register("email")}
-                placeholder="your@email.com"
-                data-testid="input-email"
-              />
-              {form.formState.errors.email && (
-                <p className="text-sm text-destructive mt-1">{form.formState.errors.email.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                {...form.register("password")}
-                placeholder="••••••••"
-                data-testid="input-password"
-              />
-              {form.formState.errors.password && (
-                <p className="text-sm text-destructive mt-1">{form.formState.errors.password.message}</p>
-              )}
-            </div>
-
-            <DialogFooter>
-              <div className="flex flex-col w-full gap-4">
-                <Button type="submit" className="w-full" data-testid="button-submit-auth">
-                  {isLogin ? "Sign In" : "Create Account"}
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    form.reset();
-                  }}
-                  className="w-full"
-                  data-testid="button-toggle-auth-mode"
-                >
-                  {isLogin ? "Need an account? Sign up" : "Already have an account? Sign in"}
-                </Button>
-              </div>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <AuthModal
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }
