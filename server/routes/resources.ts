@@ -81,69 +81,6 @@ router.post("/auth/login", async (req, res) => {
   }
 });
 
-router.post("/auth/supabase", async (req, res) => {
-  try {
-    const { supabaseAccessToken, supabaseUserId, email, name } = req.body;
-
-    if (!supabaseAccessToken || !supabaseUserId || !email) {
-      return res.status(400).json({ error: "Supabase access token, user ID, and email are required" });
-    }
-
-    const supabaseUrl = process.env.VITE_SUPABASE_URL;
-    if (!supabaseUrl) {
-      console.error("VITE_SUPABASE_URL not configured on server");
-      return res.status(500).json({ error: "Server configuration error" });
-    }
-
-    const verifyResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: {
-        "Authorization": `Bearer ${supabaseAccessToken}`,
-        "apikey": process.env.VITE_SUPABASE_ANON_KEY || "",
-      },
-    });
-
-    if (!verifyResponse.ok) {
-      console.error("Supabase token verification failed:", verifyResponse.status);
-      return res.status(401).json({ error: "Invalid Supabase token" });
-    }
-
-    const supabaseUser = await verifyResponse.json();
-    
-    if (supabaseUser.id !== supabaseUserId || supabaseUser.email !== email) {
-      console.error("Supabase user mismatch:", { expected: { supabaseUserId, email }, got: supabaseUser });
-      return res.status(401).json({ error: "Token user mismatch" });
-    }
-
-    let user = await storage.getResourcesUserByEmail(email);
-    
-    if (!user) {
-      const randomPassword = Math.random().toString(36).slice(-16);
-      const hashedPassword = await bcrypt.hash(randomPassword, 10);
-      
-      user = await storage.createResourcesUser({
-        email,
-        name: name || email.split("@")[0],
-        password: hashedPassword,
-      });
-    }
-
-    const token = generateToken(user.id, user.email, user.isAdmin);
-
-    res.json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        isAdmin: user.isAdmin,
-      },
-    });
-  } catch (error) {
-    console.error("Supabase auth error:", error);
-    res.status(500).json({ error: "Failed to authenticate with Supabase" });
-  }
-});
-
 router.post("/admin/login", async (req, res) => {
   try {
     const { email, password } = req.body;
