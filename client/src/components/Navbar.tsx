@@ -12,11 +12,11 @@ export default function Navbar() {
     >
       <div className="container mx-auto max-w-6xl">
         <div className="flex items-center justify-between px-3 md:px-6 gap-4">
-          <Link href="/" className="py-2 md:py-2 flex-shrink-0 -ml-6 md:-ml-12">
+          <Link href="/" className="py-1 md:py-1 flex-shrink-0 -ml-6 md:-ml-12">
             <img 
               src={bcalmLogo} 
               alt="Bcalm - Crack Any Interview in 30 Days"
-              className="select-none cursor-pointer h-20 md:h-28 w-auto"
+              className="select-none cursor-pointer h-14 md:h-20 w-auto"
               style={{
                 objectFit: 'contain',
                 objectPosition: 'left center'
