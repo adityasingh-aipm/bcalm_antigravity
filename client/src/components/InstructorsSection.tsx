@@ -48,10 +48,10 @@ export default function InstructorsSection() {
           className="text-center mb-10"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Designed by leaders who hired 1000+ folks across college campuses and large tech companies
+            Built by Leaders Who've Hired 1000+
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Industry experts with proven track records at top tech companies
+            From IITs to top tech companies — they know what it takes to get hired
           </p>
         </motion.div>
         
