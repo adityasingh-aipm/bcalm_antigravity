@@ -5,15 +5,16 @@ import bcalmLogo from "@assets/Bcalm-logo-Nobackground_1764679699958.png";
 export default function Navbar() {
   return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50"
+      className="fixed top-0 left-0 right-0 z-50 overflow-visible"
       style={{
+        height: '68px',
         background: '#FFFFFF',
         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
       }}
     >
-      <div className="container mx-auto max-w-6xl">
-        <div className="flex items-center justify-between px-4 md:px-6 gap-4">
-          <Link href="/" className="flex-shrink-0 py-2">
+      <div className="container mx-auto max-w-6xl h-full">
+        <div className="flex items-center justify-between px-4 md:px-6 gap-4 h-full">
+          <Link href="/" className="flex-shrink-0 flex items-center h-full overflow-visible">
             <img 
               src={bcalmLogo} 
               alt="Bcalm - Crack Any Interview in 30 Days"

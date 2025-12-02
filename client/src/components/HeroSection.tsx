@@ -7,7 +7,7 @@ import heroBackground from "@assets/generated_images/AI_neural_network_hero_back
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: '100px' }}>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ paddingTop: '68px' }}>
       {/* Unified dark background */}
       <div 
         className="absolute inset-0 z-0"
