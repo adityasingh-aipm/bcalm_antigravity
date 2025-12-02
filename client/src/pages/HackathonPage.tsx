@@ -16,7 +16,7 @@ import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Link } from "wouter";
-import bcalmLogo from "@assets/587825421_122110881585061636_4522478478515908937_n_1763885253278.jpg";
+import bcalmLogo from "@assets/Bcalm-logo-Nobackground_1764679699958.png";
 
 const registrationSchema = z.object({
   fullName: z.string().min(3, "Name must be at least 3 characters"),

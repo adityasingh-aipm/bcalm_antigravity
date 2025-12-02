@@ -1,7 +1,7 @@
 import { SiLinkedin, SiX, SiInstagram } from "react-icons/si";
 import { Mail, MessageCircle } from "lucide-react";
 import { Link } from "wouter";
-import bcalmLogo from "@assets/587825421_122110881585061636_4522478478515908937_n_1763885253278.jpg";
+import bcalmLogo from "@assets/Bcalm-logo-Nobackground_1764679699958.png";
 
 export default function Footer() {
   return (
