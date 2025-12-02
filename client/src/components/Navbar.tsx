@@ -7,7 +7,7 @@ export default function Navbar() {
     <nav
       className="fixed top-0 left-0 right-0 z-50"
       style={{
-        backgroundColor: 'transparent',
+        backgroundColor: '#E8D5F2',
       }}
     >
       <div className="container mx-auto max-w-6xl">
@@ -30,20 +30,18 @@ export default function Navbar() {
             className="rounded-full font-medium transition-all duration-300 flex-shrink-0 whitespace-nowrap text-xs md:text-sm flex items-center gap-2"
             style={{
               padding: '8px 16px',
-              backgroundColor: 'transparent',
+              backgroundColor: '#6c47ff',
               color: '#ffffff',
               textDecoration: 'none',
-              border: '1.5px solid rgba(255, 255, 255, 0.7)',
+              boxShadow: '0 2px 8px rgba(108, 71, 255, 0.3)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#ffffff';
-              e.currentTarget.style.color = '#1a0b2e';
-              e.currentTarget.style.borderColor = '#ffffff';
+              e.currentTarget.style.backgroundColor = '#5a38f0';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(108, 71, 255, 0.4)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#ffffff';
-              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.7)';
+              e.currentTarget.style.backgroundColor = '#6c47ff';
+              e.currentTarget.style.boxShadow = '0 2px 8px rgba(108, 71, 255, 0.3)';
             }}
             data-testid="button-upload-resume-nav"
           >
