@@ -1,17 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Calendar, Download } from "lucide-react";
-import { SiWhatsapp } from "react-icons/si";
+import { GraduationCap, Upload, Mic, FileCheck, MessageSquare, Briefcase } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
 import { trackEvent } from "@/lib/analytics";
 import heroBackground from "@assets/generated_images/AI_neural_network_hero_background_86a25de9.png";
 
-interface HeroSectionProps {
-  onJoinWaitlist: () => void;
-  onScheduleCall: () => void;
-}
-
-export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSectionProps) {
+export default function HeroSection() {
   return (
     <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden pt-20">
       <div 
@@ -58,40 +52,37 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
           </p>
           
           {/* CTAs - Side by side on desktop, stacked on mobile */}
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 sm:max-w-lg sm:mx-auto mb-3 md:mb-4 px-4 sm:px-0 justify-center sm:justify-center">
-            {/* Primary CTA - WhatsApp Contact */}
-            <Button 
-              className="w-full sm:w-auto text-base rounded-lg text-white hover:text-white border-0 py-3 md:py-4 px-6 md:px-8"
-              style={{
-                backgroundColor: '#25D366',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#20BD5A';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#25D366';
-              }}
-              onClick={() => {
-                trackEvent("whatsapp_clicked", {
-                  device: navigator.userAgent
-                });
-                window.open('https://wa.me/919398354912?text=Hi%2C%20I%27m%20interested%20in%20the%20AI%20PM%20Launchpad%20program', '_blank');
-              }}
-              data-testid="button-contact-whatsapp"
-            >
-              <SiWhatsapp className="mr-2 h-5 w-5" />
-              Contact us
-            </Button>
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 sm:max-w-lg sm:mx-auto mb-6 md:mb-8 px-4 sm:px-0 justify-center sm:justify-center">
+            {/* Primary CTA - Practice Interviews */}
+            <Link href="/coming-soon/practice-interviews" className="block w-full sm:w-auto">
+              <Button 
+                className="w-full sm:w-auto text-base rounded-lg text-white hover:text-white border-0 py-3 md:py-4 px-6 md:px-8 bg-primary hover:bg-primary/90"
+                onClick={() => {
+                  trackEvent("practice_interviews_clicked", {
+                    device: navigator.userAgent
+                  });
+                }}
+                data-testid="button-practice-interviews"
+              >
+                <Mic className="mr-2 h-5 w-5" />
+                Practice Interviews
+              </Button>
+            </Link>
 
-            {/* Secondary CTA - Free Resources */}
-            <Link href="/resources" className="block w-full sm:w-auto">
+            {/* Secondary CTA - Upload Resume */}
+            <Link href="/coming-soon/upload-resume" className="block w-full sm:w-auto">
               <Button 
                 variant="outline"
                 className="w-full sm:w-auto text-base rounded-lg bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20 hover:text-white hover:border-white/30 py-3 md:py-4 px-6 md:px-8"
-                data-testid="button-download-resources"
+                onClick={() => {
+                  trackEvent("upload_resume_clicked", {
+                    device: navigator.userAgent
+                  });
+                }}
+                data-testid="button-upload-resume"
               >
-                <Download className="mr-2 h-5 w-5" />
-                Free resources
+                <Upload className="mr-2 h-5 w-5" />
+                Upload Resume
               </Button>
             </Link>
           </div>
@@ -101,7 +92,7 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-2 md:mb-3"
+            className="mb-8 md:mb-10"
           >
             <div className="flex items-center justify-center gap-2">
               <GraduationCap className="h-4 w-4 flex-shrink-0 text-white/60" />
@@ -111,51 +102,45 @@ export default function HeroSection({ onJoinWaitlist, onScheduleCall }: HeroSect
             </div>
           </motion.div>
 
-          {/* Cohort Info - Simple text line */}
+          {/* Value Propositions */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="mb-2 md:mb-3"
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto"
           >
-            <div className="flex items-center justify-center gap-2">
-              <Calendar className="h-4 w-4 flex-shrink-0 text-white/60" />
-              <p className="text-xs sm:text-sm text-white/70">
-                Next cohort starts: <span className="font-medium text-white/90">December 2, 2025</span>
+            {/* Free CV Scoring */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:bg-white/10 transition-all duration-300">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-r from-primary/20 to-violet-500/20 mx-auto mb-3">
+                <FileCheck className="w-6 h-6 text-primary" />
+              </div>
+              <h3 className="text-white font-semibold text-base mb-2">Free CV Scoring</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                Upload your CV and check where you stand against any job description
               </p>
             </div>
-          </motion.div>
 
-          {/* Secondary Actions - Inline links, very light */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="mb-8 md:mb-10"
-          >
-            <p className="text-sm text-white/60">
-              <button
-                onClick={() => {
-                  trackEvent("schedule_call_clicked", {
-                    page: window.location.pathname,
-                    utm: Object.fromEntries(new URLSearchParams(window.location.search))
-                  });
-                  onScheduleCall();
-                }}
-                className="hover:text-white/80 transition-colors underline-offset-4 hover:underline"
-                data-testid="button-schedule-call"
-              >
-                Schedule a call
-              </button>
-              <span className="mx-2">·</span>
-              <a
-                href="/ai-pm-readiness"
-                className="hover:text-white/80 transition-colors underline-offset-4 hover:underline"
-                data-testid="link-readiness-check"
-              >
-                Take the AI PM Readiness Check →
-              </a>
-            </p>
+            {/* Mock Interviews */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:bg-white/10 transition-all duration-300">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-r from-amber-500/20 to-orange-500/20 mx-auto mb-3">
+                <MessageSquare className="w-6 h-6 text-amber-400" />
+              </div>
+              <h3 className="text-white font-semibold text-base mb-2">Mock Interviews</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                Do multiple mock interviews and get detailed feedback
+              </p>
+            </div>
+
+            {/* Job Board Access */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 hover:bg-white/10 transition-all duration-300">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-gradient-to-r from-emerald-500/20 to-teal-500/20 mx-auto mb-3">
+                <Briefcase className="w-6 h-6 text-emerald-400" />
+              </div>
+              <h3 className="text-white font-semibold text-base mb-2">Job Board Access</h3>
+              <p className="text-white/60 text-sm leading-relaxed">
+                Access curated job opportunities matching your profile
+              </p>
+            </div>
           </motion.div>
         </motion.div>
       </div>

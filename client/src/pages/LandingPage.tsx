@@ -41,10 +41,7 @@ export default function LandingPage() {
       <Navbar />
       
       {/* Fold 1 - Hero */}
-      <HeroSection 
-        onJoinWaitlist={() => setWaitlistOpen(true)} 
-        onScheduleCall={() => setScheduleOpen(true)} 
-      />
+      <HeroSection />
       
       {/* Instructors Section - Above Why Bcalm Works */}
       <InstructorsSection />

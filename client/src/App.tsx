@@ -16,6 +16,7 @@ import ShareResultsPage from "@/pages/ShareResultsPage";
 import NotFound from "@/pages/not-found";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import HackathonPage from "@/pages/HackathonPage";
+import ComingSoonPage from "@/pages/ComingSoonPage";
 
 function Router() {
   return (
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/ai-pm-readiness/results/:attemptId" component={AssessmentResultsPage} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/hackathon" component={HackathonPage} />
+      <Route path="/coming-soon/:feature" component={ComingSoonPage} />
       <Route component={NotFound} />
     </Switch>
   );
