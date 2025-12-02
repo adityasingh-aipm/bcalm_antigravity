@@ -48,7 +48,7 @@ export default function HeroSection() {
           
           {/* Subheadline */}
           <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-4 md:mb-5">
-            Designed for non-tech professionals and students
+            Designed for early career professionals and students
           </p>
           
           {/* CTAs - Side by side on desktop, stacked on mobile */}
