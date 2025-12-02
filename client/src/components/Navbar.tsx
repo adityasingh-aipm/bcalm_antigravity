@@ -7,16 +7,17 @@ export default function Navbar() {
     <nav
       className="fixed top-0 left-0 right-0 z-50"
       style={{
-        backgroundColor: '#F3E8F9',
+        height: '74px',
+        background: 'linear-gradient(to right, #20004F, #0C0F2A)',
       }}
     >
-      <div className="container mx-auto max-w-6xl">
-        <div className="flex items-center justify-between px-3 md:px-6 gap-4">
-          <Link href="/" className="flex-shrink-0 -ml-6 md:-ml-12">
+      <div className="container mx-auto max-w-6xl h-full">
+        <div className="flex items-center justify-between px-4 md:px-6 gap-4 h-full">
+          <Link href="/" className="flex-shrink-0">
             <img 
               src={bcalmLogo} 
               alt="Bcalm - Crack Any Interview in 30 Days"
-              className="select-none cursor-pointer h-14 md:h-20 w-auto"
+              className="select-none cursor-pointer h-12 md:h-14 w-auto"
               style={{
                 objectFit: 'contain',
                 objectPosition: 'left center'
@@ -27,21 +28,20 @@ export default function Navbar() {
           
           <Link 
             href="/coming-soon/upload-resume"
-            className="rounded-full font-medium transition-all duration-300 flex-shrink-0 whitespace-nowrap text-xs md:text-sm flex items-center gap-2"
+            className="font-medium transition-all duration-300 flex-shrink-0 whitespace-nowrap text-sm flex items-center gap-2"
             style={{
-              padding: '8px 16px',
-              backgroundColor: '#6c47ff',
-              color: '#ffffff',
+              padding: '12px 20px',
+              backgroundColor: '#6A0DFF',
+              color: '#FFFFFF',
               textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(108, 71, 255, 0.3)',
+              borderRadius: '8px',
+              fontFamily: 'Inter, Poppins, sans-serif',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#5a38f0';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(108, 71, 255, 0.4)';
+              e.currentTarget.style.backgroundColor = '#7B27FF';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#6c47ff';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(108, 71, 255, 0.3)';
+              e.currentTarget.style.backgroundColor = '#6A0DFF';
             }}
             data-testid="button-upload-resume-nav"
           >

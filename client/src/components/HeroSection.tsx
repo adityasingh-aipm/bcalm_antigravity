@@ -7,12 +7,12 @@ import heroBackground from "@assets/generated_images/AI_neural_network_hero_back
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-16 md:pt-20">
-      {/* Unified dark background */}
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden" style={{ paddingTop: '74px' }}>
+      {/* Unified dark background - seamlessly blends with header gradient ending at #0C0F2A */}
       <div 
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: `linear-gradient(rgba(26, 11, 46, 0.88), rgba(11, 19, 43, 0.95)), url(${heroBackground})`,
+          backgroundImage: `linear-gradient(to bottom, #0C0F2A 0%, rgba(12, 15, 42, 0.98) 10%, rgba(26, 11, 46, 0.88) 50%, rgba(11, 19, 43, 0.95) 100%), url(${heroBackground})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
