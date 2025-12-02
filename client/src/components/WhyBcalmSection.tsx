@@ -4,57 +4,51 @@ import { motion } from "framer-motion";
 
 const comparisonData = [
   {
-    benefit: "Curriculum",
-    traditional: "Basic PM theory",
-    bcalm: "Deep AI-first PM curriculum covering AI, GenAI, LLM thinking, metrics, and strategy",
+    benefit: "Resume Feedback",
+    traditional: "No expert review, guesswork",
+    bcalm: "AI-powered CV scoring + expert review from hiring managers at top companies",
     bcalmWins: true
   },
   {
-    benefit: "Instructor Expertise",
-    traditional: "Limited real PM experience",
-    bcalm: "Taught by working AI PMs & leaders from top companies",
+    benefit: "Interview Practice",
+    traditional: "Watching YouTube videos alone",
+    bcalm: "Simulated mock interviews with real-time, actionable feedback",
     bcalmWins: true
   },
   {
-    benefit: "Personalized Support",
-    traditional: "Generic feedback",
-    bcalm: "1:1 mentorship, assignment feedback, resume + portfolio review, interview coaching",
+    benefit: "Job Discovery",
+    traditional: "Spray-and-pray applications",
+    bcalm: "Curated job board with insider hiring signals & referral opportunities",
+    bcalmWins: true
+  },
+  {
+    benefit: "Expert Guidance",
+    traditional: "Generic career advice online",
+    bcalm: "Direct mentorship from IIT/IIM alumni working at Zepto, Google, Amazon",
+    bcalmWins: true
+  },
+  {
+    benefit: "Personalized Feedback",
+    traditional: "No feedback loop",
+    bcalm: "Detailed feedback on every session — know exactly where to improve",
     bcalmWins: true
   },
   {
     benefit: "Community",
-    traditional: "Basic Slack/WhatsApp group",
-    bcalm: "Ambitious cohort from IITs, BITS, NITs, IIITs + lifelong alumni network",
+    traditional: "Prep alone in isolation",
+    bcalm: "Join 1000+ ambitious peers from IITs, NITs, BITS + lifelong network",
     bcalmWins: true
   },
   {
-    benefit: "Hands-On Learning",
-    traditional: "One capstone project",
-    bcalm: "5 simulations + weekly assignments + full capstone with detailed feedback",
+    benefit: "Timeline",
+    traditional: "Months of scattered, unstructured prep",
+    bcalm: "Structured 30-day roadmap designed to get you interview-ready fast",
     bcalmWins: true
   },
   {
-    benefit: "Post-Completion Support",
-    traditional: "Ends with cohort",
-    bcalm: "2 years of continued help, office hours, and alumni support",
-    bcalmWins: true
-  },
-  {
-    benefit: "Offline Events",
-    traditional: "Minimal",
-    bcalm: "Regular meetups in Bangalore, Delhi NCR, Pune, Mumbai, Hyderabad",
-    bcalmWins: true
-  },
-  {
-    benefit: "Industry Connects",
-    traditional: "One-time",
-    bcalm: "Multiple speaker sessions, founder talks, and AI PM AMA sessions",
-    bcalmWins: true
-  },
-  {
-    benefit: "Placement Assistance",
-    traditional: "Basic job board",
-    bcalm: "Resume review, portfolio creation, mock interviews, job board, alumni referrals",
+    benefit: "Success Rate",
+    traditional: "Low callback rates, wasted effort",
+    bcalm: "3x higher interview callback rate with optimized applications",
     bcalmWins: true
   }
 ];
@@ -74,7 +68,7 @@ export default function WhyBcalmSection() {
             Why Choose Bcalm?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            See how Bcalm compares to traditional bootcamps
+            See how Bcalm compares to preparing on your own
           </p>
         </motion.div>
         
@@ -91,8 +85,8 @@ export default function WhyBcalmSection() {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left p-4 font-semibold bg-muted/30">Benefit</th>
-                      <th className="text-left p-4 font-semibold bg-muted/30 hidden md:table-cell">Traditional Bootcamps</th>
-                      <th className="text-left p-4 font-semibold bg-primary/10">Bcalm AI PM Launchpad</th>
+                      <th className="text-left p-4 font-semibold bg-muted/30 hidden md:table-cell">Self-Prep / Traditional</th>
+                      <th className="text-left p-4 font-semibold bg-primary/10">Bcalm Interview Platform</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -128,7 +122,7 @@ export default function WhyBcalmSection() {
           className="text-center mt-8"
         >
           <p className="text-lg font-medium text-foreground">
-            Bcalm isn't just a course — it's a launchpad into AI Product Management.
+            Bcalm isn't just prep — it's your launchpad to landing your dream role.
           </p>
         </motion.div>
       </div>
