@@ -47,8 +47,13 @@ export default function HeroSection() {
           </div>
           
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-4 md:mb-5">
+          <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed mb-2">
             Designed for early career professionals and students
+          </p>
+          
+          {/* Founder Credibility */}
+          <p className="text-sm text-white/60 mb-4 md:mb-5">
+            Created by founders from IIT Delhi and IIM Calcutta
           </p>
           
           {/* CTAs - Side by side on desktop, stacked on mobile */}
