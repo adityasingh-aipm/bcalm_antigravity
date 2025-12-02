@@ -66,15 +66,15 @@ export default function ScheduleCallDialog({ open, onOpenChange }: ScheduleCallD
         <DialogHeader>
           <DialogTitle>Schedule a Call</DialogTitle>
           <DialogDescription>
-            Book a 30-minute consultation with our team to learn more about the AI PM Launchpad program.
+            Book a 30-minute consultation with our team to learn how Bcalm can help you land your dream job.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <h4 className="font-medium text-sm">What to expect:</h4>
             <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-              <li>Program overview and curriculum details</li>
-              <li>Career support and outcomes discussion</li>
+              <li>Discuss your career goals and target roles</li>
+              <li>Review our 30-day interview prep roadmap</li>
               <li>Q&A about your specific background</li>
               <li>Next steps and enrollment process</li>
             </ul>

@@ -18,10 +18,10 @@ export default function CTASection({ onEnroll, onScheduleCall }: CTASectionProps
           className="text-center"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Start Your AI Product Journey Today
+            Ready to Land Your Dream Job?
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join a focused learning community, build your portfolio, and confidently prepare for AI PM interviews.
+            Join thousands of ambitious professionals who've transformed their interview skills and landed roles at top companies.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
