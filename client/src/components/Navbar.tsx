@@ -7,7 +7,7 @@ export default function Navbar() {
     <nav
       className="fixed top-0 left-0 right-0 z-50"
       style={{
-        backgroundColor: '#F3E5F5',
+        backgroundColor: 'transparent',
       }}
     >
       <div className="container mx-auto max-w-6xl">
@@ -16,7 +16,7 @@ export default function Navbar() {
             <img 
               src={bcalmLogo} 
               alt="Bcalm - Crack Any Interview in 30 Days"
-              className="select-none cursor-pointer h-10 md:h-16 w-auto"
+              className="select-none cursor-pointer h-10 md:h-14 w-auto"
               style={{
                 objectFit: 'contain',
                 objectPosition: 'left center'
@@ -27,21 +27,23 @@ export default function Navbar() {
           
           <Link 
             href="/coming-soon/upload-resume"
-            className="rounded-full font-medium transition-all duration-200 flex-shrink-0 whitespace-nowrap text-xs md:text-sm flex items-center gap-2"
+            className="rounded-full font-medium transition-all duration-300 flex-shrink-0 whitespace-nowrap text-xs md:text-sm flex items-center gap-2"
             style={{
               padding: '8px 16px',
-              backgroundColor: '#1a1a2e',
+              backgroundColor: 'transparent',
               color: '#ffffff',
               textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(26, 26, 46, 0.25)'
+              border: '1.5px solid rgba(255, 255, 255, 0.7)',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#2d2d4a';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(26, 26, 46, 0.35)';
+              e.currentTarget.style.backgroundColor = '#ffffff';
+              e.currentTarget.style.color = '#1a0b2e';
+              e.currentTarget.style.borderColor = '#ffffff';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#1a1a2e';
-              e.currentTarget.style.boxShadow = '0 2px 8px rgba(26, 26, 46, 0.25)';
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = '#ffffff';
+              e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.7)';
             }}
             data-testid="button-upload-resume-nav"
           >
