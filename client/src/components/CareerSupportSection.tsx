@@ -1,27 +1,27 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { FileText, Briefcase, MessageSquare, Building2 } from "lucide-react";
+import { FileText, Target, MessageSquare, Building2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const supportCards = [
   {
     icon: FileText,
-    title: "Resume Optimization",
-    description: "1:1 expert review and optimization so your resume highlights PM-ready skills and AI understanding."
+    title: "AI-Powered CV Scoring",
+    description: "Get instant feedback on your resume with our AI scoring system, plus expert review from hiring managers at top companies."
   },
   {
-    icon: Briefcase,
-    title: "Build Your Portfolio",
-    description: "Hands-on assignments and product simulations to create a strong PM + AI portfolio. NEW: Build and present your own AI product case study."
+    icon: Target,
+    title: "Skill Gap Analysis",
+    description: "Identify exactly what's holding you back. Personalized roadmap to fill gaps and match job requirements in your target roles."
   },
   {
     icon: MessageSquare,
-    title: "Extensive Interview Prep",
-    description: "AI + Product + Strategy interview prep. Mock interviews, frameworks, practice questions, and personalized feedback."
+    title: "Mock Interview Practice",
+    description: "Practice with realistic interview simulations. Get detailed feedback on your answers, body language cues, and areas to improve."
   },
   {
     icon: Building2,
     title: "Job Board & Referrals",
-    description: "Access curated PM + AI opportunities, hiring partner intros, and alumni referrals when available."
+    description: "Access curated opportunities at high-growth startups, hiring partner intros, and alumni referrals to skip the queue."
   }
 ];
 
@@ -37,10 +37,10 @@ export default function CareerSupportSection() {
           className="text-center mb-10"
         >
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Extensive Career Support
+            Everything You Need to Land the Job
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to turn your skills into real opportunities.
+            From resume to offer letter — we've got you covered at every step.
           </p>
         </motion.div>
         
