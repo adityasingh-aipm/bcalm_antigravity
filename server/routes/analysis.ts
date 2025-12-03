@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import { storage } from "../storage";
-import { isAuthenticated } from "../replitAuth";
+import { isAuthenticated } from "../supabaseAuth";
+import { supabaseAdmin } from "../supabaseClient";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
@@ -23,7 +23,7 @@ const upload = multer({
       cb(null, uniqueSuffix + path.extname(file.originalname));
     },
   }),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedMimes = [
       "application/pdf",
@@ -38,16 +38,42 @@ const upload = multer({
   },
 });
 
-router.post("/submit", isAuthenticated, upload.single("cv"), async (req: any, res: Response) => {
+async function extractTextFromFile(filePath: string, mimeType: string): Promise<string> {
   try {
-    const userId = req.user.claims.sub;
-    const user = await storage.getUser(userId);
+    if (mimeType === "application/pdf") {
+      const pdfParse = require("pdf-parse");
+      const dataBuffer = fs.readFileSync(filePath);
+      const data = await pdfParse(dataBuffer);
+      return data.text;
+    } else if (
+      mimeType === "application/msword" ||
+      mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      const mammoth = require("mammoth");
+      const result = await mammoth.extractRawText({ path: filePath });
+      return result.value;
+    }
+  } catch (error) {
+    console.error("Error extracting text:", error);
+  }
+  return "";
+}
+
+router.post("/submit", isAuthenticated, upload.single("cv"), async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).userId;
     
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (profileError || !profile) {
+      return res.status(404).json({ message: "Profile not found" });
     }
     
-    if (user.onboardingStatus !== "complete") {
+    if (profile.onboarding_status !== "complete") {
       return res.status(400).json({ message: "Please complete onboarding first" });
     }
     
@@ -55,110 +81,179 @@ router.post("/submit", isAuthenticated, upload.single("cv"), async (req: any, re
       return res.status(400).json({ message: "CV file is required" });
     }
     
-    const job = await storage.createAnalysisJob({
-      userId,
-      status: "processing",
-      cvFilePath: req.file.path,
-      cvFileName: req.file.originalname,
-      jdText: req.body.jdText || null,
-    });
+    const cvText = await extractTextFromFile(req.file.path, req.file.mimetype);
+    
+    if (!cvText || cvText.trim().length < 50) {
+      return res.status(400).json({ message: "Could not extract text from CV. Please upload a readable PDF or DOCX file." });
+    }
+
+    const metaSnapshot = {
+      current_status: profile.current_status,
+      target_role: profile.target_role,
+      years_experience: profile.years_experience,
+      personalization_quality: profile.personalization_quality
+    };
+
+    const { data: submission, error: subError } = await supabaseAdmin
+      .from('cv_submissions')
+      .insert({
+        user_id: userId,
+        cv_file_path: req.file.path,
+        cv_text: cvText,
+        meta_snapshot: metaSnapshot
+      })
+      .select()
+      .single();
+
+    if (subError) {
+      console.error("Error creating submission:", subError);
+      return res.status(500).json({ message: "Failed to create CV submission" });
+    }
+
+    const { data: job, error: jobError } = await supabaseAdmin
+      .from('analysis_jobs')
+      .insert({
+        submission_id: submission.id,
+        user_id: userId,
+        status: 'processing'
+      })
+      .select()
+      .single();
+
+    if (jobError) {
+      console.error("Error creating job:", jobError);
+      return res.status(500).json({ message: "Failed to create analysis job" });
+    }
     
     const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
     if (n8nWebhookUrl) {
       try {
-        const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-        const host = req.get("host") || "localhost:5000";
-        const cvFileUrl = `${protocol}://${host}/api/analysis/files/${job.id}`;
-        
+        const payload = {
+          meta: {
+            jobId: job.id,
+            submissionId: submission.id,
+            userId: userId,
+            current_status: profile.current_status,
+            target_role: profile.target_role,
+            years_experience: profile.years_experience,
+            personalization_quality: profile.personalization_quality,
+            source: "bcalm_replit",
+            uploaded_at: new Date().toISOString()
+          },
+          cv_text: cvText,
+          jd_text: req.body.jdText || null
+        };
+
         const response = await fetch(n8nWebhookUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            jobId: job.id,
-            userId: user.id,
-            currentStatus: user.currentStatus,
-            targetRole: user.targetRole,
-            yearsExperience: user.yearsExperience,
-            cvFileUrl,
-            jdText: req.body.jdText || null,
-          }),
+          body: JSON.stringify(payload),
         });
         
         if (!response.ok) {
           console.error("n8n webhook returned error:", response.status, await response.text());
-          await storage.updateAnalysisJobResults(job.id, {
-            status: "failed",
-            notes: "Failed to connect to analysis service. Please try again.",
-          });
+          await supabaseAdmin
+            .from('analysis_jobs')
+            .update({ 
+              status: 'failed',
+              error_text: 'Failed to connect to analysis service'
+            })
+            .eq('id', job.id);
         }
       } catch (webhookError) {
         console.error("Error calling n8n webhook:", webhookError);
-        await storage.updateAnalysisJobResults(job.id, {
-          status: "failed",
-          notes: "Failed to connect to analysis service. Please try again.",
-        });
+        await supabaseAdmin
+          .from('analysis_jobs')
+          .update({ 
+            status: 'failed',
+            error_text: 'Failed to connect to analysis service'
+          })
+          .eq('id', job.id);
       }
     } else {
       setTimeout(async () => {
-        await storage.updateAnalysisJobResults(job.id, {
-          status: "complete",
-          score: 72,
-          strengths: [
-            "Strong technical background with relevant skills",
-            "Clear project descriptions with measurable outcomes",
-            "Good educational credentials"
+        const mockResult = {
+          role_preset: profile.target_role || "General",
+          overall_score: 72,
+          score_breakdown: {
+            ats: { score: 75, feedback: "Good keyword optimization" },
+            impact: { score: 70, feedback: "Could use more quantifiable results" },
+            role_signals: { score: 68, feedback: "Role alignment is decent" },
+            job_match: { score: 75, feedback: "Good match overall", skipped: !profile.target_role }
+          },
+          summary: "Your CV shows solid potential with good technical skills. Focus on adding measurable achievements and industry-specific keywords to boost your score.",
+          top_strengths: [
+            { point: "Strong technical background", evidence: "Listed relevant skills", why_it_works: "Demonstrates capability" },
+            { point: "Clear project descriptions", evidence: "Projects have context", why_it_works: "Shows practical experience" },
+            { point: "Good educational credentials", evidence: "Listed degree and institution", why_it_works: "Establishes credibility" }
           ],
-          gaps: [
-            "Could benefit from more industry-specific keywords",
-            "Consider adding more quantifiable achievements",
-            "Leadership experience section could be expanded"
+          top_fixes: [
+            { point: "Add more metrics", expected_lift: 5, why_weak: "Achievements lack numbers", recommended: "Include percentages, numbers, or revenue impact" },
+            { point: "Optimize for ATS", expected_lift: 3, why_weak: "Some keywords missing", recommended: "Add industry-standard terminology" },
+            { point: "Strengthen summary", expected_lift: 4, why_weak: "Summary is generic", recommended: "Tailor to target role with specific achievements" }
           ],
-          quickWins: [
-            "Add 2-3 more relevant skills to the skills section",
-            "Include metrics in your project descriptions",
-            "Add a professional summary at the top"
+          bullet_review: [],
+          info_needed_from_user: profile.target_role ? [] : ["What specific role are you targeting?"],
+          seven_step_plan: [
+            { step: 1, action: "Add a compelling professional summary", priority: "high" },
+            { step: 2, action: "Quantify your achievements with metrics", priority: "high" },
+            { step: 3, action: "Optimize keywords for your target role", priority: "medium" },
+            { step: 4, action: "Improve project descriptions with outcomes", priority: "medium" },
+            { step: 5, action: "Add relevant certifications if any", priority: "low" },
+            { step: 6, action: "Review formatting for ATS compatibility", priority: "low" },
+            { step: 7, action: "Get feedback from industry professionals", priority: "low" }
           ],
-          notes: "Your CV shows good potential. Focus on quantifying your achievements and adding industry-specific keywords to improve your score.",
-          needsJd: !req.body.jdText,
-          needsTargetRole: !user.targetRole,
-        });
+          job_match_section: {
+            match_score: profile.target_role ? 75 : null,
+            missing_skills: [],
+            strong_matches: []
+          }
+        };
+
+        await supabaseAdmin
+          .from('analysis_jobs')
+          .update({
+            status: 'complete',
+            result_json: mockResult,
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', job.id);
       }, 5000);
     }
     
-    res.json({ jobId: job.id, status: "processing" });
+    res.json({ ok: true, jobId: job.id });
   } catch (error) {
     console.error("Error submitting CV for analysis:", error);
     res.status(500).json({ message: "Failed to submit CV for analysis" });
   }
 });
 
-router.get("/:jobId", isAuthenticated, async (req: any, res: Response) => {
+router.get("/:jobId", isAuthenticated, async (req: Request, res: Response) => {
   try {
     const { jobId } = req.params;
-    const userId = req.user.claims.sub;
+    const userId = (req as any).userId;
     
-    const job = await storage.getAnalysisJob(jobId);
+    const { data: job, error } = await supabaseAdmin
+      .from('analysis_jobs')
+      .select('*')
+      .eq('id', jobId)
+      .single();
     
-    if (!job) {
+    if (error || !job) {
       return res.status(404).json({ message: "Job not found" });
     }
     
-    if (job.userId !== userId) {
+    if (job.user_id !== userId) {
       return res.status(403).json({ message: "Access denied" });
     }
     
     res.json({
       id: job.id,
       status: job.status,
-      score: job.score,
-      strengths: job.strengths,
-      gaps: job.gaps,
-      quickWins: job.quickWins,
-      notes: job.notes,
-      needsJd: job.needsJd,
-      needsTargetRole: job.needsTargetRole,
-      createdAt: job.createdAt,
-      completedAt: job.completedAt,
+      result_json: job.result_json,
+      error_text: job.error_text,
+      created_at: job.created_at,
+      completed_at: job.completed_at,
     });
   } catch (error) {
     console.error("Error fetching analysis job:", error);
@@ -166,18 +261,27 @@ router.get("/:jobId", isAuthenticated, async (req: any, res: Response) => {
   }
 });
 
-router.get("/user/jobs", isAuthenticated, async (req: any, res: Response) => {
+router.get("/user/jobs", isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.claims.sub;
-    const jobs = await storage.getAnalysisJobsByUser(userId);
+    const userId = (req as any).userId;
     
-    res.json(jobs.map((job) => ({
+    const { data: jobs, error } = await supabaseAdmin
+      .from('analysis_jobs')
+      .select('id, status, result_json, created_at, completed_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error("Error fetching jobs:", error);
+      return res.status(500).json({ message: "Failed to fetch jobs" });
+    }
+    
+    res.json(jobs.map((job: any) => ({
       id: job.id,
       status: job.status,
-      score: job.score,
-      cvFileName: job.cvFileName,
-      createdAt: job.createdAt,
-      completedAt: job.completedAt,
+      score: job.result_json?.overall_score,
+      createdAt: job.created_at,
+      completedAt: job.completed_at,
     })));
   } catch (error) {
     console.error("Error fetching user jobs:", error);
@@ -195,31 +299,35 @@ router.get("/files/:jobId", async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized access to file" });
     }
     
-    const job = await storage.getAnalysisJob(jobId);
-    if (!job || !job.cvFilePath) {
+    const { data: job, error } = await supabaseAdmin
+      .from('analysis_jobs')
+      .select('submission_id')
+      .eq('id', jobId)
+      .single();
+
+    if (error || !job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    const { data: submission } = await supabaseAdmin
+      .from('cv_submissions')
+      .select('cv_file_path')
+      .eq('id', job.submission_id)
+      .single();
+
+    if (!submission?.cv_file_path) {
       return res.status(404).json({ message: "File not found" });
     }
     
-    if (!fs.existsSync(job.cvFilePath)) {
+    if (!fs.existsSync(submission.cv_file_path)) {
       return res.status(404).json({ message: "File not found on disk" });
     }
     
-    res.sendFile(path.resolve(job.cvFilePath));
+    res.sendFile(path.resolve(submission.cv_file_path));
   } catch (error) {
     console.error("Error serving CV file:", error);
     res.status(500).json({ message: "Failed to serve file" });
   }
-});
-
-const callbackSchema = z.object({
-  jobId: z.string(),
-  score: z.number(),
-  strengths: z.array(z.string()),
-  gaps: z.array(z.string()),
-  quick_wins: z.array(z.string()),
-  notes: z.string().optional(),
-  needs_jd: z.boolean().optional(),
-  needs_target_role: z.boolean().optional(),
 });
 
 router.post("/callback", async (req: Request, res: Response) => {
@@ -231,28 +339,34 @@ router.post("/callback", async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid callback secret" });
     }
     
-    const data = callbackSchema.parse(req.body);
+    let resultData = req.body;
     
-    const updated = await storage.updateAnalysisJobResults(data.jobId, {
-      status: "complete",
-      score: data.score,
-      strengths: data.strengths,
-      gaps: data.gaps,
-      quickWins: data.quick_wins,
-      notes: data.notes,
-      needsJd: data.needs_jd,
-      needsTargetRole: data.needs_target_role,
-    });
+    if (Array.isArray(resultData) && resultData.length > 0) {
+      resultData = resultData[0];
+    }
     
-    if (!updated) {
-      return res.status(404).json({ message: "Job not found" });
+    const jobId = resultData.jobId || resultData.meta?.jobId;
+    
+    if (!jobId) {
+      return res.status(400).json({ message: "Missing jobId in callback" });
+    }
+
+    const { error } = await supabaseAdmin
+      .from('analysis_jobs')
+      .update({
+        status: 'complete',
+        result_json: resultData,
+        completed_at: new Date().toISOString()
+      })
+      .eq('id', jobId);
+
+    if (error) {
+      console.error("Error updating job:", error);
+      return res.status(500).json({ message: "Failed to update job" });
     }
     
     res.json({ success: true });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ message: "Invalid callback data", errors: error.errors });
-    }
     console.error("Error processing callback:", error);
     res.status(500).json({ message: "Failed to process callback" });
   }

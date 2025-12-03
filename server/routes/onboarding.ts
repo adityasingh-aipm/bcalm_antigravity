@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
-import { storage } from "../storage";
-import { isAuthenticated } from "../replitAuth";
+import { isAuthenticated } from "../supabaseAuth";
+import { supabaseAdmin } from "../supabaseClient";
 import { z } from "zod";
 
 const router = Router();
@@ -11,21 +11,26 @@ const onboardingSchema = z.object({
   yearsExperience: z.number().min(0).max(50).optional(),
 });
 
-router.get("/status", isAuthenticated, async (req: any, res: Response) => {
+router.get("/status", isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.claims.sub;
-    const user = await storage.getUser(userId);
+    const userId = (req as any).userId;
     
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { data: profile, error } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (error || !profile) {
+      return res.status(404).json({ message: "Profile not found" });
     }
     
     res.json({
-      onboardingStatus: user.onboardingStatus || "not_started",
-      currentStatus: user.currentStatus,
-      targetRole: user.targetRole,
-      yearsExperience: user.yearsExperience,
-      personalizationQuality: user.personalizationQuality,
+      onboardingStatus: profile.onboarding_status || "not_started",
+      currentStatus: profile.current_status,
+      targetRole: profile.target_role,
+      yearsExperience: profile.years_experience,
+      personalizationQuality: profile.personalization_quality,
     });
   } catch (error) {
     console.error("Error fetching onboarding status:", error);
@@ -33,23 +38,43 @@ router.get("/status", isAuthenticated, async (req: any, res: Response) => {
   }
 });
 
-router.post("/update", isAuthenticated, async (req: any, res: Response) => {
+router.post("/update", isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.claims.sub;
+    const userId = (req as any).userId;
     const validatedData = onboardingSchema.parse(req.body);
     
-    const updated = await storage.updateUserOnboarding(userId, validatedData);
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
     
-    if (!updated) {
-      return res.status(404).json({ message: "User not found" });
+    if (validatedData.currentStatus !== undefined) {
+      updateData.current_status = validatedData.currentStatus;
+    }
+    if (validatedData.targetRole !== undefined) {
+      updateData.target_role = validatedData.targetRole;
+    }
+    if (validatedData.yearsExperience !== undefined) {
+      updateData.years_experience = validatedData.yearsExperience;
+    }
+    
+    const { data: profile, error } = await supabaseAdmin
+      .from('profiles')
+      .update(updateData)
+      .eq('id', userId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error("Error updating profile:", error);
+      return res.status(500).json({ message: "Failed to update profile" });
     }
     
     res.json({
-      onboardingStatus: updated.onboardingStatus,
-      currentStatus: updated.currentStatus,
-      targetRole: updated.targetRole,
-      yearsExperience: updated.yearsExperience,
-      personalizationQuality: updated.personalizationQuality,
+      onboardingStatus: profile.onboarding_status,
+      currentStatus: profile.current_status,
+      targetRole: profile.target_role,
+      yearsExperience: profile.years_experience,
+      personalizationQuality: profile.personalization_quality,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -60,23 +85,37 @@ router.post("/update", isAuthenticated, async (req: any, res: Response) => {
   }
 });
 
-router.post("/complete", isAuthenticated, async (req: any, res: Response) => {
+router.post("/complete", isAuthenticated, async (req: Request, res: Response) => {
   try {
-    const userId = req.user.claims.sub;
-    const user = await storage.getUser(userId);
+    const userId = (req as any).userId;
     
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { data: profile, error: fetchError } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (fetchError || !profile) {
+      return res.status(404).json({ message: "Profile not found" });
     }
     
-    const hasRole = !!user.targetRole;
-    const hasExperience = user.yearsExperience !== null && user.yearsExperience !== undefined;
+    const hasRole = !!profile.target_role;
+    const hasExperience = profile.years_experience !== null && profile.years_experience !== undefined;
     const personalizationQuality = hasRole && hasExperience ? "full" : "partial";
     
-    const updated = await storage.updateUserOnboarding(userId, {
-      onboardingStatus: "complete",
-      personalizationQuality,
-    });
+    const { error: updateError } = await supabaseAdmin
+      .from('profiles')
+      .update({
+        onboarding_status: "complete",
+        personalization_quality: personalizationQuality,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId);
+    
+    if (updateError) {
+      console.error("Error completing onboarding:", updateError);
+      return res.status(500).json({ message: "Failed to complete onboarding" });
+    }
     
     res.json({
       onboardingStatus: "complete",

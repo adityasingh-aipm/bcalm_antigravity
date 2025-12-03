@@ -70,6 +70,10 @@ externalPort = 5173
 localPort = 46191
 externalPort = 8000
 
+[[ports]]
+localPort = 46571
+externalPort = 8080
+
 [env]
 PORT = "5000"
 
@@ -102,3 +106,4 @@ integrations = ["javascript_mem_db:1.0.0", "javascript_database:1.0.0", "twilio:
 [userenv.shared]
 VITE_SUPABASE_URL = "https://rhwvwvvwjwvtlxzqooii.supabase.co"
 VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3Z3dnZ3and2dGx4enFvb2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1ODQzOTEsImV4cCI6MjA3ODE2MDM5MX0.tvv9lDe_4PACmq4s1j1jkwAPiTEYATjLZUaDtW_e4Ms"
+SUPABASE_URL = "https://rhwvwvvwjwvtlxzqooii.supabase.co"

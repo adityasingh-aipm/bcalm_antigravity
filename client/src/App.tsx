@@ -22,11 +22,15 @@ import UploadPage from "@/pages/UploadPage";
 import ProcessingPage from "@/pages/ProcessingPage";
 import ResultsPage from "@/pages/ResultsPage";
 import DashboardPage from "@/pages/DashboardPage";
+import AuthCallbackPage from "@/pages/AuthCallbackPage";
+import StartPage from "@/pages/StartPage";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
+      <Route path="/auth/callback" component={AuthCallbackPage} />
+      <Route path="/start" component={StartPage} />
       <Route path="/onboarding" component={OnboardingPage} />
       <Route path="/upload" component={UploadPage} />
       <Route path="/processing" component={ProcessingPage} />
