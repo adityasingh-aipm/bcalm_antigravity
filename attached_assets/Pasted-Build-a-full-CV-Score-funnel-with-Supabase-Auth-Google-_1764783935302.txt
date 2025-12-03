@@ -1,0 +1,391 @@
+Build a full CV Score funnel  with Supabase Auth (Google) + my existing public.profiles table. It must work end-to-end: landing CTA → Google login → onboarding gating → CV upload → parse CV to text → save submission + job in Supabase → trigger n8n webhook → poll job status → receive callback → render results.
+
+Environment variables (Replit Secrets)
+
+SUPABASE_URL
+
+SUPABASE_ANON_KEY (frontend)
+
+SUPABASE_SERVICE_ROLE_KEY (server only)
+
+SESSION_SECRET
+
+BASE_URL = https://bcalm.org
+
+N8N_WEBHOOK_URL = https://adityabcalm.app.n8n.cloud/webhook/cv-score/start
+
+N8N_CALLBACK_SECRET (string you will verify on callback)
+
+Supabase tables to create (include SQL in project under /supabase/schema.sql and also auto-run check at startup)
+
+1) cv_submissions
+
+create table if not exists public.cv_submissions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  cv_file_path text,
+  cv_text text not null,
+  meta_snapshot jsonb,
+  created_at timestamptz not null default now()
+);
+alter table public.cv_submissions enable row level security;
+create policy if not exists "cv_submissions_select_own"
+on public.cv_submissions for select using (auth.uid() = user_id);
+create policy if not exists "cv_submissions_insert_own"
+on public.cv_submissions for insert with check (auth.uid() = user_id);
+
+
+2) analysis_jobs
+
+create table if not exists public.analysis_jobs (
+  id uuid primary key default gen_random_uuid(),  -- jobId
+  submission_id uuid not null references public.cv_submissions(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'processing'
+    check (status in ('processing','complete','failed')),
+  result_json jsonb,
+  error_text text,
+  created_at timestamptz not null default now(),
+  completed_at timestamptz
+);
+alter table public.analysis_jobs enable row level security;
+create policy if not exists "analysis_jobs_select_own"
+on public.analysis_jobs for select using (auth.uid() = user_id);
+create policy if not exists "analysis_jobs_insert_own"
+on public.analysis_jobs for insert with check (auth.uid() = user_id);
+
+Pages / Routes
+
+Frontend pages
+
+/ Landing
+
+Top nav CTA + hero CTA: “Get My Free CV Score”
+
+On click:
+
+if not logged in → trigger Supabase Google OAuth login
+
+if logged in → go to /start
+
+/auth/callback
+
+Supabase OAuth redirect lands here.
+
+Use supabase-js on client to read session from URL hash.
+
+POST access token to backend /api/session.
+
+Redirect to /start.
+
+/start
+
+Protected by backend session middleware.
+
+Calls /api/me.
+
+If profile.onboarding_status != 'complete' → /onboarding
+
+Else → /upload
+
+/onboarding
+
+3-step wizard with conditional experience step.
+
+Step 1 (Q1):
+Title: “Let’s personalize your CV score”
+Question: “What best describes you right now?”
+Options ONLY:
+
+“Student / Fresher”
+
+“Working Professional”
+
+“Switching Careers”
+
+Step 2 (Target role):
+Title: “What role are you aiming for?”
+Subtitle: “We’ll score your CV against this role’s expectations.”
+Dynamic chips:
+
+If Student/Fresher: “Software Engineer (SDE)”, “Data Analyst”, “Product Intern”, “Business Analyst”, “ML Engineer”, “UI/UX Designer”, “Not sure yet”
+
+Else: “Backend Engineer”, “Product Manager”, “Data Scientist”, “DevOps Engineer”, “Marketing / Growth”, “Consulting”, “Not sure yet”
+Free text input allowed. Skippable.
+
+Step 3 (Experience):
+
+Show ALWAYS (but preselect “0 (Just starting)” if Student/Fresher).
+Title: “Your experience level”
+Options:
+
+“0 (Just starting)”
+
+“1–2 years”
+
+“3–5 years”
+
+“6–9 years”
+
+“10+ years”
+CTA primary: “See my CV score”
+Secondary: “Skip for now”
+
+Completion rules:
+
+If user clicks primary or skip on Step 3, onboarding is considered complete.
+
+Update profiles:
+
+current_status
+
+target_role (null if “Not sure yet” / skipped)
+
+years_experience (null if skipped, else numeric; Student default 0)
+
+onboarding_status='complete'
+
+personalization_quality='full' only if target_role AND years_experience are present, else 'partial'
+
+/upload
+
+Requires onboarding complete.
+
+Primary CTA: “Analyze My CV”
+
+Secondary inline CTA (do not navigate away):
+“Don’t have a CV? See best CV samples →” (open modal or new tab)
+
+Accept PDF/DOC/DOCX (max 5MB).
+
+/processing?jobId=...
+
+Show loader copy:
+
+Title: “Scoring your CV…”
+
+Bullets: Reading experience & projects → Matching to role expectations → Finding gaps recruiters notice → Generating your fixes
+
+Poll /api/analysis/:jobId every 2 seconds until complete.
+
+/results/:jobId
+
+Render agent output.
+
+First render raw JSON view collapsible.
+
+Beautify key parts:
+
+Overall score
+
+Summary
+
+Score breakdown cards (ATS, Impact, Role signals, Job match)
+
+Top strengths list
+
+Top fixes list
+
+Seven step plan timeline
+
+Info needed questions
+
+Bullet review table
+
+Add “Improve accuracy” nudges:
+
+If profile.target_role null OR result hints missing role → CTA “Add target role for sharper scoring” linking /onboarding?edit=role
+
+If result.score_breakdown.job_match.skipped OR result.needs_jd true → CTA “Add JD to check fit for a specific job”
+
+CTA: “Re-score after edits” → back to /upload
+
+Backend API
+
+Use supabase-js server client with service role key.
+
+Auth/session strategy
+
+Frontend handles OAuth.
+
+Backend stores sb_access_token cookie.
+
+Middleware checks cookie, uses supabase.auth.getUser(token) to fetch user.
+
+Endpoints
+
+POST /api/session
+
+body: { access_token }
+
+verify with Supabase, set secure cookie.
+
+GET /api/me
+
+return { user, profile } from Supabase profiles.
+
+POST /api/profile
+
+update onboarding fields per rules above.
+
+POST /api/cv/upload
+
+multipart upload.
+
+Save file to Replit FS.
+
+Parse to text:
+
+PDF: pdf-parse
+
+DOCX: mammoth
+
+Fetch profile from Supabase.
+
+Insert into cv_submissions with:
+
+user_id
+
+cv_file_path
+
+cv_text
+
+meta_snapshot (snapshot of current_status, target_role, years_experience, personalization_quality)
+
+Insert into analysis_jobs:
+
+submission_id
+
+user_id
+
+status='processing'
+
+Trigger n8n webhook asynchronously using preferred payload shape:
+
+{
+  "meta": {
+    "jobId": "<analysis_jobs.id>",
+    "submissionId": "<cv_submissions.id>",
+    "userId": "<auth user id>",
+    "current_status": "...",
+    "target_role": "... or null",
+    "years_experience": 0 or null,
+    "personalization_quality": "partial|full",
+    "source": "bcalm_replit",
+    "uploaded_at": "<iso>"
+  },
+  "cv_text": "<FULL CV TEXT STRING>",
+  "jd_text": null
+}
+
+
+Respond { ok:true, jobId }.
+
+GET /api/analysis/:jobId
+
+read analysis_jobs by id
+
+return status + result_json.
+
+POST /api/analysis/callback
+
+This is the exact callback URL already used by agent:
+https://bcalm.org/api/analysis/callback
+
+Verify header x-callback-secret == N8N_CALLBACK_SECRET.
+
+Agent will send JSON shaped like the provided sample array.
+
+Store it into analysis_jobs.result_json, set status='complete', completed_at=now().
+
+Agent sample output handling
+
+The callback payload will look like:
+
+An array with one object containing:
+
+role_preset
+
+overall_score
+
+score_breakdown (ats/impact/role_signals/job_match)
+
+summary
+
+top_strengths[]
+
+top_fixes[]
+
+bullet_review[]
+
+info_needed_from_user[]
+
+seven_step_plan[]
+
+job_match_section{...}
+
+Rendering requirements
+
+If result_json is an array, use first element as report.
+
+Render:
+
+Overall score big
+
+Score breakdown in 4 mini cards
+
+Summary paragraph
+
+Strengths + fixes as cards with evidence/why/expected lift
+
+Bullet review as a table (original bullet, why weak, recommended)
+
+Info needed list
+
+Seven step plan as numbered steps.
+
+Also include a collapsible “Raw JSON” block for debugging.
+
+Styling
+
+Purple/black modern theme matching earlier screenshots.
+
+Mobile friendly.
+
+End-to-end test harness (must implement)
+
+Add:
+
+GET /api/test/health
+
+checks Supabase connectivity
+
+checks profile exists for logged-in user
+
+A /test/e2e page listing exact manual steps to validate:
+
+OAuth works and session cookie set
+
+Onboarding gates correctly
+
+CV parses to text and saves in cv_submissions
+
+analysis_jobs row created
+
+webhook called (log request id)
+
+callback updates job
+
+results render from sample JSON
+
+Important
+
+Do not use Replit Auth.
+
+Use Supabase Auth only.
+
+Everything must be runnable with no TODO placeholders.
+
+Use the exact webhook and callback URLs given.
+
+Deliver the complete runnable Replit project with clear file structure and comments.
