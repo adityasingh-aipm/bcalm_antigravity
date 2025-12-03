@@ -62,6 +62,8 @@ export async function setupSupabaseAuth(app: Express) {
   app.get("/api/auth/user", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
+      const user = (req as any).user;
+      
       const { data: profile, error } = await supabaseAdmin
         .from('profiles')
         .select('*')
@@ -70,6 +72,13 @@ export async function setupSupabaseAuth(app: Express) {
 
       if (error) {
         console.error("Error fetching profile:", error);
+        const fallbackProfile = await ensureProfile(user);
+        if (fallbackProfile) {
+          return res.json({
+            id: userId,
+            ...fallbackProfile
+          });
+        }
         return res.status(500).json({ error: "Failed to fetch user profile" });
       }
 
@@ -86,6 +95,8 @@ export async function setupSupabaseAuth(app: Express) {
   app.get("/api/me", isAuthenticated, async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
+      const user = (req as any).user;
+      
       const { data: profile, error } = await supabaseAdmin
         .from('profiles')
         .select('*')
@@ -93,6 +104,14 @@ export async function setupSupabaseAuth(app: Express) {
         .single();
 
       if (error) {
+        console.error("Error fetching profile in /api/me:", error);
+        const fallbackProfile = await ensureProfile(user);
+        if (fallbackProfile) {
+          return res.json({
+            user: { id: userId },
+            profile: fallbackProfile
+          });
+        }
         return res.status(500).json({ error: "Failed to fetch profile" });
       }
 
@@ -118,40 +137,62 @@ export async function setupSupabaseAuth(app: Express) {
 }
 
 async function ensureProfile(user: any) {
-  const { data: existingProfile } = await supabaseAdmin
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  try {
+    const { data: existingProfile, error: fetchError } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
 
-  if (existingProfile) {
-    return existingProfile;
-  }
+    if (existingProfile) {
+      return existingProfile;
+    }
 
-  const fullName = user.user_metadata?.full_name || user.user_metadata?.name || '';
-  const nameParts = fullName.split(' ');
-  const firstName = nameParts[0] || '';
-  const lastName = nameParts.slice(1).join(' ') || '';
+    if (fetchError && fetchError.code !== 'PGRST116') {
+      console.error("Error fetching profile:", fetchError);
+    }
 
-  const { data: newProfile, error } = await supabaseAdmin
-    .from('profiles')
-    .insert({
+    const fullName = user.user_metadata?.full_name || user.user_metadata?.name || '';
+    const nameParts = fullName.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const { data: newProfile, error } = await supabaseAdmin
+      .from('profiles')
+      .insert({
+        id: user.id,
+        email: user.email,
+        first_name: firstName,
+        last_name: lastName,
+        avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+        onboarding_status: 'not_started'
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Error creating profile:", error);
+      return {
+        id: user.id,
+        email: user.email,
+        first_name: firstName,
+        last_name: lastName,
+        avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+        onboarding_status: 'not_started',
+        _temporary: true
+      };
+    }
+
+    return newProfile;
+  } catch (err) {
+    console.error("ensureProfile exception:", err);
+    return {
       id: user.id,
       email: user.email,
-      first_name: firstName,
-      last_name: lastName,
-      avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
-      onboarding_status: 'not_started'
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Error creating profile:", error);
-    return null;
+      onboarding_status: 'not_started',
+      _temporary: true
+    };
   }
-
-  return newProfile;
 }
 
 export const isAuthenticated: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
