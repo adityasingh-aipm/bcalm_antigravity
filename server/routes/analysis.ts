@@ -133,20 +133,13 @@ router.post("/submit", isAuthenticated, upload.single("cv"), async (req: Request
     if (n8nWebhookUrl) {
       try {
         const payload = {
-          meta: {
-            jobId: job.id,
-            submissionId: submission.id,
-            userId: userId,
-            current_status: profile.current_status,
-            target_role: profile.target_role,
-            years_experience: profile.years_experience,
-            personalization_quality: profile.personalization_quality,
-            source: "bcalm_replit",
-            uploaded_at: new Date().toISOString()
-          },
+          id: submission.id,
           cv_text: cvText,
-          jd_text: req.body.jdText || null
+          meta_snapshot: metaSnapshot,
+          jobId: job.id
         };
+
+        console.log("Triggering n8n webhook with payload:", JSON.stringify(payload, null, 2));
 
         const response = await fetch(n8nWebhookUrl, {
           method: "POST",
