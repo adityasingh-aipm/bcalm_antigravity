@@ -13,7 +13,6 @@ interface AnalysisJob {
   id: string;
   status: string;
   score: number | null;
-  cvFileName: string | null;
   createdAt: string;
   completedAt: string | null;
 }
@@ -28,7 +27,7 @@ interface OnboardingStatus {
 
 export default function DashboardPage() {
   const [, navigate] = useLocation();
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { user, isLoading: authLoading, isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -52,8 +51,9 @@ export default function DashboardPage() {
     }
   }, [onboardingLoading, onboardingData, navigate]);
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
   };
 
   if (authLoading || onboardingLoading) {
@@ -122,7 +122,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="text-white/60 text-sm">Latest Score</p>
                     <p className="text-2xl font-bold text-white" data-testid="text-latest-score">
-                      {latestScore !== undefined ? `${latestScore}/100` : "—"}
+                      {latestScore !== undefined && latestScore !== null ? `${latestScore}/100` : "—"}
                     </p>
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export default function DashboardPage() {
         >
           <Card className="bg-white/5 border-white/10 mb-8">
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
                   <CardTitle className="text-white">CV Analyses</CardTitle>
                   <CardDescription className="text-white/60">
@@ -224,7 +224,7 @@ export default function DashboardPage() {
                         </div>
                         <div>
                           <p className="text-white font-medium">
-                            {job.cvFileName || "CV Analysis"}
+                            CV Analysis
                           </p>
                           <div className="flex items-center gap-2 text-white/60 text-sm">
                             <Clock className="h-3 w-3" />
@@ -242,7 +242,7 @@ export default function DashboardPage() {
                           variant={job.status === "complete" ? "default" : "secondary"}
                           className={job.status === "complete" ? "bg-green-500/20 text-green-400" : ""}
                         >
-                          {job.status === "complete" ? "Complete" : "Processing"}
+                          {job.status === "complete" ? "Complete" : job.status === "failed" ? "Failed" : "Processing"}
                         </Badge>
                       </div>
                     </motion.div>

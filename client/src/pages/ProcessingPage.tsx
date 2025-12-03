@@ -9,15 +9,10 @@ import { Button } from "@/components/ui/button";
 interface AnalysisJob {
   id: string;
   status: string;
-  score: number | null;
-  strengths: string[] | null;
-  gaps: string[] | null;
-  quickWins: string[] | null;
-  notes: string | null;
-  needsJd: boolean;
-  needsTargetRole: boolean;
-  createdAt: string;
-  completedAt: string | null;
+  result_json: any;
+  error_text: string | null;
+  created_at: string;
+  completed_at: string | null;
 }
 
 const LOADING_STEPS = [
@@ -89,7 +84,7 @@ export default function ProcessingPage() {
           <h2 className="text-2xl font-bold text-white mb-4">Analysis Failed</h2>
           
           <p className="text-white/60 mb-8">
-            {jobData.notes || "Something went wrong while analyzing your CV. Please try again."}
+            {jobData.error_text || "Something went wrong while analyzing your CV. Please try again."}
           </p>
 
           <Button

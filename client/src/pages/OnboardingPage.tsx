@@ -11,6 +11,15 @@ interface OnboardingStatus {
   yearsExperience: number | null;
   personalizationQuality: string | null;
 }
+
+interface Profile {
+  id: string;
+  onboarding_status: string | null;
+  current_status: string | null;
+  target_role: string | null;
+  years_experience: number | null;
+  personalization_quality: string | null;
+}
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
