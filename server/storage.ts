@@ -1,4 +1,4 @@
-import { type User, type UpsertUser, type ResourcesUser, type InsertResourcesUser, type Resource, type InsertResource, type DownloadLog, type InsertDownloadLog, type AssessmentQuestion, type InsertAssessmentQuestion, type AssessmentAttempt, type InsertAssessmentAttempt, type AssessmentAnswer, type InsertAssessmentAnswer, type HackathonRegistration, type InsertHackathonRegistration, type CvSubmission, type InsertCvSubmission, users, resourcesUsers, resources, downloadLogs, assessmentQuestions, assessmentAttempts, assessmentAnswers, hackathonRegistrations, cvSubmissions } from "@shared/schema";
+import { type User, type UpsertUser, type ResourcesUser, type InsertResourcesUser, type Resource, type InsertResource, type DownloadLog, type InsertDownloadLog, type AssessmentQuestion, type InsertAssessmentQuestion, type AssessmentAttempt, type InsertAssessmentAttempt, type AssessmentAnswer, type InsertAssessmentAnswer, type HackathonRegistration, type InsertHackathonRegistration, type CvSubmission, type InsertCvSubmission, type AnalysisJob, type InsertAnalysisJob, users, resourcesUsers, resources, downloadLogs, assessmentQuestions, assessmentAttempts, assessmentAnswers, hackathonRegistrations, cvSubmissions, analysisJobs } from "@shared/schema";
 import bcrypt from "bcrypt";
 import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
@@ -47,6 +47,30 @@ export interface IStorage {
   createCvSubmission(submission: InsertCvSubmission): Promise<CvSubmission>;
   getAllCvSubmissions(): Promise<CvSubmission[]>;
   getCvSubmissionStats(): Promise<{ total: number; byRole: Record<string, number>; today: number }>;
+  
+  // User Onboarding Methods
+  updateUserOnboarding(userId: string, data: {
+    currentStatus?: string;
+    targetRole?: string;
+    yearsExperience?: number;
+    onboardingStatus?: string;
+    personalizationQuality?: string;
+  }): Promise<User | undefined>;
+  
+  // Analysis Job Methods
+  createAnalysisJob(job: InsertAnalysisJob): Promise<AnalysisJob>;
+  getAnalysisJob(id: string): Promise<AnalysisJob | undefined>;
+  getAnalysisJobsByUser(userId: string): Promise<AnalysisJob[]>;
+  updateAnalysisJobResults(id: string, results: {
+    status: string;
+    score?: number;
+    strengths?: string[];
+    gaps?: string[];
+    quickWins?: string[];
+    notes?: string;
+    needsJd?: boolean;
+    needsTargetRole?: boolean;
+  }): Promise<AnalysisJob | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -378,6 +402,72 @@ export class DatabaseStorage implements IStorage {
     }).length;
     
     return { total, byRole, today: todayCount };
+  }
+
+  // User Onboarding Methods
+  async updateUserOnboarding(userId: string, data: {
+    currentStatus?: string;
+    targetRole?: string;
+    yearsExperience?: number;
+    onboardingStatus?: string;
+    personalizationQuality?: string;
+  }): Promise<User | undefined> {
+    const [updated] = await db
+      .update(users)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return updated || undefined;
+  }
+
+  // Analysis Job Methods
+  async createAnalysisJob(job: InsertAnalysisJob): Promise<AnalysisJob> {
+    const [newJob] = await db.insert(analysisJobs).values(job).returning();
+    return newJob;
+  }
+
+  async getAnalysisJob(id: string): Promise<AnalysisJob | undefined> {
+    const [job] = await db.select().from(analysisJobs).where(eq(analysisJobs.id, id));
+    return job || undefined;
+  }
+
+  async getAnalysisJobsByUser(userId: string): Promise<AnalysisJob[]> {
+    return await db
+      .select()
+      .from(analysisJobs)
+      .where(eq(analysisJobs.userId, userId))
+      .orderBy(sql`${analysisJobs.createdAt} DESC`);
+  }
+
+  async updateAnalysisJobResults(id: string, results: {
+    status: string;
+    score?: number;
+    strengths?: string[];
+    gaps?: string[];
+    quickWins?: string[];
+    notes?: string;
+    needsJd?: boolean;
+    needsTargetRole?: boolean;
+  }): Promise<AnalysisJob | undefined> {
+    const [updated] = await db
+      .update(analysisJobs)
+      .set({
+        status: results.status,
+        score: results.score,
+        strengths: results.strengths,
+        gaps: results.gaps,
+        quickWins: results.quickWins,
+        notes: results.notes,
+        needsJd: results.needsJd,
+        needsTargetRole: results.needsTargetRole,
+        completedAt: results.status === "complete" ? new Date() : undefined,
+      })
+      .where(eq(analysisJobs.id, id))
+      .returning();
+    return updated || undefined;
   }
 }
 

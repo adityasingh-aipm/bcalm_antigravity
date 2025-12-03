@@ -14,19 +14,59 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)],
 );
 
-// User storage table for Replit Auth
+// Onboarding status enum values
+export const CURRENT_STATUS_OPTIONS = ["student_fresher", "working_professional", "switching_careers"] as const;
+export const ONBOARDING_STATUS_OPTIONS = ["not_started", "complete"] as const;
+export const PERSONALIZATION_QUALITY_OPTIONS = ["full", "partial"] as const;
+
+// User storage table for Replit Auth with onboarding fields
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: varchar("email").unique(),
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
+  // Onboarding fields
+  currentStatus: varchar("current_status"),
+  targetRole: varchar("target_role"),
+  yearsExperience: integer("years_experience"),
+  onboardingStatus: varchar("onboarding_status").default("not_started"),
+  personalizationQuality: varchar("personalization_quality"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
+
+// Analysis Jobs table for CV processing
+export const analysisJobs = pgTable("analysis_jobs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  status: varchar("status").notNull().default("processing"),
+  cvFilePath: text("cv_file_path"),
+  cvFileName: text("cv_file_name"),
+  cvText: text("cv_text"),
+  jdText: text("jd_text"),
+  score: integer("score"),
+  strengths: jsonb("strengths"),
+  gaps: jsonb("gaps"),
+  quickWins: jsonb("quick_wins"),
+  notes: text("notes"),
+  needsJd: boolean("needs_jd").default(false),
+  needsTargetRole: boolean("needs_target_role").default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  completedAt: timestamp("completed_at"),
+});
+
+export const insertAnalysisJobSchema = createInsertSchema(analysisJobs).omit({
+  id: true,
+  createdAt: true,
+  completedAt: true,
+});
+
+export type AnalysisJob = typeof analysisJobs.$inferSelect;
+export type InsertAnalysisJob = z.infer<typeof insertAnalysisJobSchema>;
 
 export const resourcesUsers = pgTable("resources_users", {
   id: uuid("id").primaryKey().defaultRandom(),
