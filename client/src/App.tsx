@@ -17,11 +17,21 @@ import NotFound from "@/pages/not-found";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import HackathonPage from "@/pages/HackathonPage";
 import ComingSoonPage from "@/pages/ComingSoonPage";
+import OnboardingPage from "@/pages/OnboardingPage";
+import UploadPage from "@/pages/UploadPage";
+import ProcessingPage from "@/pages/ProcessingPage";
+import ResultsPage from "@/pages/ResultsPage";
+import DashboardPage from "@/pages/DashboardPage";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={LandingPage} />
+      <Route path="/onboarding" component={OnboardingPage} />
+      <Route path="/upload" component={UploadPage} />
+      <Route path="/processing" component={ProcessingPage} />
+      <Route path="/results/:jobId" component={ResultsPage} />
+      <Route path="/dashboard" component={DashboardPage} />
       <Route path="/resources" component={ResourcesPage} />
       <Route path="/admin/resources" component={ResourcesAdminDashboard} />
       <Route path="/ai-pm-readiness" component={AssessmentLandingPage} />

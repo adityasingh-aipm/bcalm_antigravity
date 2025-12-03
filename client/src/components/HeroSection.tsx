@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,6 +8,7 @@ import { Upload, CheckCircle, ChevronRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const targetRoles = [
   "Product Manager",
@@ -20,6 +22,8 @@ const targetRoles = [
 ];
 
 export default function HeroSection() {
+  const [, navigate] = useLocation();
+  const { isAuthenticated } = useAuth();
   const [step, setStep] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,6 +33,14 @@ export default function HeroSection() {
     targetRole: "",
     resume: null as File | null
   });
+
+  const handleGetCvScore = () => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      window.location.href = "/api/login";
+    }
+  };
 
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,7 +188,7 @@ export default function HeroSection() {
             className="mb-8 md:mb-10"
           >
             <button
-              onClick={scrollToForm}
+              onClick={handleGetCvScore}
               className="group inline-flex items-center gap-2 px-8 py-4 md:px-10 md:py-5 rounded-full text-lg md:text-xl font-semibold text-white transition-all duration-300 hover:scale-105 active:scale-100"
               style={{
                 background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%)',

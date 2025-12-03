@@ -1,5 +1,5 @@
-import { Link } from "wouter";
-import { GraduationCap, LogOut, Loader2, User } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { GraduationCap, LogOut, Loader2, User, LayoutDashboard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -8,28 +8,19 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
+  const [, navigate] = useLocation();
   const { user, isLoading, isAuthenticated } = useAuth();
 
-  const scrollToForm = () => {
-    const formCard = document.getElementById('cv-form-card');
-    if (formCard) {
-      const navbarHeight = 60;
-      const offset = 20;
-      const elementPosition = formCard.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - navbarHeight - offset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+  const handleGetCvScore = () => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      window.location.href = "/api/login";
     }
-  };
-
-  const handleLogin = () => {
-    window.location.href = "/api/login";
   };
 
   const handleLogout = () => {
@@ -82,6 +73,11 @@ export default function Navbar() {
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer" data-testid="button-dashboard">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer" data-testid="button-logout">
                       <LogOut className="mr-2 h-4 w-4" />
                       Logout
@@ -91,11 +87,11 @@ export default function Navbar() {
               </div>
             ) : (
               <button 
-                onClick={scrollToForm}
+                onClick={handleGetCvScore}
                 className="text-white/80 hover:text-white text-sm font-medium transition-colors cursor-pointer"
                 data-testid="button-get-cv-score"
               >
-                Get Free CV Score
+                Get My Free CV Score
               </button>
             )}
           </div>
