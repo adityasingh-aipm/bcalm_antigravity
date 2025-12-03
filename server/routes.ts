@@ -8,14 +8,25 @@ import hackathonRouter from "./routes/hackathon";
 import cvSubmissionsRouter from "./routes/cv-submissions";
 import express from "express";
 import path from "path";
+import { setupAuth, isAuthenticated } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // put application routes here
-  // prefix all routes with /api
+  // Setup Replit Auth
+  await setupAuth(app);
 
-  // use storage to perform CRUD operations on the storage interface
-  // e.g. storage.insertUser(user) or storage.getUserByUsername(username)
+  // Auth routes - get current user
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
 
+  // Application routes
   app.use("/api/resources", resourcesRouter);
   app.use("/api/assessment", assessmentRouter);
   app.use("/api/analytics", analyticsRouter);
