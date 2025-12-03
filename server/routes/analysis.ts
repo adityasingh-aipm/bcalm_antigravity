@@ -6,9 +6,6 @@ import path from "path";
 import fs from "fs";
 import { z } from "zod";
 import mammoth from "mammoth";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdfParse = require("pdf-parse");
 
 const router = Router();
 
@@ -45,6 +42,8 @@ const upload = multer({
 async function extractTextFromFile(filePath: string, mimeType: string): Promise<string> {
   try {
     if (mimeType === "application/pdf") {
+      const pdfParseModule = await import("pdf-parse");
+      const pdfParse = pdfParseModule.default || pdfParseModule;
       const dataBuffer = fs.readFileSync(filePath);
       const data = await pdfParse(dataBuffer);
       return data.text;
