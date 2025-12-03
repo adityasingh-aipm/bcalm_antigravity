@@ -2,6 +2,13 @@ import { Link } from "wouter";
 import { GraduationCap } from "lucide-react";
 
 export default function Navbar() {
+  const scrollToForm = () => {
+    const formCard = document.getElementById('cv-form-card');
+    if (formCard) {
+      formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   return (
     <nav
       className="fixed top-0 left-0 right-0 z-50"
@@ -21,13 +28,13 @@ export default function Navbar() {
             <span className="text-white font-bold text-xl tracking-tight">BCALM</span>
           </Link>
           
-          <Link 
-            href="/resources"
-            className="text-white/80 hover:text-white text-sm font-medium transition-colors"
+          <button 
+            onClick={scrollToForm}
+            className="text-white/80 hover:text-white text-sm font-medium transition-colors cursor-pointer"
             data-testid="link-login"
           >
             Login
-          </Link>
+          </button>
         </div>
       </div>
     </nav>
