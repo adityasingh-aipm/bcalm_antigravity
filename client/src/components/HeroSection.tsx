@@ -123,7 +123,7 @@ export default function HeroSection() {
   return (
     <section 
       id="hero"
-      className="relative min-h-screen overflow-hidden" 
+      className="relative overflow-hidden" 
       style={{ paddingTop: '20px' }}
     >
       {/* Dark gradient background - Seekho inspired */}
