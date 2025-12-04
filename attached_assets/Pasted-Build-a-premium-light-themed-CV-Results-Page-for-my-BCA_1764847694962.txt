@@ -1,0 +1,257 @@
+Build a premium, light-themed CV Results Page for my BCALM app (Node.js + Express backend, vanilla HTML/CSS/JS frontend).
+The page must feel like an “aha moment”: instant clarity, then progressive depth.
+Remove all CTAs from the top. Only show actions at bottom: Send on my Mail (left) and Share (right).
+Implement routes and UI exactly as described.
+
+Data contract
+
+Backend endpoint:
+
+GET /api/analysis/:jobId returns:
+
+{
+  "status": "complete",
+  "jobId": "...",
+  "report": {
+    "role_preset": "...",
+    "overall_score": 56,
+    "score_breakdown": {
+      "ats": {"score":12,"notes":"..."},
+      "impact": {"score":20,"notes":"..."},
+      "role_signals": {"score":10,"notes":"..."},
+      "job_match": {"score":0,"skipped":true,"notes":"..."}
+    },
+    "summary": "...",
+    "top_strengths": [{"strength":"...","evidence":"..."}],
+    "top_fixes": [{"fix":"...","expected_score_lift":4,"how_to_do_it":"...","why_it_matters":"..."}],
+    "seven_step_plan": [{"step":1,"task":"...","output_expected":"..."}],
+    "bullet_review": [{"original_bullet":"...","why_weak":"...","recommended_text":"...","placeholders_to_fill":["METRIC"]}],
+    "info_needed_from_user": ["..."],
+    "job_match_section": {"top_jd_requirements":[],"top_gaps":[],"match_verdict":"..."},
+    "cta":"..."
+  }
+}
+
+
+If status is not complete, show a full-page loading state.
+
+Page routes
+
+/results/:jobId → full private results
+
+/share/:jobId → public share poster (no private details)
+
+Results page layout (implement exactly)
+1) Hero “Aha” Block (NO CTAs here)
+
+Centered BCALM logo small at top.
+
+Animated score ring (SVG donut) counts up 0→score in ~700ms.
+
+Big score number overall_score/100.
+
+Verdict label computed from score:
+
+<40 “Needs work”
+
+40–59 “Good foundation”
+
+60–79 “Strong”
+
+80+ “Excellent”
+
+Role preset pill: Target role: {role_preset}
+
+1-sentence coach summary: use first sentence of summary.
+
+2) “Quickest win” strip (right after hero)
+
+Pull from top_fixes[0]:
+
+Text: “Quickest win (+{expected_score_lift} pts): {fix}”
+
+If no fixes, hide this strip.
+
+3) Score Breakdown Cards (2x2 grid)
+
+Cards for ATS, Impact, Role Signals, Job Match:
+
+show score big + 1-line truncated notes
+
+tiny “View details” chevron expands card to show full notes
+
+If job_match.skipped true, show small badge “JD missing”.
+
+4) Strengths & Fixes (emotional core)
+
+Two columns on desktop, stacked on mobile:
+
+Top Strengths
+
+heading: “What you’re already doing right”
+
+show first 3 with evidence
+
+“Show all strengths” expands rest
+
+Highest ROI Fixes
+
+heading: “What will boost your score fastest”
+
+show first 3
+
+each fix card shows:
+
+fix text
+
+expected_score_lift badge like “+4 pts”
+
+accordion for “how_to_do_it” and “why_it_matters”
+
+5) 7-Step Plan Timeline
+
+Vertical checklist / timeline style
+
+each step shows step number, task, output_expected (muted)
+
+6) Deep Dive Sections (collapsed by default)
+
+Create accordion groups with counts:
+
+Bullet Review ({bullet_review.length})
+
+each item shows:
+
+original bullet (muted monospace)
+
+why_weak
+
+recommended_text
+
+placeholders chips
+
+Job Match Deep Dive
+
+If skipped or empty requirements:
+
+empty state: “Upload a JD to unlock role-specific fit scoring.”
+
+Else:
+
+table of top_jd_requirements with status pills (strong/weak/missing)
+
+top_gaps as small cards
+
+Info Needed From You ({info_needed_from_user.length})
+
+list of questions as chips
+
+7) Bottom Action Row (ONLY CTAs on page)
+
+Sticky bar is NOT allowed. Place at end of content.
+Two large buttons side-by-side:
+
+Left: “Send on my Mail”
+
+Right: “Share”
+
+Send on my Mail flow
+
+On click:
+
+If user not authenticated:
+
+open modal: “Login to email your report”
+
+trigger Supabase Google SSO login
+
+After login:
+
+call POST /api/email-report with { jobId }
+
+show toast popup:
+“Sent! Check your inbox in 30 seconds.”
+
+no navigation away from results.
+
+Share flow
+
+Right CTA opens a share modal with:
+
+Preview mini share card
+
+Buttons:
+
+Copy link
+
+WhatsApp
+
+Telegram
+
+X (Twitter)
+
+LinkedIn
+
+Link used: ${BASE_URL}/share/${jobId}
+
+If Web Share API exists, use native share first.
+
+Public share page /share/:jobId
+
+Render only a share poster, no private analysis:
+
+Title: “I got my CV Score on BCALM”
+
+Score big + verdict
+
+Role preset pill
+
+Top 1 strength only
+
+CTA line: “Get your free CV Score → bcalm.org”
+
+meta tags for social preview (OpenGraph + Twitter)
+
+Styling (lighter than current)
+
+Use airy premium palette:
+
+Background: soft lavender/white #F7F5FF
+
+Cards: white #FFFFFF with subtle purple tint
+
+Primary purple: #6D4CFF
+
+Text: near-black #15131C
+
+Muted: #6B6480
+
+Soft shadows (no neon glow)
+
+Rounded corners 16–20px
+
+Spacious padding
+
+Smooth fade/slide-in reveals for sections on scroll
+
+Files to produce
+
+server.js
+
+serves /results/:jobId and /share/:jobId
+
+includes POST /api/email-report placeholder that logs for now
+
+public/results.html
+
+public/results.css
+
+public/results.js
+
+public/share.html
+
+public/share.css
+
+public/share.js
+
+Everything must run end-to-end on Replit with clean, commented code and robust null/empty handling.

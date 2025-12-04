@@ -1007,24 +1007,52 @@ export default function ResultsPage() {
         transition={{ delay: 1, type: "spring" }}
         className="fixed bottom-0 left-0 right-0 bg-[#0a0014]/95 backdrop-blur-lg border-t border-white/10 p-4 z-50"
       >
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
-          <Button
-            onClick={() => navigate("/upload")}
-            className="flex-1 gap-2"
-            data-testid="button-rescore-sticky"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Re-score after edits
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => navigate("/upload?jd=true")}
-            className="flex-1 gap-2 border-white/20 text-white hover:bg-white/10"
-            data-testid="button-upload-jd-sticky"
-          >
-            <FileText className="h-4 w-4" />
-            Upload JD
-          </Button>
+        <div className="max-w-4xl mx-auto space-y-3">
+          {/* Primary Actions */}
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              onClick={() => navigate("/upload")}
+              className="flex-1 max-w-[280px] gap-2"
+              data-testid="button-rescore-sticky"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Re-score after edits
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => navigate("/upload?jd=true")}
+              className="flex-1 max-w-[280px] gap-2 border-white/20 text-white hover:bg-white/10"
+              data-testid="button-upload-jd-sticky"
+            >
+              <FileText className="h-4 w-4" />
+              Upload JD for fit match
+            </Button>
+          </div>
+          
+          {/* Share Actions */}
+          <div className="flex items-center justify-center gap-4">
+            <span className="text-white/50 text-sm">Share your score</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleShare}
+              className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
+              data-testid="button-share-footer"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyLink}
+              className="gap-2 text-white/70 hover:text-white hover:bg-white/10"
+              data-testid="button-copy-footer"
+            >
+              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
         </div>
       </motion.div>
     </div>
