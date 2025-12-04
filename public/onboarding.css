@@ -1,3 +1,9 @@
+/* =========================
+   BCALM Onboarding Theme v2
+   (contrast + hierarchy fix)
+   Drop-in replacement
+========================= */
+
 * {
   margin: 0;
   padding: 0;
@@ -6,12 +12,18 @@
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #0a0014 0%, #110022 50%, #1a0033 100%);
+
+  /* darker base + subtle purple vignette */
+  background:
+    radial-gradient(1200px 800px at 50% -10%, #120A24 0%, transparent 60%),
+    radial-gradient(900px 700px at 10% 20%, #0F0830 0%, transparent 55%),
+    linear-gradient(180deg, #07040F 0%, #07040F 100%);
+
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: #F5F2FF;
   padding: 20px;
 }
 
@@ -26,48 +38,53 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
+/* Main card surface now pops from bg */
 .card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0E0A1A;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 18px;
   padding: 32px;
-  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
 }
 
+/* Clearer hierarchy */
 .step-indicator {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 24px;
+  color: #8B84A6;
+  margin-bottom: 22px;
   text-align: center;
 }
 
 .title {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 700;
   margin-bottom: 8px;
   text-align: center;
   line-height: 1.3;
+  color: #F5F2FF;
 }
 
 .subtitle {
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 28px;
+  color: #B7B0CE;
+  margin-bottom: 26px;
   text-align: center;
   line-height: 1.5;
 }
 
 .helper-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-top: -16px;
-  margin-bottom: 24px;
+  color: #8B84A6;
+  margin-top: -14px;
+  margin-bottom: 22px;
   text-align: center;
   font-style: italic;
 }
@@ -76,54 +93,58 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 28px;
+  margin-bottom: 26px;
 }
 
+/* Option cards use elevated neutral surface */
 .option {
   display: flex;
   align-items: flex-start;
   gap: 14px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  background: #141026;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
 }
 
 .option:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(106, 61, 240, 0.3);
+  background: #191233;
+  border-color: rgba(109, 76, 255, 0.55);
+  transform: translateY(-1px);
 }
 
 .option.selected {
-  background: rgba(106, 61, 240, 0.15);
-  border-color: rgba(106, 61, 240, 0.5);
+  background: rgba(109, 76, 255, 0.12);
+  border-color: #6D4CFF;
 }
 
+/* Radio sharper */
 .option-radio {
   width: 20px;
   height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(245, 242, 255, 0.35);
   border-radius: 50%;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-top: 2px;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
 }
 
 .option.selected .option-radio {
-  border-color: #6a3df0;
-  background: #6a3df0;
+  border-color: #6D4CFF;
+  background: #6D4CFF;
+  box-shadow: 0 0 0 3px rgba(109, 76, 255, 0.25);
 }
 
 .option.selected .option-radio::after {
   content: '';
   width: 8px;
   height: 8px;
-  background: #fff;
+  background: white;
   border-radius: 50%;
 }
 
@@ -132,100 +153,108 @@ body {
 }
 
 .option-label {
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
   margin-bottom: 4px;
+  color: #F5F2FF;
 }
 
 .option-description {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.4;
+  color: #8B84A6;
+  line-height: 1.45;
 }
 
 .section-label {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 12px;
-  font-weight: 500;
+  color: #8B84A6;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 
 .chips-container {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
+/* Chips: clearer default, solid selected */
 .chip {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 20px;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
+  color: #EAE6FF;
 }
 
 .chip:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(106, 61, 240, 0.3);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(109, 76, 255, 0.55);
 }
 
 .chip.selected {
-  background: rgba(106, 61, 240, 0.2);
-  border-color: rgba(106, 61, 240, 0.5);
-  color: #c4b5fd;
+  background: #6D4CFF;
+  border-color: #6D4CFF;
+  color: white;
+  transform: scale(1.02);
+  box-shadow: 0 8px 20px rgba(109, 76, 255, 0.35);
 }
 
 .search-input {
   width: 100%;
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #141026;
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 10px;
   font-size: 15px;
-  color: #fff;
-  margin-bottom: 16px;
-  transition: all 0.2s ease;
+  color: #F5F2FF;
+  margin-bottom: 14px;
+  transition: all 0.18s ease;
 }
 
 .search-input::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #8B84A6;
 }
 
 .search-input:focus {
   outline: none;
-  border-color: rgba(106, 61, 240, 0.5);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(109, 76, 255, 0.8);
+  background: #191233;
+  box-shadow: 0 0 0 3px rgba(109, 76, 255, 0.18);
 }
 
+/* safe option stays neutral but clearer */
 .safe-option {
   width: 100%;
   padding: 12px 16px;
   background: transparent;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border: 1px dashed rgba(255, 255, 255, 0.18);
   border-radius: 10px;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.6);
+  color: #B7B0CE;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 24px;
+  transition: all 0.18s ease;
+  margin-bottom: 22px;
 }
 
 .safe-option:hover {
   background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.3);
-  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(109, 76, 255, 0.55);
+  color: #EAE6FF;
 }
 
 .safe-option.selected {
-  background: rgba(106, 61, 240, 0.1);
-  border-color: rgba(106, 61, 240, 0.4);
+  background: rgba(109, 76, 255, 0.10);
+  border-color: #6D4CFF;
   border-style: solid;
-  color: #c4b5fd;
+  color: #EAE6FF;
 }
 
+/* Buttons */
 .buttons {
   display: flex;
   flex-direction: column;
@@ -241,47 +270,53 @@ body {
   padding: 14px 24px;
   border-radius: 10px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.18s ease;
   border: none;
   text-align: center;
   text-decoration: none;
 }
 
+/* Primary now clearly active */
 .btn-primary {
-  background: linear-gradient(135deg, #6a3df0 0%, #8b5cf6 100%);
+  background: #6D4CFF;
   color: #fff;
   flex: 1;
+  box-shadow: 0 10px 30px rgba(109, 76, 255, 0.35);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #7c4dff 0%, #9d6fff 100%);
+  background: #7C5CFF;
   transform: translateY(-1px);
+  box-shadow: 0 12px 36px rgba(109, 76, 255, 0.45);
 }
 
 .btn-primary:disabled {
-  opacity: 0.4;
+  background: rgba(109, 76, 255, 0.25);
+  color: rgba(255, 255, 255, 0.6);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
+/* Secondary kept neutral */
 .btn-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.8);
+  background: #141026;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #EAE6FF;
   padding: 14px 20px;
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: #191233;
 }
 
 .skip-link {
   text-align: center;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8B84A6;
   cursor: pointer;
-  transition: color 0.2s ease;
+  transition: color 0.18s ease;
   background: none;
   border: none;
   width: 100%;
@@ -289,78 +324,82 @@ body {
 }
 
 .skip-link:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: #EAE6FF;
 }
 
+/* Dropzone becomes obvious hero */
 .dropzone {
-  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border: 2px dashed rgba(255, 255, 255, 0.12);
+  background: #141026;
   border-radius: 12px;
-  padding: 40px 20px;
+  padding: 38px 20px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 20px;
+  transition: all 0.18s ease;
+  margin-bottom: 18px;
 }
 
 .dropzone:hover,
 .dropzone.dragover {
-  border-color: rgba(106, 61, 240, 0.5);
-  background: rgba(106, 61, 240, 0.05);
+  border-color: #6D4CFF;
+  background: rgba(109, 76, 255, 0.08);
 }
 
 .dropzone.has-file {
-  border-color: rgba(106, 61, 240, 0.5);
-  background: rgba(106, 61, 240, 0.1);
+  border-color: #6D4CFF;
+  background: rgba(109, 76, 255, 0.12);
 }
 
 .dropzone-icon {
   width: 48px;
   height: 48px;
-  margin: 0 auto 16px;
-  opacity: 0.6;
+  margin: 0 auto 14px;
+  opacity: 0.8;
 }
 
 .dropzone-text {
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #F5F2FF;
   margin-bottom: 4px;
 }
 
 .dropzone-subtext {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8B84A6;
 }
 
 .file-name {
   font-size: 14px;
-  color: #c4b5fd;
-  margin-top: 12px;
+  color: #C4B5FD;
+  margin-top: 10px;
   word-break: break-all;
 }
 
+/* JD toggle uses inner panel surface */
 .toggle-container {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  background: #141026;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   cursor: pointer;
 }
 
 .toggle {
   width: 44px;
   height: 24px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.14);
   border-radius: 12px;
   position: relative;
-  transition: background 0.2s ease;
+  transition: background 0.18s ease;
   flex-shrink: 0;
 }
 
 .toggle.active {
-  background: #6a3df0;
+  background: #6D4CFF;
 }
 
 .toggle::after {
@@ -372,7 +411,7 @@ body {
   border-radius: 50%;
   top: 3px;
   left: 3px;
-  transition: transform 0.2s ease;
+  transition: transform 0.18s ease;
 }
 
 .toggle.active::after {
@@ -381,12 +420,12 @@ body {
 
 .toggle-label {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #EAE6FF;
 }
 
 .jd-input {
   display: none;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .jd-input.visible {
@@ -397,26 +436,28 @@ body {
   width: 100%;
   min-height: 120px;
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #141026;
+  border: 1px solid rgba(255, 255, 255, 0.10);
   border-radius: 10px;
   font-size: 14px;
-  color: #fff;
+  color: #F5F2FF;
   resize: vertical;
   font-family: inherit;
 }
 
 .jd-textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #8B84A6;
 }
 
 .jd-textarea:focus {
   outline: none;
-  border-color: rgba(106, 61, 240, 0.5);
+  border-color: rgba(109, 76, 255, 0.8);
+  box-shadow: 0 0 0 3px rgba(109, 76, 255, 0.18);
 }
 
+/* Benefits list is more readable */
 .benefits-list {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .benefit-item {
@@ -425,11 +466,11 @@ body {
   gap: 10px;
   margin-bottom: 10px;
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #B7B0CE;
 }
 
 .benefit-icon {
-  color: #6a3df0;
+  color: #6D4CFF;
   flex-shrink: 0;
   margin-top: 2px;
 }
@@ -440,22 +481,22 @@ body {
   justify-content: center;
   gap: 8px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
-  margin-bottom: 24px;
+  color: #8B84A6;
+  margin-bottom: 22px;
 }
 
 .privacy-icon {
   width: 14px;
   height: 14px;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 .context-footer {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 22px;
+  padding-top: 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #8B84A6;
   text-align: center;
 }
 
@@ -467,15 +508,15 @@ body {
   .card {
     padding: 24px;
   }
-  
+
   .title {
-    font-size: 20px;
+    font-size: 22px;
   }
-  
+
   .buttons-row {
     flex-direction: column;
   }
-  
+
   .btn-secondary {
     order: 1;
   }

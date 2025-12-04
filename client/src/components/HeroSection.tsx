@@ -128,17 +128,12 @@ export default function HeroSection() {
           </motion.div>
           
           {/* Main Headline */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-4 md:mb-6">
-            <span className="block">Crack Your Dream Job</span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.1] mb-8 md:mb-10">
+            <span className="block whitespace-nowrap">Crack Your Dream Job</span>
             <span className="block bg-gradient-to-r from-violet-400 via-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
               in 30 Days
             </span>
           </h1>
-          
-          {/* Subheadline */}
-          <p className="text-lg sm:text-xl md:text-2xl text-white/80 mb-8 md:mb-10 font-medium">
-            Free AI CV Score + 30-Day Personalized Plan
-          </p>
           
           {/* Lead Capture Form Card */}
           <motion.div
