@@ -1,0 +1,310 @@
+You are modifying my existing BCALM web app. Implement the following EXACT UX + copy + logic. Do NOT add any extra text/copy beyond what I specify. Do NOT invent new headings, helper lines, tooltips, labels, empty states, or microcopy. Use ONLY the strings I provide.
+
+1) Landing Page CTAs (two intent-based entries)
+A) Primary Hero CTA (cold users / value-first)
+
+On the landing hero section:
+
+Main CTA button text EXACT: "Check my CV"
+
+Small helper text directly under this CTA EXACT: "Free • 2 min • private"
+
+Clicking this CTA should scroll/navigate to the CV upload flow.
+
+If user is not logged in and not onboarded, allow them to proceed; do NOT force auth before upload.
+
+This hero CTA must be the visually dominant CTA on DWeb and MWeb.
+
+B) Secondary Nav CTA (warm users / start-first)
+
+In the top nav bar (right side):
+
+Secondary button text EXACT: "Start for free"
+
+Next to it a text link EXACT: "Sign in"
+
+"Start for free" is visually secondary to hero CTA (smaller or outlined).
+
+Clicking "Start for free" opens a centered modal lead form (see section 2).
+
+2) Warm Lead Modal (opened from nav CTA)
+
+Modal design:
+
+Centered, minimal, no extra decoration or copy.
+
+Title text EXACT: "Start your journey"
+
+Subtitle text EXACT: "Get your plan + CV score in minutes."
+
+Input labels EXACT: "Full name", "Mobile number"
+
+Placeholders EXACT: "Enter your name", "10-digit mobile number"
+
+Primary button text EXACT: "Continue"
+
+Small reassurance line under button EXACT: "No spam. We’ll only use this to share your score & plan."
+
+Close icon (X) top-right.
+
+Behavior:
+
+On submit, save lead in Supabase leads table (full_name, mobile, source="nav_start_for_free", created_at).
+
+After successful submit, route user into onboarding step 1 immediately (see section 4).
+
+Do NOT show auth UI in this modal.
+
+3) CV Upload Flow (cold path from hero CTA)
+
+CV Upload screen copy must be EXACT:
+
+Title: "Upload your CV"
+
+Subtitle: "Get your personalized CV analysis powered by AI"
+
+Dropzone text: "Drag & drop your CV here"
+
+Dropzone subtext: "or click to browse (PDF, DOC, DOCX)"
+
+Optional JD toggle label: "Add job description (optional)"
+
+Benefits header: "What you'll get:"
+
+Benefits bullets EXACT (no additions):
+
+"Overall CV score out of 100"
+
+"Detailed breakdown by category"
+
+"Actionable improvements"
+
+"Role-specific recommendations"
+
+Primary button: "Analyze my CV"
+
+Bottom tuning line (auto-filled): "Targeting: {target_role or 'General role'} | {current_status label}"
+
+Do not add any other copy.
+
+Behavior:
+
+Allow upload without login.
+
+If user not onboarded, show onboarding before analysis (after file choose OR on clicking Analyze).
+
+Parse CV to text and store in Supabase cv_submissions (cv_text text column, meta jsonb column holds onboarding + file info).
+
+Trigger n8n webhook POST to:
+https://adityabcalm.app.n8n.cloud/webhook/cv-score/start
+
+with JSON body:
+{
+"meta": {
+"jobId": "<uuid>",
+"submissionId": "<uuid>",
+"userId": "<nullable if not logged in>",
+"current_status": "...",
+"target_role": "... or null",
+"years_experience": 0,
+"source": "bcalm_web",
+"uploaded_at": "<iso>"
+},
+"cv_text": "<string>",
+"jd_text": "<string or null>"
+}
+
+Create analysis_jobs row before webhook with status="processing".
+
+Redirect to /processing?jobId=...
+
+4) Onboarding (2-step, simple + delightful)
+
+Onboarding occurs for:
+
+any user without onboarding_completed=true in profiles table
+
+regardless of login state (store to Supabase using anonymous userId or temp id cookie)
+
+Step 1: Current status
+
+Copy EXACT:
+
+Title: "Let’s personalize your experience"
+
+Subtitle: "This helps us tailor your CV analysis"
+Options EXACT (3 cards):
+
+"Student / Fresher"
+
+description: "Currently studying or recently graduated"
+
+"Working Professional"
+
+description: "Currently employed and looking to grow"
+
+"Switching Careers"
+
+description: "Transitioning from another field"
+No other options. No "Not sure yet" here.
+
+Buttons:
+
+Primary: "Next"
+
+No skip on step 1.
+
+Logic:
+
+Save current_status.
+
+Set years_experience=0 for all users (silent default).
+
+Step 2: Target role
+
+Copy EXACT:
+
+Title: "What role are you targeting?"
+
+Subtitle: "We'll optimize your CV for this role"
+Chips:
+
+Provide dynamic chip presets based on current_status (use existing logic).
+
+Always include chip "Not sure yet".
+Input placeholder EXACT: "Or type a custom role..."
+
+Buttons:
+
+Left: "Back"
+
+Right primary: "Next"
+
+Under buttons a text link EXACT: "Skip for now"
+
+Logic:
+
+If "Not sure yet" chosen or skipped → target_role=null and proceed.
+
+Completion:
+
+If user clicks Next OR skip on step 2, mark onboarding_completed=true and save profile to Supabase profiles table (current_status, target_role, years_experience=0).
+
+If user closes onboarding mid-way:
+
+Do NOT mark completed.
+
+Re-nudge next session.
+
+5) Results Page (aha moment, clean start)
+
+Results page uses analysis_jobs.result_json.result object.
+
+Layout rules:
+
+No top CTAs for share, JD, or rescore.
+
+Show score + breakdown immediately.
+
+Top section:
+
+Circular score meter (0–100) using overall_score.
+
+Under meter show a qualitative label derived from score (you can compute label but DO NOT display any extra copy besides label itself).
+
+Role pill showing role_preset if present.
+
+Sections order:
+
+Score Breakdown (4 cards: ATS/Structure, Impact, Role Signals, Job Match)
+
+Coach Summary (use summary)
+
+Top Strengths
+
+Highest-ROI Fixes (top_fixes)
+
+Bullet Review (collapsible) only if bullet_review exists
+
+Job Match Deep Dive (collapsible) only if job_match_section has content
+No extra headings besides those listed.
+
+Bottom CTAs ONLY (sticky footer):
+
+Left button text EXACT: "Send on my mail"
+
+Right button text EXACT: "Share"
+
+Send on my mail behavior:
+
+If not authenticated → trigger Supabase auth modal (Google + email) after click.
+
+After login/signup success, call backend /api/send-result-email?jobId=... to email full result to user.
+
+Show centered success popup with EXACT text:
+
+Title: "Sent!"
+
+Body: "Check your inbox for your CV review."
+
+Share behavior:
+
+Open share sheet/modal with options:
+
+Copy link
+
+WhatsApp
+
+Telegram
+
+X
+
+LinkedIn
+No extra copy besides option labels.
+Public share page should summarize:
+
+overall_score
+
+role_preset
+
+1–2 top_strengths
+
+1 top_fix
+and include a CTA link back to landing:
+
+CTA text EXACT: "Check your CV"
+Do not add other marketing copy.
+
+6) Tech + tables (Supabase)
+
+Use existing Supabase project credentials from env.
+
+Ensure tables:
+
+profiles (user_id pk, current_status text, target_role text nullable, years_experience int default 0, onboarding_completed boolean default false)
+
+leads (id uuid pk, full_name text, mobile text, source text, created_at timestamp)
+
+cv_submissions (id uuid pk, user_id nullable, cv_text text, meta jsonb, created_at)
+
+analysis_jobs (id uuid pk, submission_id uuid, user_id nullable, status text, result_json jsonb, created_at, completed_at)
+
+Integrate callback:
+POST https://bcalm.org/api/analysis/callback
+
+Store payload into analysis_jobs.result_json and set status="complete".
+
+7) Constraints
+
+DO NOT add any extra copy anywhere.
+
+DO NOT rename buttons or headings.
+
+Keep styling aligned to BCALM brand but slightly lighter background for results (improve contrast).
+
+Maintain responsive behavior for MWeb and DWeb.
+
+Test all flows end-to-end:
+landing → hero CTA → onboarding (2 steps) → upload → processing → callback mocked → results
+landing → nav CTA → lead modal → onboarding (2 steps) → upload → results
+Provide the updated code files and a short checklist of what you tested.
