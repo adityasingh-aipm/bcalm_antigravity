@@ -6,12 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { 
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { 
   GraduationCap, Loader2, CheckCircle, AlertTriangle, Zap, Target, FileText, 
   ArrowRight, RefreshCw, ChevronDown, ChevronUp, Share2, Copy, Check,
   Sparkles, TrendingUp, List, HelpCircle, ExternalLink, FileSearch, Briefcase,
@@ -837,97 +831,78 @@ export default function ResultsPage() {
             transition={{ delay: 0.55 }}
             className="mb-8"
           >
-            <Card className="bg-white/5 border-white/10">
+            <Card className="bg-white/5 border-white/10 overflow-hidden">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg text-white flex items-center gap-2">
-                  <Edit3 className="h-5 w-5 text-primary" />
+                  <Edit3 className="h-5 w-5 text-amber-400" />
                   Bullet-by-Bullet Rewrite Recommendations
-                  <Badge variant="outline" className="bg-white/10 text-white/60 border-white/20">
-                    {bulletReview.length} bullets
-                  </Badge>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <Accordion type="multiple" className="space-y-2">
-                  {bulletReview.map((item, index) => {
-                    const originalText = item.original_bullet || item.original || '';
-                    const recommendedText = item.recommended_text || item.recommended || '';
-                    
-                    return (
-                      <AccordionItem 
-                        key={index} 
-                        value={`bullet-${index}`}
-                        className="border border-white/10 rounded-lg overflow-hidden bg-white/5"
-                      >
-                        <AccordionTrigger className="px-4 py-3 hover:bg-white/5 [&[data-state=open]]:bg-white/5">
-                          <div className="flex items-center gap-3 text-left">
-                            <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-sm flex items-center justify-center shrink-0">
-                              {index + 1}
-                            </span>
-                            <span className="text-white/80 text-sm line-clamp-1">{originalText}</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="px-4 pb-4 space-y-4">
-                          {/* Original Bullet */}
-                          <div>
-                            <span className="text-xs text-white/40 uppercase tracking-wider flex items-center gap-1">
-                              <FileText className="h-3 w-3" /> Original
-                            </span>
-                            <p className="text-white/60 mt-1 text-sm">{originalText}</p>
-                          </div>
-                          
-                          {/* Why Weak */}
-                          {item.why_weak && (
-                            <div>
-                              <span className="text-xs text-red-400 uppercase tracking-wider flex items-center gap-1">
-                                <AlertCircle className="h-3 w-3" /> Why weak
-                              </span>
-                              <p className="text-white/60 mt-1 text-sm">{item.why_weak}</p>
-                            </div>
-                          )}
-                          
-                          {/* Recommended Rewrite */}
-                          {recommendedText && (
-                            <div className="p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                              <span className="text-xs text-green-400 uppercase tracking-wider flex items-center gap-1">
-                                <CheckCircle className="h-3 w-3" /> 
-                                Recommended rewrite
-                                {item.recommended_version && (
-                                  <span className="ml-1 text-green-300/80">(Version {item.recommended_version})</span>
-                                )}
-                              </span>
-                              <p className="text-white/80 mt-1 text-sm">{recommendedText}</p>
-                            </div>
-                          )}
-                          
-                          {/* Why This Version */}
-                          {item.why_this_version && (
-                            <div className="p-2 bg-primary/5 rounded-lg border border-primary/10">
-                              <span className="text-xs text-primary/80 uppercase tracking-wider flex items-center gap-1">
-                                <Lightbulb className="h-3 w-3" /> Why this version
-                              </span>
-                              <p className="text-white/60 mt-1 text-sm">{item.why_this_version}</p>
-                            </div>
-                          )}
-                          
-                          {/* Placeholders if any */}
-                          {((item.placeholders && item.placeholders.length > 0) || (item.fill && item.fill.length > 0)) && (
-                            <div>
-                              <span className="text-xs text-primary uppercase tracking-wider">Fill these placeholders</span>
-                              <div className="flex flex-wrap gap-2 mt-2">
-                                {(item.placeholders || item.fill || []).map((placeholder: string, pIndex: number) => (
-                                  <Badge key={pIndex} variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                                    [{placeholder}]
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </AccordionContent>
-                      </AccordionItem>
-                    );
-                  })}
-                </Accordion>
+              <CardContent className="p-0">
+                {/* Table Header */}
+                <div className="grid grid-cols-[48px_1fr_1fr] border-b border-white/10 bg-white/5">
+                  <div className="p-4 text-sm font-medium text-white/60">#</div>
+                  <div className="p-4 text-sm font-medium text-white/60 border-l border-white/10">Before</div>
+                  <div className="p-4 text-sm font-medium text-white/60 border-l border-white/10">After</div>
+                </div>
+                
+                {/* Table Rows */}
+                {bulletReview.map((item, index) => {
+                  const originalText = item.original_bullet || item.original || '';
+                  const recommendedText = item.recommended_text || item.recommended || '';
+                  const placeholders = item.placeholders || item.fill || [];
+                  
+                  return (
+                    <div 
+                      key={index}
+                      className="grid grid-cols-[48px_1fr_1fr] border-b border-white/10 last:border-b-0"
+                      data-testid={`bullet-row-${index}`}
+                    >
+                      {/* Row Number */}
+                      <div className="p-4 flex items-start justify-center">
+                        <span className="text-white/60 font-medium">{index + 1}</span>
+                      </div>
+                      
+                      {/* Before Column */}
+                      <div className="p-4 border-l border-white/10 space-y-3">
+                        <div>
+                          <span className="text-sm font-medium text-white/50">Original</span>
+                          <p className="text-white/80 mt-1 text-sm leading-relaxed">
+                            {originalText}
+                          </p>
+                        </div>
+                        {item.why_weak && (
+                          <p className="text-sm">
+                            <span className="font-medium text-amber-500">Why weak: </span>
+                            <span className="text-amber-500/80">{item.why_weak}</span>
+                          </p>
+                        )}
+                      </div>
+                      
+                      {/* After Column */}
+                      <div className="p-4 border-l border-white/10 space-y-3">
+                        <div>
+                          <span className="text-sm font-medium text-white/50">Recommended rewrite</span>
+                          <p className="text-white/90 mt-1 text-sm leading-relaxed">
+                            {recommendedText}
+                          </p>
+                        </div>
+                        {item.why_this_version && (
+                          <p className="text-sm">
+                            <span className="font-medium text-green-500">Why this version: </span>
+                            <span className="text-green-500/80">{item.why_this_version}</span>
+                          </p>
+                        )}
+                        {placeholders.length > 0 && (
+                          <p className="text-sm">
+                            <span className="font-medium text-white/50">Fill: </span>
+                            <span className="text-white/60">{placeholders.join(', ')}</span>
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </CardContent>
             </Card>
           </motion.section>
