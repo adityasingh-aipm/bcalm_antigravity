@@ -1,0 +1,165 @@
+Build a premium-looking Results Page after we get the callback response form n8n.
+The page fetches analysis from /api/analysis/:jobId and renders result_json.result which is a JSON object like the sample below.
+Create a beautiful purple/black UI, aha-first, with progressive disclosure and a public share flow.
+
+Data contract
+
+Backend endpoint:
+
+GET /api/analysis/:jobId returns:
+
+{
+  "status": "complete",
+  "jobId": "...",
+  "report": {
+    "role_preset": "...",
+    "overall_score": 42,
+    "score_breakdown": { "ats": {...}, "impact": {...}, "role_signals": {...}, "job_match": {...} },
+    "summary": "...",
+    "top_strengths": [...],
+    "top_fixes": [...],
+    "seven_step_plan": [...],
+    "bullet_review": [...],
+    "info_needed_from_user": [...],
+    "job_match_section": {...},
+    "cta": "..."
+  }
+}
+
+
+If status is not complete, show a loading state.
+
+Page routes
+
+/results/:jobId
+
+/share/:jobId (public, simplified share poster only)
+
+Results page layout (implement exactly)
+
+A. Hero Summary (first screen)
+
+Big circular score ring (SVG donut) showing overall_score/100
+
+Status label derived from score:
+
+<40 “Needs work”
+
+40–59 “Good foundation”
+
+60–79 “Strong”
+
+80+ “Excellent”
+
+Role preset pill
+
+1-line summary (first sentence of summary)
+
+Primary CTA button: “Re-score after edits” → /upload
+
+Secondary CTA: “Upload JD for fit match” → /upload?jd=true
+
+Share row: “Share your score” + “Copy link”
+
+B. Breakdown grid (2x2 cards)
+Cards for ATS, Impact, Role Signals, Job Match:
+
+show score big + short notes
+
+if job_match.skipped true, show “JD missing” badge
+
+C. Strengths & Fixes (two-column, stack on mobile)
+
+Left: Top Strengths (show first 3, “Show all” expands)
+
+Right: Highest ROI Fixes (first 3, each with expected_score_lift badge, accordion for how_to_do_it)
+
+D. 7-Step Plan timeline
+
+vertical checklist style
+
+E. Bullet Review deep dive
+
+collapsed accordion by default
+
+each item shows original bullet, why weak, recommended text, placeholder chips
+
+F. Job Match Deep Dive
+
+If skipped → empty state + CTA to upload JD
+
+Else render requirements table and gaps
+
+G. Info Needed
+
+list of questions
+
+H. Sticky bottom action bar
+
+Primary: Re-score after edits
+
+Secondary: Upload JD
+
+Share icon
+
+Share flow
+
+On /results/:jobId, create a Share Card section (mini poster) with:
+
+“I got my CV Score on bcalm”
+
+score big
+
+role preset
+
+top 1 strength
+
+“Try yours → bcalm.org”
+
+Add a “Share” button that:
+
+Uses Web Share API if available:
+
+title: “My CV Score on bcalm”
+
+text: I scored ${score}/100 for ${role}. Get your free CV score at bcalm.org
+
+url: ${BASE_URL}/share/${jobId}
+
+Fallback:
+
+Copy link to clipboard
+
+Provide Twitter and LinkedIn share links using share URL
+
+/share/:jobId should render only the share card in a clean centered layout, SEO friendly, no private data (no bullet review, no fixes list).
+
+Styling
+
+Purple/black aesthetic
+
+soft glow background
+
+big rounded CTAs
+
+responsive, elegant typography
+
+subtle animations (fade/slide on section reveal)
+
+Deliverables
+
+Produce files:
+
+server.js (express routes for /results, /share, /api/analysis proxy if needed)
+
+public/results.html
+
+public/share.html
+
+public/results.js
+
+public/results.css
+
+Add clear comments and ensure everything runs end-to-end on Replit.
+
+Use the sample report shape above to harden null/empty states.
