@@ -1,0 +1,140 @@
+
+Hey there 👋
+Here’s your full resume diagnostic. Use the recommended bullet rewrites and fill the placeholders.
+Overall Score
+76
+Strong
+ATS / Structure
+14/20
+ATS score is moderate; issues with role separation, inconsistent formatting, and unformatted sections impact keyword matching and parsing.
+Impact
+20/30
+Impact is strong with significant product launches, feature shipping, and data analysis; lacks quantified results in some bullets.
+Role Signals
+15/20
+Role-specific signals are well represented with mobile app focus, cross-functional collaboration, and product ownership; some reductions due to vague impact metrics.
+Job Match
+27/30
+Candidate demonstrates strong product management experience with emphasis on app features and data-driven decisions; gaps in research, experimentation, and formal PRD experience.
+Coach Summary
+The candidate exhibits comprehensive product management expertise with robust experience in mobile app features, launching products, and data analysis. Minor ATS issues involve formatting and section clarity, which can be optimized for parsing. Overall, the fit for the role is high, but addressing specific gaps can improve alignment further.
+🎯 Job Match Deep Dive
+The candidate demonstrates strong product management experience with significant mobile app focus, cross-functional collaboration, data analysis, and feature launches aligned with role requirements. Slight gaps exist regarding explicit research, experimentation, and formal PRD experience, but overall, the fit is high for the position.
+The 'skills' subscore reflects core product skills, 'tools_tech' captures relevant tools/tools mentioned, and 'responsibility_phrase' indicates role-specific language. The overall score combines these factors with the job match quality.
+Top JD requirements & your evidence
+Requirement	Evidence quality	Resume evidence
+Experience owning consumer-facing mobile app products
+must_have
+Strong evidence	Led web-to-app migration and launched app features.
+Drive product roadmap and execution for app-based features
+must_have
+Strong evidence	Accelerated web-to-app migration; revamped navigation flows.
+Translate user needs into clear product requirements
+must_have
+Missing	No evidence found in resume
+Use data, research, and experimentation to make informed product decisions
+must_have
+Missing	No evidence found in resume
+Highest-ROI gaps to close
+experience with research and experimentation
+Why it matters: The role emphasizes data-driven product decisions involving testing and research.
+Proof needed: Describe your involvement in research activities or running experiments like A/B tests.
+Bullet frame: - I have conducted research or experiments in product development, such as [example].
+experience in writing clear PRDs
+Why it matters: The role expects structured documentation and clear requirements articulation.
+Proof needed: Can you detail your experience in writing product requirement documents?
+Bullet frame: - I have authored PRDs for products or features including [examples].
+✅ Top Strengths
+Extensive mobile app product experience including app migrations and feature launches.
+Evidence: Led web-to-app migration; designed and shipped app features such as reviews and health queries.
+Strong use of data analysis for decision-making and operational improvements.
+Evidence: Built dashboards monitoring payment health, refunds, and latency metrics; improved success rates.
+Cross-functional collaboration with finance, operations, and engineering teams.
+Evidence: Partnered with finance and operations to build refund/reconciliation flows; collaborated on product launches.
+Impact on customer experience through navigation and flow improvements.
+Evidence: Revamped on-page navigation, optimized user flows for better engagement.
+Proven track record of implementing system reliability features.
+Evidence: Built fallback routing increasing transaction reliability.
+🔧 Highest-ROI Fixes
+Standardize section headers and formatting for clarity and ATS parsing. +4 pts
+Why: Ensures roles, projects, and education sections are clearly delineated, improving keyword recognition and parsing accuracy.
+How: Use consistent section headers (e.g., 'WORK EXPERIENCE', 'PROJECTS', 'EDUCATION') and uniform formatting for dates and responsibilities.
+Ref: Issue_1 and 2 in ATS module output
+Add quantifiable impact metrics to impact-focused bullets. +3 pts
+Why: Provides concrete evidence of success, enabling ATS and recruiters to assess effectiveness.
+How: Include placeholders for metrics like [PERCENTAGE], [OUTCOME], or [METRIC] alongside achievements.
+Ref: Impact bullets such as Trust & Confidence features, onboarding flows, dashboards
+Explicitly mention experience with research, experimentation, and formal PRDs. +3 pts
+Why: Role emphasizes data-driven decisions and structured documentation; absence could hinder full role fit.
+How: Add bullets describing conducting user research, running A/B tests, and writing detailed product requirements or PRDs.
+Ref: Missing keywords/references identified in hit list
+✍️ Bullet-by-Bullet Rewrite Recommendations
+#	Before	After
+1	
+Original
+Built trust & user confidence: Designed and shipped Reviews & Ratings and Health Queries (AI-assisted Q&A) features, enhancing platform authority and PDP engagement.
+Why weak: Lacks measurable impact metrics or specific outcome data, making it hard to quantify success.
+Recommended rewrite
+Designed and shipped AI-assisted Reviews & Ratings and Health Queries features, resulting in [OUTCOME] and [METRIC] improvements in platform trust and engagement.
+Why this version: Includes placeholders for impact and metrics, emphasizing measurable success.
+Fill: OUTCOME, METRIC
+2	
+Original
+Improved user journey efficiency: Streamlined cart and onboarding flows to reduce friction and improve activation-to-purchase funnel completion.
+Why weak: No quantifiable improvement metrics provided, reducing perceived impact.
+Recommended rewrite
+Streamlined cart and onboarding flows, leading to a [PERCENTAGE]% reduction in friction and improved conversion rate by [METRIC], enhancing activation-to-purchase completion.
+Why this version: Adds impact placeholders for quantification, making results clearer.
+Fill: PERCENTAGE, METRIC
+3	
+Original
+Enhanced reliability: Built intelligent fallback routing for gateway failures, cutting transaction friction by double digits.
+Why weak: Use of vague 'double digits' term; specific percentage impact needed for clarity.
+Recommended rewrite
+Built fallback routing for gateway failures, reducing transaction friction by [PERCENTAGE]%.
+Why this version: Provides a clear, specific quantification placeholder.
+Fill: PERCENTAGE
+4	
+Original
+Strengthened trust signals: Partnered with finance and operations to build transparent refund and reconciliation flows improving post-payment NPS.
+Why weak: Outcome vague; lacks specific NPS or customer satisfaction improvement metrics.
+Recommended rewrite
+Partnered with finance and operations to develop refund processes, achieving a [METRIC]% increase in post-payment NPS or customer satisfaction.
+Why this version: Includes placeholders for measurable impact, clarifying success.
+Fill: METRIC
+5	
+Original
+Created visibility through dashboards: Designed 7 cross-functional dashboards monitoring payment health, refunds, and latency metrics.
+Why weak: No quantification of how dashboards improved processes or decision-making; impact should be clarified.
+Recommended rewrite
+Designed dashboards monitoring payment health, refunds, and latency metrics, leading to a [PERCENTAGE]% reduction in issue resolution time or process delays.
+Why this version: Adds impact metric placeholders for clarity.
+Fill: PERCENTAGE
+🔎 Info to Fill Placeholders
+Can you specify impact/outcome metrics or results for your features and improvements?
+Do you have quantifiable data showing success of your system reliability or dashboard initiatives?
+Are there specific NPS or customer satisfaction metrics achievable for refund flow improvements?
+Do you have percentages or ranges for transaction friction reduction or process delays?
+Can you provide any formal research, experimentation, or PRD experience details?
+📌 7-Step Improvement Plan
+Step 1	
+Revise section headers to consistently separate 'WORK EXPERIENCE', 'PROJECTS', and 'EDUCATION'.
+Output: Improved clarity and parsing accuracy.
+Step 2	
+Add impact metrics and placeholders to each relevant accomplishment bullet.
+Output: Enhanced quantification and KPIs for role impact.
+Step 3	
+Include specific evidence or descriptions of research activities, experiments, and PRDs.
+Output: Expanded detail on role-specific processes.
+Step 4	
+Incorporate consistent formatting, especially for dates and section titles.
+Output: Better ATS parsing and readability.
+Step 5	
+Identify missing impact metrics and gather supporting data from the candidate.
+Output: Quantitative evidence to strengthen impact claims.
+Step 6	
+Update bullet content based on user-provided impact metrics and research details.
+Output: More precise and impactful bullet statements.
+Step 7	
+Conduct final review for clarity, measurable outcomes, and ATS optimization.
+Output: Maximize resume robustness and role fit.
