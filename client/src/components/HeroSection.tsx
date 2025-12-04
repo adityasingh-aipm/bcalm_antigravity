@@ -177,27 +177,6 @@ export default function HeroSection() {
             </span>
           </h1>
           
-          {/* Primary CTA Button - Seekho gradient pill style */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="mb-8 md:mb-10"
-          >
-            <button
-              onClick={handleGetCvScore}
-              className="group inline-flex items-center gap-2 px-8 py-4 md:px-10 md:py-5 rounded-full text-lg md:text-xl font-semibold text-white transition-all duration-300 hover:scale-105 active:scale-100"
-              style={{
-                background: 'linear-gradient(135deg, #8B5CF6 0%, #7C3AED 50%, #6D28D9 100%)',
-                boxShadow: '0 8px 32px rgba(139, 92, 246, 0.4), 0 4px 12px rgba(0,0,0,0.3)',
-              }}
-              data-testid="button-get-cv-score-main"
-            >
-              Start for free
-              <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-            </button>
-          </motion.div>
-          
           {/* Form Card - Floating style */}
           <motion.div
             id="cv-form-card"
