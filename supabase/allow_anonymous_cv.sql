@@ -1,36 +1,42 @@
--- MIGRATION: Enable anonymous CV submissions with proper user tracking
--- Run this in Supabase SQL Editor to enable anonymous CV scoring
+-- =====================================================
+-- MIGRATION: Enable anonymous CV submissions
+-- Run this ENTIRE script in Supabase SQL Editor
+-- =====================================================
 
--- 1. Add columns to profiles for anonymous user tracking
-ALTER TABLE public.profiles 
-ADD COLUMN IF NOT EXISTS anonymous_session_id text,
-ADD COLUMN IF NOT EXISTS is_anonymous boolean DEFAULT false;
+-- 1. Allow NULL user_id in cv_submissions for anonymous users
+ALTER TABLE public.cv_submissions ALTER COLUMN user_id DROP NOT NULL;
 
--- Create index for fast anonymous session lookup
-CREATE INDEX IF NOT EXISTS idx_profiles_anonymous_session_id 
-ON public.profiles(anonymous_session_id) 
-WHERE anonymous_session_id IS NOT NULL;
+-- 2. Allow NULL user_id in analysis_jobs for anonymous users  
+ALTER TABLE public.analysis_jobs ALTER COLUMN user_id DROP NOT NULL;
 
--- 2. Add service role policy for profiles (to create anonymous users)
-DROP POLICY IF EXISTS "profiles_insert_service" ON public.profiles;
-CREATE POLICY "profiles_insert_service" ON public.profiles 
+-- 3. Update cv_submissions policies for service role
+DROP POLICY IF EXISTS "cv_submissions_insert_service" ON public.cv_submissions;
+CREATE POLICY "cv_submissions_insert_service" ON public.cv_submissions 
 FOR INSERT TO service_role WITH CHECK (true);
 
-DROP POLICY IF EXISTS "profiles_select_service" ON public.profiles;
-CREATE POLICY "profiles_select_service" ON public.profiles 
+DROP POLICY IF EXISTS "cv_submissions_select_service" ON public.cv_submissions;
+CREATE POLICY "cv_submissions_select_service" ON public.cv_submissions 
 FOR SELECT TO service_role USING (true);
 
-DROP POLICY IF EXISTS "profiles_update_service" ON public.profiles;
-CREATE POLICY "profiles_update_service" ON public.profiles 
+-- 4. Update analysis_jobs policies for service role
+DROP POLICY IF EXISTS "analysis_jobs_insert_service" ON public.analysis_jobs;
+CREATE POLICY "analysis_jobs_insert_service" ON public.analysis_jobs 
+FOR INSERT TO service_role WITH CHECK (true);
+
+DROP POLICY IF EXISTS "analysis_jobs_select_service" ON public.analysis_jobs;
+CREATE POLICY "analysis_jobs_select_service" ON public.analysis_jobs 
+FOR SELECT TO service_role USING (true);
+
+DROP POLICY IF EXISTS "analysis_jobs_update_service" ON public.analysis_jobs;
+CREATE POLICY "analysis_jobs_update_service" ON public.analysis_jobs 
 FOR UPDATE TO service_role USING (true);
 
--- 3. Add policy for anonymous users to view analysis via share links
-DROP POLICY IF EXISTS "analysis_jobs_public_select" ON public.analysis_jobs;
-CREATE POLICY "analysis_jobs_public_select" ON public.analysis_jobs 
-FOR SELECT TO anon USING (true);
-
--- Verify changes
-SELECT column_name, data_type, is_nullable 
+-- Verify the changes worked
+SELECT 
+  table_name, 
+  column_name, 
+  is_nullable 
 FROM information_schema.columns 
-WHERE table_schema = 'public' AND table_name = 'profiles'
-ORDER BY ordinal_position;
+WHERE table_schema = 'public' 
+  AND table_name IN ('cv_submissions', 'analysis_jobs') 
+  AND column_name = 'user_id';
