@@ -203,39 +203,6 @@ export default function HeroSection() {
             </button>
           </motion.div>
           
-          {/* Trust Line */}
-          <p className="text-sm md:text-base text-white/60 mb-4">
-            Trusted by Students from IITs, BITS, NITs & IIMs
-          </p>
-          
-          {/* College Chips */}
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-4">
-            {["IIT", "BITS", "NIT", "IIM"].map((college) => (
-              <span 
-                key={college}
-                className="px-4 py-1.5 rounded-full text-xs md:text-sm font-medium text-white/80"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                }}
-              >
-                {college}
-              </span>
-            ))}
-          </div>
-          
-          {/* Success Stories with Avatars */}
-          <div className="flex items-center justify-center gap-3 mb-10 md:mb-14">
-            <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 border-2 border-[#0a0014]" />
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-[#0a0014]" />
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-[#0a0014]" />
-            </div>
-            <p className="text-sm text-white/70">
-              <span className="font-semibold text-white">200+</span> success stories
-            </p>
-          </div>
-          
           {/* Form Card - Floating style */}
           <motion.div
             id="cv-form-card"
@@ -254,24 +221,6 @@ export default function HeroSection() {
             >
               {!showSuccess ? (
                 <>
-                  {/* Progress Bar */}
-                  <div className="mb-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-xs md:text-sm text-white/70">
-                        Step {step} of 2 · {step === 1 ? "Get your FREE CV Score" : "Upload your CV"}
-                      </span>
-                    </div>
-                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: step === 1 ? '50%' : '100%',
-                          background: 'linear-gradient(90deg, #8B5CF6 0%, #A855F7 100%)',
-                        }}
-                      />
-                    </div>
-                  </div>
-                  
                   {step === 1 ? (
                     <form onSubmit={handleStep1Submit} className="space-y-4">
                       <div className="text-left">
