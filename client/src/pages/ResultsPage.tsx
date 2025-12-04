@@ -190,6 +190,11 @@ export default function ResultsPage() {
 
   const { data: jobData, isLoading } = useQuery<AnalysisJob>({
     queryKey: ["/api/analysis/share", jobId],
+    queryFn: async () => {
+      const res = await fetch(`/api/analysis/share/${jobId}`);
+      if (!res.ok) throw new Error("Failed to load analysis");
+      return res.json();
+    },
     enabled: !!jobId,
     staleTime: 60000,
     gcTime: 300000,
@@ -285,7 +290,8 @@ export default function ResultsPage() {
   const jobMatchSkipped = breakdown.job_match?.skipped;
 
   const quickestWin = fixes[0];
-  const coachSummary = report.summary?.split('.')[0] + '.' || '';
+  const summaryText = report.summary || report.coach_summary || '';
+  const coachSummary = summaryText ? (summaryText.split('.')[0] + '.') : '';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0a0014] via-[#110022] to-[#1a0033]">
@@ -385,7 +391,7 @@ export default function ResultsPage() {
           <h2 className="text-white/70 text-sm font-medium mb-4 flex items-center gap-2">
             <Target className="h-4 w-4" /> Score Breakdown
           </h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <BreakdownCard
               title="ATS Readability"
               score={breakdown.ats?.score || 0}
