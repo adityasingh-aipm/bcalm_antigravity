@@ -7,8 +7,11 @@ import hackathonRouter from "./routes/hackathon";
 import onboardingRouter from "./routes/onboarding";
 import analysisRouter from "./routes/analysis";
 import leadsRouter from "./routes/leads";
+import profileRouter from "./routes/profile";
+import cvRouter from "./routes/cv";
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { setupSupabaseAuth } from "./supabaseAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -36,10 +39,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/onboarding", onboardingRouter);
   app.use("/api/analysis", analysisRouter);
   app.use("/api/leads", leadsRouter);
+  app.use("/api/profile", profileRouter);
+  app.use("/api/cv", cvRouter);
   
   app.use("/uploads/resources", express.static(path.join(process.cwd(), "uploads/resources")));
   app.use("/uploads/cv-submissions", express.static(path.join(process.cwd(), "uploads/cv-submissions")));
   app.use("/uploads/cv-analysis", express.static(path.join(process.cwd(), "uploads/cv-analysis")));
+  
+  // Serve static files for onboarding pages (CSS, JS)
+  app.use(express.static(path.join(process.cwd(), "public")));
+  
+  // Serve onboarding HTML pages
+  const publicDir = path.join(process.cwd(), "public");
+  
+  app.get("/onboarding", (req, res) => {
+    res.sendFile(path.join(publicDir, "onboarding-step1.html"));
+  });
+  
+  app.get("/onboarding/role", (req, res) => {
+    res.sendFile(path.join(publicDir, "onboarding-step2.html"));
+  });
+  
+  app.get("/onboarding/experience", (req, res) => {
+    res.sendFile(path.join(publicDir, "onboarding-step3.html"));
+  });
+  
+  app.get("/upload", (req, res) => {
+    res.sendFile(path.join(publicDir, "upload.html"));
+  });
 
   const httpServer = createServer(app);
 

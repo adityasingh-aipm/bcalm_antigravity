@@ -195,6 +195,36 @@ async function ensureProfile(user: any) {
   }
 }
 
+export const optionalAuth: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const accessToken = (req.session as any)?.accessToken;
+    
+    if (!accessToken) {
+      (req as any).userId = null;
+      (req as any).user = null;
+      return next();
+    }
+
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(accessToken);
+    
+    if (error || !user) {
+      (req as any).userId = null;
+      (req as any).user = null;
+      return next();
+    }
+
+    (req as any).userId = user.id;
+    (req as any).user = user;
+    
+    next();
+  } catch (error) {
+    console.error("Optional auth middleware error:", error);
+    (req as any).userId = null;
+    (req as any).user = null;
+    next();
+  }
+};
+
 export const isAuthenticated: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const accessToken = (req.session as any)?.accessToken;

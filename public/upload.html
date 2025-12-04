@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload CV - Bcalm CV Score</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/onboarding.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1 class="title">Upload your CV</h1>
+      <p class="subtitle">Get your personalized review in ~60 seconds.</p>
+      
+      <div class="dropzone" id="dropzone">
+        <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <div class="dropzone-text">Drag & drop your CV</div>
+        <div class="dropzone-subtext">or browse files (PDF, DOC, DOCX)</div>
+        <div class="file-name" id="fileName"></div>
+        <input type="file" class="file-input" id="fileInput" accept=".pdf,.doc,.docx">
+      </div>
+      
+      <div class="toggle-container" id="jdToggle">
+        <div class="toggle" id="toggle"></div>
+        <span class="toggle-label">Add a job description (optional) for fit score</span>
+      </div>
+      
+      <div class="jd-input" id="jdInput">
+        <textarea 
+          class="jd-textarea" 
+          id="jdTextarea" 
+          placeholder="Paste the job description here..."
+        ></textarea>
+      </div>
+      
+      <div class="benefits-list">
+        <div class="benefit-item">
+          <svg class="benefit-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Overall CV score + role readiness</span>
+        </div>
+        <div class="benefit-item">
+          <svg class="benefit-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Top strengths recruiters notice</span>
+        </div>
+        <div class="benefit-item">
+          <svg class="benefit-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>Fastest fixes to improve your score</span>
+        </div>
+      </div>
+      
+      <div class="privacy-line">
+        <svg class="privacy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Your CV is private and never shared.</span>
+      </div>
+      
+      <button class="btn btn-primary" id="analyzeBtn" disabled style="width: 100%;">Analyze my CV</button>
+      
+      <div class="context-footer" id="contextFooter">
+        Scoring for: <span id="contextRole">General readiness</span> · <span id="contextStatus">Not specified</span> · <span id="contextExperience">Not specified</span>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/onboarding.js"></script>
+  <script src="/upload.js"></script>
+</body>
+</html>

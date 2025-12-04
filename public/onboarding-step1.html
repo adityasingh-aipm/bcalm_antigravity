@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Setup - Bcalm CV Score</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/onboarding.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="step-indicator">Step 1 of 3 · ~20 sec</div>
+      
+      <h1 class="title">Quick setup for a better CV review</h1>
+      <p class="subtitle">This helps us score you against the right bar.</p>
+      
+      <div class="options-list" id="options">
+        <div class="option" data-value="Student / Fresher">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">Student / Fresher</div>
+            <div class="option-description">Starting out or recently graduated — we'll focus on potential.</div>
+          </div>
+        </div>
+        
+        <div class="option" data-value="Working Professional">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">Working Professional</div>
+            <div class="option-description">Already working — we'll score for your next level.</div>
+          </div>
+        </div>
+        
+        <div class="option" data-value="Switching Careers">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">Switching Careers</div>
+            <div class="option-description">Moving into a new field — we'll look for transferable wins.</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="buttons">
+        <button class="btn btn-primary" id="continueBtn" disabled>Continue</button>
+        <button class="skip-link" id="skipBtn">Skip for now</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/onboarding.js"></script>
+  <script>
+    let selectedStatus = null;
+    
+    document.querySelectorAll('.option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedStatus = option.dataset.value;
+        document.getElementById('continueBtn').disabled = false;
+      });
+    });
+    
+    document.getElementById('continueBtn').addEventListener('click', async () => {
+      if (!selectedStatus) return;
+      await saveStatus(selectedStatus);
+      window.location.href = '/onboarding/role';
+    });
+    
+    document.getElementById('skipBtn').addEventListener('click', async () => {
+      await saveStatus(null);
+      window.location.href = '/onboarding/role';
+    });
+  </script>
+</body>
+</html>

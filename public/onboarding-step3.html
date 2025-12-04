@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Experience - Bcalm CV Score</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/onboarding.css">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="step-indicator">Step 3 of 3 · ~10 sec</div>
+      
+      <h1 class="title">How much experience do you have?</h1>
+      <p class="subtitle">Helps us benchmark your CV fairly.</p>
+      <p class="helper-text" id="careerSwitcherHelper" style="display: none;">Count relevant experience, even from another field.</p>
+      <p class="helper-text" id="prefillHelper" style="display: none;">We pre-filled this based on your choice — change if needed.</p>
+      
+      <div class="options-list" id="options">
+        <div class="option" data-value="0">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">0 years</div>
+            <div class="option-description">Just starting</div>
+          </div>
+        </div>
+        
+        <div class="option" data-value="1">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">1–2 years</div>
+            <div class="option-description">Early career</div>
+          </div>
+        </div>
+        
+        <div class="option" data-value="3">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">3–5 years</div>
+            <div class="option-description">Mid level</div>
+          </div>
+        </div>
+        
+        <div class="option" data-value="6">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">6–9 years</div>
+            <div class="option-description">Experienced</div>
+          </div>
+        </div>
+        
+        <div class="option" data-value="10">
+          <div class="option-radio"></div>
+          <div class="option-content">
+            <div class="option-label">10+ years</div>
+            <div class="option-description">Senior level</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="buttons">
+        <div class="buttons-row">
+          <button class="btn btn-secondary" id="backBtn">Back</button>
+          <button class="btn btn-primary" id="continueBtn" disabled>Continue to upload</button>
+        </div>
+        <button class="skip-link" id="skipBtn">Skip for now</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="/onboarding.js"></script>
+  <script>
+    let selectedExperience = null;
+    
+    async function initPage() {
+      const profile = await getProfile();
+      const status = profile?.current_status;
+      
+      if (status === 'Switching Careers') {
+        document.getElementById('careerSwitcherHelper').style.display = 'block';
+      }
+      
+      if (status === 'Student / Fresher') {
+        const firstOption = document.querySelector('.option[data-value="0"]');
+        firstOption.classList.add('selected');
+        selectedExperience = 0;
+        document.getElementById('continueBtn').disabled = false;
+        document.getElementById('prefillHelper').style.display = 'block';
+      }
+    }
+    
+    document.querySelectorAll('.option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+        option.classList.add('selected');
+        selectedExperience = parseInt(option.dataset.value);
+        document.getElementById('continueBtn').disabled = false;
+        document.getElementById('prefillHelper').style.display = 'none';
+      });
+    });
+    
+    document.getElementById('backBtn').addEventListener('click', () => {
+      window.location.href = '/onboarding/role';
+    });
+    
+    document.getElementById('continueBtn').addEventListener('click', async () => {
+      await saveExperience(selectedExperience);
+      await completeOnboarding();
+      window.location.href = '/upload';
+    });
+    
+    document.getElementById('skipBtn').addEventListener('click', async () => {
+      await saveExperience(null);
+      await completeOnboarding();
+      window.location.href = '/upload';
+    });
+    
+    initPage();
+  </script>
+</body>
+</html>
