@@ -175,6 +175,30 @@
   }
 }
 
+/* Hero Title Typography */
+.hero-title {
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-align: center;
+  color: #ffffff;
+  text-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+.hero-title .accent {
+  color: #C4B5FD;
+  font-weight: 800;
+}
+
+.hero-title .payoff {
+  font-weight: 700;
+  background: linear-gradient(90deg, #A78BFA, #F59E0B);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
 /**
  * Using the elevate system.
  * Automatic contrast adjustment.

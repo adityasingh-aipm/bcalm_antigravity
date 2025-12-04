@@ -95,23 +95,9 @@ export default function HeroSection({ onOpenLeadModal }: HeroSectionProps) {
             </motion.div>
             
             {/* Main Headline - polished typography */}
-            <h1 
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-3 md:mb-4"
-              style={{ 
-                lineHeight: '1.08',
-                letterSpacing: '0.3px',
-              }}
-            >
-              <span className="block whitespace-nowrap">Crack Your Dream Job</span>
-              <span 
-                className="block"
-                style={{
-                  color: '#C4B5FD',
-                  filter: 'brightness(1.15)',
-                }}
-              >
-                in 30 Days
-              </span>
+            <h1 className="hero-title mb-3 md:mb-4">
+              Crack Your <span className="accent">Dream Job</span><br />
+              in <span className="payoff">30 Days</span>
             </h1>
             
             {/* Subline */}
