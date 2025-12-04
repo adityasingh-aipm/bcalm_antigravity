@@ -165,22 +165,53 @@ export default function ResultsPage() {
   const [copied, setCopied] = useState(false);
   const [expandedFixes, setExpandedFixes] = useState<Set<number>>(new Set());
 
+  const { data: shareData, isLoading: shareLoading } = useQuery<{
+    id: string;
+    status: string;
+    share_data: {
+      overall_score: number;
+      role_preset: string;
+      summary: string;
+      top_strength: any;
+    };
+  }>({
+    queryKey: ["/api/analysis/share", jobId],
+    enabled: !!jobId,
+    staleTime: 60000,
+    gcTime: 300000,
+    retry: 2,
+  });
+
+  const { data: fullJobData, isLoading: fullLoading, refetch } = useQuery<AnalysisJob>({
+    queryKey: ["/api/analysis", jobId],
+    enabled: !!jobId && isAuthenticated,
+    staleTime: 60000,
+    gcTime: 300000,
+    retry: 2,
+    retryDelay: 1000,
+  });
+
+  const jobData: AnalysisJob | undefined = fullJobData || (shareData ? {
+    id: shareData.id,
+    status: shareData.status,
+    report: {
+      overall_score: shareData.share_data?.overall_score,
+      role_preset: shareData.share_data?.role_preset,
+      summary: shareData.share_data?.summary,
+      top_strengths: shareData.share_data?.top_strength ? [shareData.share_data.top_strength] : [],
+    },
+    error_text: null,
+    created_at: '',
+    completed_at: null,
+  } : undefined);
+
+  const isLoading = shareLoading && fullLoading;
+
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate("/");
-      return;
-    }
     if (!jobId) {
       navigate("/upload");
     }
-  }, [authLoading, isAuthenticated, jobId, navigate]);
-
-  const { data: jobData, isLoading } = useQuery<AnalysisJob>({
-    queryKey: ["/api/analysis", jobId],
-    enabled: !!jobId && isAuthenticated,
-    staleTime: 0,
-    refetchOnMount: "always",
-  });
+  }, [jobId, navigate]);
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/share/${jobId}`;
@@ -219,7 +250,7 @@ export default function ResultsPage() {
     setExpandedFixes(newExpanded);
   };
 
-  if (authLoading || isLoading || !jobId) {
+  if (isLoading || !jobId) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0a0014] via-[#110022] to-[#1a0033]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
