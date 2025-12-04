@@ -15,7 +15,6 @@ import Footer from "@/components/Footer";
 import WaitlistDialog from "@/components/WaitlistDialog";
 import ScheduleCallDialog from "@/components/ScheduleCallDialog";
 import StickyMobileCTA from "@/components/StickyMobileCTA";
-import ExitIntentPopup from "@/components/ExitIntentPopup";
 import LimitedOfferBanner from "@/components/LimitedOfferBanner";
 import { trackPageView } from "@/lib/analytics";
 
@@ -84,9 +83,6 @@ export default function LandingPage() {
       
       {/* Mobile sticky CTA */}
       <StickyMobileCTA />
-      
-      {/* Exit Intent Popup */}
-      <ExitIntentPopup />
     </div>
   );
 }
