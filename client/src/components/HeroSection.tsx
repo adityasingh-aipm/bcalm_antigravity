@@ -3,7 +3,13 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, CheckCircle, ChevronRight, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Upload, CheckCircle, ChevronRight, Loader2, PartyPopper, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +21,7 @@ export default function HeroSection() {
   const { isAuthenticated } = useAuth();
   const [step, setStep] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showCongratsDialog, setShowCongratsDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { toast } = useToast();
@@ -48,9 +55,10 @@ export default function HeroSection() {
     
     if (formData.name && formData.phoneNumber) {
       trackEvent("cv_score_step1_completed", {
-        name: formData.name
+        name: formData.name,
+        phone: formData.phoneNumber
       });
-      setStep(2);
+      setShowCongratsDialog(true);
     }
   };
 
@@ -318,6 +326,48 @@ export default function HeroSection() {
       </div>
       
       <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
+      
+      {/* Congratulations Dialog */}
+      <Dialog open={showCongratsDialog} onOpenChange={setShowCongratsDialog}>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-[#1a0033] via-[#2d1052] to-[#0d001a] border border-purple-500/30 relative">
+          <button
+            onClick={() => setShowCongratsDialog(false)}
+            className="absolute right-4 top-4 rounded-full p-1.5 hover:bg-white/10 transition-colors"
+            data-testid="button-close-congrats"
+          >
+            <X className="h-5 w-5 text-white/70" />
+          </button>
+          <DialogHeader className="pt-2">
+            <DialogTitle className="text-center text-2xl font-bold text-white flex flex-col items-center gap-4">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 10, delay: 0.1 }}
+                className="w-20 h-20 rounded-full bg-gradient-to-r from-emerald-500 to-green-500 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+              >
+                <PartyPopper className="w-10 h-10 text-white" />
+              </motion.div>
+              <motion.span
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Congrats!
+              </motion.span>
+            </DialogTitle>
+          </DialogHeader>
+          <motion.div 
+            className="text-center py-6 px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <p className="text-purple-100 text-lg leading-relaxed">
+              We will get back to you on <span className="text-emerald-400 font-semibold">WhatsApp</span> in the next <span className="text-amber-400 font-semibold">24 hours</span>
+            </p>
+          </motion.div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
