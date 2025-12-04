@@ -1,22 +1,39 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useSearch } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
-
-interface OnboardingStatus {
-  onboardingStatus: string;
-  currentStatus: string | null;
-  targetRole: string | null;
-  yearsExperience: number | null;
-  personalizationQuality: string | null;
-}
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { GraduationCap, Upload, FileText, Loader2, X, AlertCircle, ExternalLink, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { nanoid } from "nanoid";
+
+interface OnboardingData {
+  status: string;
+  currentStatus: string | null;
+  targetRole: string;
+  yearsExperience: number | null;
+}
+
+function loadOnboardingData(): OnboardingData | null {
+  try {
+    const stored = localStorage.getItem("cv_onboarding");
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
+function getOrCreateSessionId(): string {
+  let sessionId = localStorage.getItem("cv_session_id");
+  if (!sessionId) {
+    sessionId = nanoid();
+    localStorage.setItem("cv_session_id", sessionId);
+  }
+  return sessionId;
+}
 
 export default function UploadPage() {
   const [, navigate] = useLocation();
@@ -24,7 +41,6 @@ export default function UploadPage() {
   const searchParams = new URLSearchParams(searchString);
   const showJd = searchParams.get("jd") === "true";
   
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -32,36 +48,39 @@ export default function UploadPage() {
   const [jdText, setJdText] = useState("");
   const [showJdInput, setShowJdInput] = useState(showJd);
   const [dragActive, setDragActive] = useState(false);
-
-  const { data: onboardingData, isLoading: onboardingLoading } = useQuery<OnboardingStatus>({
-    queryKey: ["/api/onboarding/status"],
-    enabled: isAuthenticated,
-  });
+  const [onboardingData, setOnboardingData] = useState<OnboardingData | null>(null);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate("/");
+    const data = loadOnboardingData();
+    if (!data || data.status !== "complete") {
+      navigate("/onboarding");
       return;
     }
-    if (!onboardingLoading && onboardingData?.onboardingStatus !== "complete") {
-      navigate("/onboarding");
-    }
-  }, [authLoading, isAuthenticated, onboardingLoading, onboardingData, navigate]);
+    setOnboardingData(data);
+  }, [navigate]);
 
   const submitMutation = useMutation({
     mutationFn: async () => {
       if (!file) throw new Error("No file selected");
       
+      const sessionId = getOrCreateSessionId();
       const formData = new FormData();
       formData.append("cv", file);
+      formData.append("sessionId", sessionId);
+      
       if (jdText.trim()) {
         formData.append("jdText", jdText.trim());
       }
       
-      const response = await fetch("/api/analysis/submit", {
+      if (onboardingData) {
+        formData.append("currentStatus", onboardingData.currentStatus || "");
+        formData.append("targetRole", onboardingData.targetRole || "");
+        formData.append("yearsExperience", String(onboardingData.yearsExperience ?? 0));
+      }
+      
+      const response = await fetch("/api/analysis/submit-public", {
         method: "POST",
         body: formData,
-        credentials: "include",
       });
       
       if (!response.ok) {
@@ -72,6 +91,7 @@ export default function UploadPage() {
       return response.json();
     },
     onSuccess: (data) => {
+      localStorage.setItem("cv_current_job_id", data.jobId);
       queryClient.invalidateQueries({ queryKey: ["/api/analysis/user/jobs"] });
       navigate(`/processing?jobId=${data.jobId}`);
     },
@@ -132,6 +152,12 @@ export default function UploadPage() {
     setFile(selectedFile);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0]);
+    }
+  };
+
   const handleSubmit = () => {
     if (!file) {
       toast({
@@ -144,178 +170,159 @@ export default function UploadPage() {
     submitMutation.mutate();
   };
 
-  if (authLoading || onboardingLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#110022] to-[#1a0033]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#110022] to-[#1a0033] px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <GraduationCap className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-white font-bold text-xl">BCALM</span>
-        </div>
-
+    <div className="min-h-screen bg-gradient-to-b from-[#110022] to-[#1a0033] flex items-center justify-center px-4 py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-2xl"
+      >
         <Card className="bg-white/5 backdrop-blur border-white/10">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl text-white">Upload Your CV</CardTitle>
+          <CardHeader className="text-center pb-2">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                <GraduationCap className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-white font-bold text-xl">BCALM</span>
+            </div>
+            <CardTitle className="text-2xl text-white">Upload your CV</CardTitle>
             <CardDescription className="text-white/60">
-              We'll analyze your CV and provide personalized recommendations
+              Get your personalized CV analysis powered by AI
             </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
             <div
-              className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${
-                dragActive
-                  ? "border-primary bg-primary/10"
-                  : file
-                  ? "border-green-500/50 bg-green-500/10"
-                  : "border-white/20 hover:border-primary/50"
-              }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all ${
+                dragActive
+                  ? "border-primary bg-primary/10"
+                  : file
+                  ? "border-green-500/50 bg-green-500/10"
+                  : "border-white/20 hover:border-primary/50 hover:bg-white/5"
+              }`}
+              data-testid="dropzone-cv"
             >
               <input
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf,.doc,.docx"
-                onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+                onChange={handleFileChange}
                 className="hidden"
-                data-testid="input-cv-file"
+                data-testid="input-file"
               />
               
               {file ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
-                      <CheckCircle2 className="h-6 w-6 text-green-500" />
-                    </div>
-                    <div>
-                      <p className="text-white font-medium" data-testid="text-file-name">{file.name}</p>
-                      <p className="text-white/60 text-sm">
-                        {(file.size / 1024).toFixed(1)} KB
-                      </p>
-                    </div>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-green-500/20 flex items-center justify-center">
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-white font-medium">{file.name}</p>
+                    <p className="text-white/60 text-sm">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setFile(null)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFile(null);
+                    }}
                     className="text-white/60 hover:text-white"
                     data-testid="button-remove-file"
                   >
                     <X className="h-5 w-5" />
                   </Button>
-                </motion.div>
+                </div>
               ) : (
-                <div className="text-center">
+                <>
                   <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
                     <Upload className="h-8 w-8 text-primary" />
                   </div>
                   <p className="text-white font-medium mb-1">
-                    Drag and drop your CV here
+                    Drag & drop your CV here
                   </p>
-                  <p className="text-white/60 text-sm mb-4">
+                  <p className="text-white/60 text-sm">
                     or click to browse (PDF, DOC, DOCX)
                   </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="border-white/20 text-white hover:bg-white/10"
-                    data-testid="button-browse-files"
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Browse Files
-                  </Button>
-                </div>
+                </>
               )}
             </div>
 
-            {showJdInput && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                className="space-y-2"
-              >
-                <label className="text-white/80 text-sm font-medium">
-                  Job Description (optional)
-                </label>
-                <Textarea
-                  placeholder="Paste the job description here for more tailored analysis..."
-                  value={jdText}
-                  onChange={(e) => setJdText(e.target.value)}
-                  className="min-h-[120px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
-                  data-testid="textarea-jd"
-                />
-              </motion.div>
-            )}
-
-            {!showJdInput && (
+            <div>
               <button
-                onClick={() => setShowJdInput(true)}
+                onClick={() => setShowJdInput(!showJdInput)}
                 className="text-primary hover:text-primary/80 text-sm flex items-center gap-1"
-                data-testid="button-add-jd"
+                data-testid="button-toggle-jd"
               >
-                <span>+ Add job description for better analysis</span>
+                <FileText className="h-4 w-4" />
+                {showJdInput ? "Hide job description" : "Add job description (optional)"}
               </button>
-            )}
+              
+              {showJdInput && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="mt-3"
+                >
+                  <Textarea
+                    placeholder="Paste the job description here for more accurate feedback..."
+                    value={jdText}
+                    onChange={(e) => setJdText(e.target.value)}
+                    className="min-h-[120px] bg-white/10 border-white/20 text-white placeholder:text-white/40"
+                    data-testid="textarea-jd"
+                  />
+                </motion.div>
+              )}
+            </div>
+
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-primary/10 border border-primary/20">
+              <AlertCircle className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+              <div className="text-sm text-white/80">
+                <p className="font-medium text-white mb-1">What you'll get:</p>
+                <ul className="list-disc list-inside space-y-1 text-white/60">
+                  <li>Overall CV score out of 100</li>
+                  <li>Detailed breakdown by category</li>
+                  <li>Actionable improvements</li>
+                  <li>Role-specific recommendations</li>
+                </ul>
+              </div>
+            </div>
 
             <Button
               onClick={handleSubmit}
               disabled={!file || submitMutation.isPending}
               className="w-full h-12 text-lg"
-              data-testid="button-analyze-cv"
+              data-testid="button-analyze"
             >
               {submitMutation.isPending ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  Uploading...
+                  Submitting...
                 </>
               ) : (
                 <>
-                  <Upload className="h-5 w-5 mr-2" />
-                  Analyze My CV
+                  <ExternalLink className="h-5 w-5 mr-2" />
+                  Analyze my CV
                 </>
               )}
             </Button>
 
-            <div className="flex items-center justify-center gap-2 pt-2">
-              <AlertCircle className="h-4 w-4 text-white/40" />
-              <button
-                onClick={() => window.open("/coming-soon/cv-samples", "_blank")}
-                className="text-white/40 hover:text-white/60 text-sm flex items-center gap-1"
-                data-testid="button-cv-samples"
-              >
-                Don't have a CV? See best CV samples
-                <ExternalLink className="h-3 w-3" />
-              </button>
-            </div>
+            {onboardingData && (
+              <div className="text-center text-white/40 text-sm">
+                Targeting: {onboardingData.targetRole || "General role"} | 
+                {" "}{onboardingData.currentStatus?.replace(/_/g, " ") || ""}
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => navigate("/dashboard")}
-            className="text-white/40 hover:text-white/60 text-sm"
-            data-testid="button-go-dashboard"
-          >
-            Go to Dashboard
-          </button>
-        </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -18,11 +18,7 @@ export default function Navbar() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
 
   const handleGetCvScore = () => {
-    if (isAuthenticated) {
-      navigate("/start");
-    } else {
-      setAuthModalOpen(true);
-    }
+    navigate("/start");
   };
 
   const handleLogout = async () => {
@@ -90,13 +86,22 @@ export default function Navbar() {
                   </DropdownMenu>
                 </div>
               ) : (
-                <button 
-                  onClick={handleGetCvScore}
-                  className="text-white/80 hover:text-white text-sm font-medium transition-colors cursor-pointer"
-                  data-testid="button-get-cv-score"
-                >
-                  Get My Free CV Score
-                </button>
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setAuthModalOpen(true)}
+                    className="text-white/60 hover:text-white text-sm font-medium transition-colors cursor-pointer"
+                    data-testid="button-signin"
+                  >
+                    Sign in
+                  </button>
+                  <button 
+                    onClick={handleGetCvScore}
+                    className="text-white bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+                    data-testid="button-get-cv-score"
+                  >
+                    Get My Free CV Score
+                  </button>
+                </div>
               )}
             </div>
           </div>

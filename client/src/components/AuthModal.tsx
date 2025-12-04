@@ -43,7 +43,11 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
     try {
       await signInWithEmail(email, password);
       onOpenChange(false);
-      window.location.href = "/start";
+      toast({
+        title: "Signed in!",
+        description: "You're now signed in.",
+      });
+      setIsLoading(false);
     } catch (error: any) {
       toast({
         title: "Sign in failed",
@@ -68,8 +72,13 @@ export default function AuthModal({ open, onOpenChange }: AuthModalProps) {
         });
         onOpenChange(false);
       } else {
-        window.location.href = "/start";
+        toast({
+          title: "Account created!",
+          description: "You're now signed in.",
+        });
+        onOpenChange(false);
       }
+      setIsLoading(false);
     } catch (error: any) {
       toast({
         title: "Sign up failed",

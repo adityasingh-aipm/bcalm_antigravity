@@ -231,7 +231,7 @@ router.get("/share/:jobId", async (req: Request, res: Response) => {
     
     const { data: job, error } = await supabaseAdmin
       .from('analysis_jobs')
-      .select('id, status, result_json, created_at')
+      .select('id, status, result_json, error_text, created_at, completed_at')
       .eq('id', jobId)
       .single();
     
@@ -239,25 +239,164 @@ router.get("/share/:jobId", async (req: Request, res: Response) => {
       return res.status(404).json({ message: "Job not found" });
     }
     
-    if (job.status !== 'complete') {
-      return res.status(400).json({ message: "Analysis not complete" });
-    }
-    
     const result = job.result_json?.result || job.result_json || {};
     
     res.json({
       id: job.id,
       status: job.status,
-      share_data: {
-        overall_score: result.overall_score || 0,
-        role_preset: result.role_preset || "General",
-        summary: result.summary?.split('.')[0] || "",
-        top_strength: result.top_strengths?.[0]?.point || result.top_strengths?.[0] || "",
-      }
+      report: job.status === 'complete' ? result : {},
+      error_text: job.error_text,
+      created_at: job.created_at,
+      completed_at: job.completed_at,
     });
   } catch (error) {
     console.error("Error fetching share data:", error);
     res.status(500).json({ message: "Failed to fetch share data" });
+  }
+});
+
+router.post("/submit-public", upload.single("cv"), async (req: Request, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "CV file is required" });
+    }
+    
+    const sessionId = req.body.sessionId || `anon-${Date.now()}`;
+    const currentStatus = req.body.currentStatus || null;
+    const targetRole = req.body.targetRole || null;
+    const yearsExperience = req.body.yearsExperience ? parseInt(req.body.yearsExperience) : null;
+    const jdText = req.body.jdText || null;
+    
+    const cvText = await extractTextFromFile(req.file.path, req.file.mimetype);
+    
+    if (!cvText || cvText.trim().length < 50) {
+      return res.status(400).json({ message: "Could not extract text from CV. Please upload a readable PDF or DOCX file." });
+    }
+
+    const metaSnapshot = {
+      current_status: currentStatus,
+      target_role: targetRole,
+      years_experience: yearsExperience,
+      session_id: sessionId,
+      jd_text: jdText,
+    };
+
+    const { data: submission, error: subError } = await supabaseAdmin
+      .from('cv_submissions')
+      .insert({
+        user_id: null,
+        cv_file_path: req.file.path,
+        cv_text: cvText,
+        meta_snapshot: metaSnapshot
+      })
+      .select()
+      .single();
+
+    if (subError) {
+      console.error("Error creating submission:", subError);
+      return res.status(500).json({ message: "Failed to create CV submission" });
+    }
+
+    const { data: job, error: jobError } = await supabaseAdmin
+      .from('analysis_jobs')
+      .insert({
+        submission_id: submission.id,
+        user_id: null,
+        status: 'processing'
+      })
+      .select()
+      .single();
+
+    if (jobError) {
+      console.error("Error creating job:", jobError);
+      return res.status(500).json({ message: "Failed to create analysis job" });
+    }
+    
+    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL;
+    if (n8nWebhookUrl) {
+      try {
+        const payload = {
+          id: submission.id,
+          cv_text: cvText,
+          meta_snapshot: metaSnapshot,
+          jobId: job.id
+        };
+
+        console.log("Triggering n8n webhook (public) with payload:", JSON.stringify(payload, null, 2));
+
+        const response = await fetch(n8nWebhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        
+        if (!response.ok) {
+          console.error("n8n webhook returned error:", response.status, await response.text());
+          await supabaseAdmin
+            .from('analysis_jobs')
+            .update({ 
+              status: 'failed',
+              error_text: 'Failed to connect to analysis service'
+            })
+            .eq('id', job.id);
+        }
+      } catch (webhookError) {
+        console.error("Error calling n8n webhook:", webhookError);
+        await supabaseAdmin
+          .from('analysis_jobs')
+          .update({ 
+            status: 'failed',
+            error_text: 'Failed to connect to analysis service'
+          })
+          .eq('id', job.id);
+      }
+    } else {
+      setTimeout(async () => {
+        const mockResult = {
+          role_preset: targetRole || "General",
+          overall_score: 72,
+          score_breakdown: {
+            ats: { score: 75, notes: "Good ATS compatibility" },
+            impact: { score: 68, notes: "Could use more metrics" },
+            role_signals: { score: 70, notes: "Relevant skills present" },
+            job_match: { score: 75, notes: "Good match for target role", skipped: !targetRole }
+          },
+          summary: "Your CV shows good potential. Focus on quantifying achievements.",
+          top_strengths: [
+            { point: "Clear structure and formatting", evidence: "Well-organized sections" },
+            { point: "Relevant experience highlighted", evidence: "Good use of keywords" }
+          ],
+          top_fixes: [
+            { point: "Add more quantified achievements", expected_lift: 15, how_to_do_it: "Include metrics like percentages, numbers, and impact" },
+            { point: "Strengthen professional summary", expected_lift: 10, how_to_do_it: "Add a compelling 2-3 line summary at the top" }
+          ],
+          seven_step_plan: [
+            { step: 1, action: "Add a compelling professional summary", priority: "high" },
+            { step: 2, action: "Quantify your achievements with metrics", priority: "high" },
+            { step: 3, action: "Optimize keywords for your target role", priority: "medium" }
+          ],
+          job_match_section: {
+            match_score: targetRole ? 75 : null,
+            missing_skills: [],
+            strong_matches: []
+          }
+        };
+
+        await supabaseAdmin
+          .from('analysis_jobs')
+          .update({
+            status: 'complete',
+            result_json: mockResult,
+            completed_at: new Date().toISOString()
+          })
+          .eq('id', job.id);
+      }, 5000);
+    }
+    
+    res.json({ ok: true, jobId: job.id });
+  } catch (error) {
+    console.error("Error submitting CV for analysis (public):", error);
+    res.status(500).json({ message: "Failed to submit CV for analysis" });
   }
 });
 

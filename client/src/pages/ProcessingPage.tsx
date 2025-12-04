@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation, useSearch } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { GraduationCap, Loader2, FileSearch, Brain, CheckCircle, Sparkles, AlertCircle, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,18 +27,13 @@ export default function ProcessingPage() {
   const searchParams = new URLSearchParams(searchString);
   const jobId = searchParams.get("jobId");
   
-  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate("/");
-      return;
-    }
     if (!jobId) {
       navigate("/upload");
     }
-  }, [authLoading, isAuthenticated, jobId, navigate]);
+  }, [jobId, navigate]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -49,8 +43,8 @@ export default function ProcessingPage() {
   }, []);
 
   const { data: jobData, isLoading } = useQuery<AnalysisJob>({
-    queryKey: ["/api/analysis", jobId],
-    enabled: !!jobId && isAuthenticated,
+    queryKey: ["/api/analysis/share", jobId],
+    enabled: !!jobId,
     staleTime: 0,
     refetchInterval: (query) => {
       const status = query.state.data?.status;
@@ -102,7 +96,7 @@ export default function ProcessingPage() {
     );
   }
 
-  if (authLoading || !jobId) {
+  if (!jobId) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#110022] to-[#1a0033]">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -123,65 +117,51 @@ export default function ProcessingPage() {
         </div>
 
         <motion.div
-          className="relative w-32 h-32 mx-auto mb-8"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          key={currentStep}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-8 relative"
         >
-          <div className="absolute inset-0 rounded-full border-4 border-primary/20" />
-          <motion.div
-            className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          />
-          <div className="absolute inset-4 rounded-full bg-primary/10 flex items-center justify-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.5 }}
-                transition={{ duration: 0.3 }}
-              >
-                <CurrentIcon className="h-12 w-12 text-primary" />
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <div className="absolute inset-0 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <CurrentIcon className="h-10 w-10 text-primary" />
+            </motion.div>
+          </AnimatePresence>
         </motion.div>
 
         <AnimatePresence mode="wait">
-          <motion.h2
+          <motion.p
             key={currentStep}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="text-2xl font-bold text-white mb-4"
-            data-testid="text-loading-step"
+            className="text-xl font-semibold text-white mb-2"
           >
             {LOADING_STEPS[currentStep].text}
-          </motion.h2>
+          </motion.p>
         </AnimatePresence>
 
         <p className="text-white/60 mb-8">
-          Our AI is carefully reviewing your CV to provide personalized feedback
+          This usually takes about 30-60 seconds
         </p>
 
         <div className="flex justify-center gap-2">
           {LOADING_STEPS.map((_, index) => (
-            <motion.div
+            <div
               key={index}
-              className={`w-2 h-2 rounded-full ${
+              className={`w-2 h-2 rounded-full transition-colors ${
                 index === currentStep ? "bg-primary" : "bg-white/20"
               }`}
-              animate={{
-                scale: index === currentStep ? 1.2 : 1,
-              }}
             />
           ))}
         </div>
-
-        <p className="text-white/40 text-sm mt-8">
-          This usually takes 10-30 seconds
-        </p>
       </div>
     </div>
   );

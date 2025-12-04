@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -155,7 +154,6 @@ function BreakdownCard({
 export default function ResultsPage() {
   const [, navigate] = useLocation();
   const { jobId } = useParams();
-  const { isLoading: authLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
   
   const [showAllStrengths, setShowAllStrengths] = useState(false);
@@ -165,47 +163,13 @@ export default function ResultsPage() {
   const [copied, setCopied] = useState(false);
   const [expandedFixes, setExpandedFixes] = useState<Set<number>>(new Set());
 
-  const { data: shareData, isLoading: shareLoading } = useQuery<{
-    id: string;
-    status: string;
-    share_data: {
-      overall_score: number;
-      role_preset: string;
-      summary: string;
-      top_strength: any;
-    };
-  }>({
+  const { data: jobData, isLoading, refetch } = useQuery<AnalysisJob>({
     queryKey: ["/api/analysis/share", jobId],
     enabled: !!jobId,
     staleTime: 60000,
     gcTime: 300000,
     retry: 2,
   });
-
-  const { data: fullJobData, isLoading: fullLoading, refetch } = useQuery<AnalysisJob>({
-    queryKey: ["/api/analysis", jobId],
-    enabled: !!jobId && isAuthenticated,
-    staleTime: 60000,
-    gcTime: 300000,
-    retry: 2,
-    retryDelay: 1000,
-  });
-
-  const jobData: AnalysisJob | undefined = fullJobData || (shareData ? {
-    id: shareData.id,
-    status: shareData.status,
-    report: {
-      overall_score: shareData.share_data?.overall_score,
-      role_preset: shareData.share_data?.role_preset,
-      summary: shareData.share_data?.summary,
-      top_strengths: shareData.share_data?.top_strength ? [shareData.share_data.top_strength] : [],
-    },
-    error_text: null,
-    created_at: '',
-    completed_at: null,
-  } : undefined);
-
-  const isLoading = shareLoading && fullLoading;
 
   useEffect(() => {
     if (!jobId) {

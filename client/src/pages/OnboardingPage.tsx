@@ -1,25 +1,5 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/useAuth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
-
-interface OnboardingStatus {
-  onboardingStatus: string;
-  currentStatus: string | null;
-  targetRole: string | null;
-  yearsExperience: number | null;
-  personalizationQuality: string | null;
-}
-
-interface Profile {
-  id: string;
-  onboarding_status: string | null;
-  current_status: string | null;
-  target_role: string | null;
-  years_experience: number | null;
-  personalization_quality: string | null;
-}
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,6 +9,13 @@ import { motion, AnimatePresence } from "framer-motion";
 
 type CurrentStatus = "student_fresher" | "working_professional" | "switching_careers";
 type ExperienceOption = 0 | 1 | 2 | 3 | 4;
+
+interface OnboardingData {
+  status: string;
+  currentStatus: CurrentStatus | null;
+  targetRole: string;
+  yearsExperience: ExperienceOption | null;
+}
 
 const STATUS_OPTIONS = [
   { value: "student_fresher", label: "Student / Fresher", icon: GraduationCap, description: "Currently studying or recently graduated" },
@@ -74,83 +61,53 @@ const ROLE_SUGGESTIONS: Record<CurrentStatus, string[]> = {
   ],
 };
 
+function saveOnboardingData(data: OnboardingData) {
+  localStorage.setItem("cv_onboarding", JSON.stringify(data));
+}
+
+function loadOnboardingData(): OnboardingData | null {
+  try {
+    const stored = localStorage.getItem("cv_onboarding");
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function OnboardingPage() {
   const [, navigate] = useLocation();
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const [step, setStep] = useState(1);
   const [currentStatus, setCurrentStatus] = useState<CurrentStatus | null>(null);
   const [targetRole, setTargetRole] = useState("");
   const [yearsExperience, setYearsExperience] = useState<ExperienceOption | null>(null);
   const [customRole, setCustomRole] = useState("");
-
-  const { data: onboardingData, isLoading: onboardingLoading } = useQuery<OnboardingStatus>({
-    queryKey: ["/api/onboarding/status"],
-    enabled: isAuthenticated,
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate("/");
-    }
-  }, [authLoading, isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (onboardingData) {
-      if (onboardingData.onboardingStatus === "complete") {
+    const data = loadOnboardingData();
+    if (data) {
+      if (data.status === "complete") {
         navigate("/upload");
         return;
       }
-      if (onboardingData.currentStatus) {
-        setCurrentStatus(onboardingData.currentStatus as CurrentStatus);
-      }
-      if (onboardingData.targetRole) {
-        setTargetRole(onboardingData.targetRole);
-      }
-      if (onboardingData.yearsExperience !== null && onboardingData.yearsExperience !== undefined) {
-        const expMap: Record<number, ExperienceOption> = { 0: 0, 1: 1, 2: 1, 3: 2, 4: 2, 5: 2, 6: 3, 7: 3, 8: 3, 9: 3 };
-        setYearsExperience(onboardingData.yearsExperience >= 10 ? 4 : (expMap[onboardingData.yearsExperience] ?? 0));
-      }
+      if (data.currentStatus) setCurrentStatus(data.currentStatus);
+      if (data.targetRole) setTargetRole(data.targetRole);
+      if (data.yearsExperience !== null) setYearsExperience(data.yearsExperience);
     }
-  }, [onboardingData, navigate]);
+  }, [navigate]);
 
-  const updateMutation = useMutation({
-    mutationFn: async (data: { currentStatus?: string; targetRole?: string; yearsExperience?: number }) => {
-      const res = await fetch("/api/onboarding/update", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Failed to update");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
-    },
-  });
-
-  const completeMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch("/api/onboarding/complete", {
-        method: "POST",
-        credentials: "include",
-      });
-      if (!res.ok) throw new Error("Failed to complete");
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/onboarding/status"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      navigate("/upload");
-    },
-  });
-
-  const handleStatusSelect = async (status: CurrentStatus) => {
+  const handleStatusSelect = (status: CurrentStatus) => {
     setCurrentStatus(status);
+    const exp = status === "student_fresher" ? 0 : null;
     if (status === "student_fresher") {
       setYearsExperience(0);
     }
-    await updateMutation.mutateAsync({ currentStatus: status, yearsExperience: status === "student_fresher" ? 0 : undefined });
+    saveOnboardingData({
+      status: "in_progress",
+      currentStatus: status,
+      targetRole,
+      yearsExperience: exp,
+    });
     setStep(2);
   };
 
@@ -162,39 +119,51 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleRoleNext = async () => {
+  const handleRoleNext = () => {
     const finalRole = customRole || targetRole;
-    if (finalRole) {
-      await updateMutation.mutateAsync({ targetRole: finalRole });
-    }
+    saveOnboardingData({
+      status: currentStatus === "student_fresher" ? "complete" : "in_progress",
+      currentStatus,
+      targetRole: finalRole,
+      yearsExperience,
+    });
+    
     if (currentStatus === "student_fresher") {
-      await completeMutation.mutateAsync();
+      navigate("/upload");
     } else {
       setStep(3);
     }
   };
 
-  const handleExperienceSelect = async (exp: ExperienceOption) => {
+  const handleExperienceSelect = (exp: ExperienceOption) => {
     setYearsExperience(exp);
-    const actualYears = [0, 1, 3, 6, 10][exp];
-    await updateMutation.mutateAsync({ yearsExperience: actualYears });
+    saveOnboardingData({
+      status: "in_progress",
+      currentStatus,
+      targetRole: customRole || targetRole,
+      yearsExperience: exp,
+    });
   };
 
-  const handleComplete = async () => {
-    await completeMutation.mutateAsync();
+  const handleComplete = () => {
+    saveOnboardingData({
+      status: "complete",
+      currentStatus,
+      targetRole: customRole || targetRole,
+      yearsExperience,
+    });
+    navigate("/upload");
   };
 
-  const handleSkip = async () => {
-    await completeMutation.mutateAsync();
+  const handleSkip = () => {
+    saveOnboardingData({
+      status: "complete",
+      currentStatus,
+      targetRole: customRole || targetRole,
+      yearsExperience,
+    });
+    navigate("/upload");
   };
-
-  if (authLoading || onboardingLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#110022] to-[#1a0033]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   const totalSteps = currentStatus === "student_fresher" ? 2 : 3;
   const progress = (step / totalSteps) * 100;
@@ -238,7 +207,7 @@ export default function OnboardingPage() {
                     <button
                       key={option.value}
                       onClick={() => handleStatusSelect(option.value as CurrentStatus)}
-                      disabled={updateMutation.isPending}
+                      disabled={isLoading}
                       className={`w-full p-4 rounded-lg border transition-all flex items-center gap-4 text-left ${
                         currentStatus === option.value
                           ? "border-primary bg-primary/20 text-white"
@@ -253,9 +222,6 @@ export default function OnboardingPage() {
                         <div className="font-semibold text-white">{option.label}</div>
                         <div className="text-sm text-white/60">{option.description}</div>
                       </div>
-                      {updateMutation.isPending && currentStatus === option.value && (
-                        <Loader2 className="h-5 w-5 animate-spin ml-auto" />
-                      )}
                     </button>
                   );
                 })}
@@ -312,13 +278,10 @@ export default function OnboardingPage() {
                   </Button>
                   <Button
                     onClick={handleRoleNext}
-                    disabled={updateMutation.isPending || completeMutation.isPending}
+                    disabled={isLoading}
                     className="flex-1"
                     data-testid="button-next-step2"
                   >
-                    {(updateMutation.isPending || completeMutation.isPending) ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : null}
                     {currentStatus === "student_fresher" ? "See my CV score" : "Next"}
                     <ChevronRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -326,7 +289,7 @@ export default function OnboardingPage() {
                 
                 <button
                   onClick={handleSkip}
-                  disabled={completeMutation.isPending}
+                  disabled={isLoading}
                   className="w-full text-center text-white/50 hover:text-white/80 text-sm py-2"
                   data-testid="button-skip-role"
                 >
@@ -348,7 +311,7 @@ export default function OnboardingPage() {
                   <button
                     key={option.value}
                     onClick={() => handleExperienceSelect(option.value as ExperienceOption)}
-                    disabled={updateMutation.isPending}
+                    disabled={isLoading}
                     className={`w-full p-4 rounded-lg border transition-all flex items-center gap-4 ${
                       yearsExperience === option.value
                         ? "border-primary bg-primary/20 text-white"
@@ -363,9 +326,6 @@ export default function OnboardingPage() {
                       <div className="font-semibold text-white">{option.label}</div>
                       <div className="text-sm text-white/60">{option.description}</div>
                     </div>
-                    {updateMutation.isPending && yearsExperience === option.value && (
-                      <Loader2 className="h-5 w-5 animate-spin ml-auto" />
-                    )}
                   </button>
                 ))}
 
@@ -381,22 +341,18 @@ export default function OnboardingPage() {
                   </Button>
                   <Button
                     onClick={handleComplete}
-                    disabled={completeMutation.isPending}
+                    disabled={isLoading}
                     className="flex-1"
                     data-testid="button-see-cv-score"
                   >
-                    {completeMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <Target className="h-4 w-4 mr-2" />
-                    )}
+                    <Target className="h-4 w-4 mr-2" />
                     See my CV score
                   </Button>
                 </div>
                 
                 <button
                   onClick={handleSkip}
-                  disabled={completeMutation.isPending}
+                  disabled={isLoading}
                   className="w-full text-center text-white/50 hover:text-white/80 text-sm py-2"
                   data-testid="button-skip-exp"
                 >
