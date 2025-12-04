@@ -1,32 +1,22 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Supabase configuration - anon key is public and safe to include in client code
+const SUPABASE_URL = 'https://rhwvwvvwjwvtlxzqooii.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3Z3dnZ3and2dGx4enFvb2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1ODQzOTEsImV4cCI6MjA3ODE2MDM5MX0.tvv9lDe_4PACmq4s1j1jkwAPiTEYATjLZUaDtW_e4Ms';
 
-const isConfigured = !!(supabaseUrl && supabaseAnonKey);
+// Use environment variables if available (for flexibility), otherwise use hardcoded values
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || SUPABASE_ANON_KEY;
 
-if (!isConfigured) {
-  console.warn('Supabase environment variables not configured');
-}
+export const supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+});
 
-// Only create real client if configured, otherwise create a dummy that won't throw
-export const supabase: SupabaseClient = isConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true
-      }
-    })
-  : createClient('https://placeholder.supabase.co', 'placeholder-key', {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false
-      }
-    });
-
-export const isSupabaseConfigured = isConfigured;
+export const isSupabaseConfigured = true;
 
 export async function signInWithGoogle() {
   const { data, error } = await supabase.auth.signInWithOAuth({
