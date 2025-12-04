@@ -6,8 +6,85 @@ import path from "path";
 import fs from "fs";
 import { z } from "zod";
 import mammoth from "mammoth";
+import { nanoid } from "nanoid";
 
 const router = Router();
+
+// Helper function to get or create an anonymous user for CV submissions
+async function getOrCreateAnonUser(sessionId: string, onboardingData: {
+  currentStatus?: string | null;
+  targetRole?: string | null;
+  yearsExperience?: number | null;
+}): Promise<{ userId: string; isNew: boolean }> {
+  // Check if we already have a profile with this session_id in meta
+  // First, try to find existing anonymous user by session_id stored in profile
+  const { data: existingProfile } = await supabaseAdmin
+    .from('profiles')
+    .select('id')
+    .eq('anonymous_session_id', sessionId)
+    .single();
+
+  if (existingProfile) {
+    // Update the profile with latest onboarding data
+    await supabaseAdmin
+      .from('profiles')
+      .update({
+        current_status: onboardingData.currentStatus,
+        target_role: onboardingData.targetRole,
+        years_experience: onboardingData.yearsExperience,
+        onboarding_status: 'complete',
+        personalization_quality: onboardingData.targetRole ? 'full' : 'partial',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', existingProfile.id);
+    
+    return { userId: existingProfile.id, isNew: false };
+  }
+
+  // Create a new anonymous user in auth.users
+  const anonEmail = `anon_${sessionId}@anon.bcalm.local`;
+  const anonPassword = nanoid(32); // Random secure password
+  
+  const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    email: anonEmail,
+    password: anonPassword,
+    email_confirm: true, // Auto-confirm since it's anonymous
+    user_metadata: {
+      is_anonymous: true,
+      session_id: sessionId
+    }
+  });
+
+  if (authError || !authUser.user) {
+    console.error("Error creating anonymous user:", authError);
+    throw new Error("Failed to create anonymous user");
+  }
+
+  const userId = authUser.user.id;
+
+  // Create profile for the anonymous user
+  const { error: profileError } = await supabaseAdmin
+    .from('profiles')
+    .insert({
+      id: userId,
+      email: anonEmail,
+      current_status: onboardingData.currentStatus,
+      target_role: onboardingData.targetRole,
+      years_experience: onboardingData.yearsExperience,
+      onboarding_status: 'complete',
+      personalization_quality: onboardingData.targetRole ? 'full' : 'partial',
+      anonymous_session_id: sessionId,
+      is_anonymous: true
+    });
+
+  if (profileError) {
+    console.error("Error creating anonymous profile:", profileError);
+    // Profile creation failed, but user exists - try to continue
+  }
+
+  console.log(`Created anonymous user: ${userId} for session: ${sessionId}`);
+  return { userId, isNew: true };
+}
 
 const uploadDir = path.join(process.cwd(), "uploads/cv-analysis");
 if (!fs.existsSync(uploadDir)) {
@@ -261,11 +338,18 @@ router.post("/submit-public", upload.single("cv"), async (req: Request, res: Res
       return res.status(400).json({ message: "CV file is required" });
     }
     
-    const sessionId = req.body.sessionId || `anon-${Date.now()}`;
+    const sessionId = req.body.sessionId || `anon-${nanoid()}`;
     const currentStatus = req.body.currentStatus || null;
     const targetRole = req.body.targetRole || null;
     const yearsExperience = req.body.yearsExperience ? parseInt(req.body.yearsExperience) : null;
     const jdText = req.body.jdText || null;
+    
+    // Get or create anonymous user with proper user_id
+    const { userId } = await getOrCreateAnonUser(sessionId, {
+      currentStatus,
+      targetRole,
+      yearsExperience
+    });
     
     const cvText = await extractTextFromFile(req.file.path, req.file.mimetype);
     
@@ -273,18 +357,22 @@ router.post("/submit-public", upload.single("cv"), async (req: Request, res: Res
       return res.status(400).json({ message: "Could not extract text from CV. Please upload a readable PDF or DOCX file." });
     }
 
+    // Get personalization quality
+    const personalizationQuality = targetRole ? 'full' : 'partial';
+
     const metaSnapshot = {
       current_status: currentStatus,
       target_role: targetRole,
       years_experience: yearsExperience,
       session_id: sessionId,
       jd_text: jdText,
+      personalization_quality: personalizationQuality,
     };
 
     const { data: submission, error: subError } = await supabaseAdmin
       .from('cv_submissions')
       .insert({
-        user_id: null,
+        user_id: userId,
         cv_file_path: req.file.path,
         cv_text: cvText,
         meta_snapshot: metaSnapshot
@@ -301,7 +389,7 @@ router.post("/submit-public", upload.single("cv"), async (req: Request, res: Res
       .from('analysis_jobs')
       .insert({
         submission_id: submission.id,
-        user_id: null,
+        user_id: userId,
         status: 'processing'
       })
       .select()
@@ -319,7 +407,8 @@ router.post("/submit-public", upload.single("cv"), async (req: Request, res: Res
           id: submission.id,
           cv_text: cvText,
           meta_snapshot: metaSnapshot,
-          jobId: job.id
+          jobId: job.id,
+          userId: userId
         };
 
         console.log("Triggering n8n webhook (public) with payload:", JSON.stringify(payload, null, 2));
@@ -393,7 +482,7 @@ router.post("/submit-public", upload.single("cv"), async (req: Request, res: Res
       }, 5000);
     }
     
-    res.json({ ok: true, jobId: job.id });
+    res.json({ ok: true, jobId: job.id, userId: userId });
   } catch (error) {
     console.error("Error submitting CV for analysis (public):", error);
     res.status(500).json({ message: "Failed to submit CV for analysis" });

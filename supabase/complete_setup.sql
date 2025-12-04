@@ -22,8 +22,13 @@ ADD COLUMN IF NOT EXISTS target_role text,
 ADD COLUMN IF NOT EXISTS years_experience integer,
 ADD COLUMN IF NOT EXISTS onboarding_status text DEFAULT 'not_started',
 ADD COLUMN IF NOT EXISTS personalization_quality text,
+ADD COLUMN IF NOT EXISTS anonymous_session_id text,
+ADD COLUMN IF NOT EXISTS is_anonymous boolean DEFAULT false,
 ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now(),
 ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+
+-- Create index for fast anonymous session lookup
+CREATE INDEX IF NOT EXISTS idx_profiles_anonymous_session_id ON public.profiles(anonymous_session_id) WHERE anonymous_session_id IS NOT NULL;
 
 -- Remove any existing check constraints that might conflict
 ALTER TABLE public.profiles DROP CONSTRAINT IF EXISTS profiles_current_status_check;
