@@ -177,11 +177,6 @@ export default function HeroSection() {
             </span>
           </h1>
           
-          {/* Subheadline */}
-          <p className="text-lg sm:text-xl md:text-2xl text-white/80 mb-8 md:mb-10 font-medium">
-            Free AI CV Score + 30-Day Personalized Plan
-          </p>
-          
           {/* Primary CTA Button - Seekho gradient pill style */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
