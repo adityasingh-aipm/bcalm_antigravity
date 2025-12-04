@@ -3,24 +3,12 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Upload, CheckCircle, ChevronRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/analytics";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import AuthModal from "@/components/AuthModal";
-
-const targetRoles = [
-  "Product Manager",
-  "Data Analyst",
-  "Software Engineer",
-  "Business Analyst",
-  "Consultant",
-  "Marketing",
-  "Operations",
-  "Other"
-];
 
 export default function HeroSection() {
   const [, navigate] = useLocation();
@@ -31,20 +19,36 @@ export default function HeroSection() {
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { toast } = useToast();
   const [formData, setFormData] = useState({
-    email: "",
-    targetRole: "",
+    name: "",
+    phoneNumber: "",
     resume: null as File | null
   });
+  const [phoneError, setPhoneError] = useState("");
 
   const handleGetCvScore = () => {
     navigate("/start");
   };
 
+  const validatePhoneNumber = (phone: string) => {
+    const digitsOnly = phone.replace(/\D/g, '');
+    if (digitsOnly.length !== 10) {
+      return "Please enter a valid 10-digit phone number";
+    }
+    return "";
+  };
+
   const handleStep1Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.email && formData.targetRole) {
+    const phoneValidation = validatePhoneNumber(formData.phoneNumber);
+    if (phoneValidation) {
+      setPhoneError(phoneValidation);
+      return;
+    }
+    setPhoneError("");
+    
+    if (formData.name && formData.phoneNumber) {
       trackEvent("cv_score_step1_completed", {
-        targetRole: formData.targetRole
+        name: formData.name
       });
       setStep(2);
     }
@@ -58,8 +62,8 @@ export default function HeroSection() {
     
     try {
       const submitData = new FormData();
-      submitData.append("email", formData.email);
-      submitData.append("targetRole", formData.targetRole);
+      submitData.append("name", formData.name);
+      submitData.append("phoneNumber", formData.phoneNumber);
       submitData.append("cv", formData.resume);
       
       const urlParams = new URLSearchParams(window.location.search);
@@ -77,7 +81,7 @@ export default function HeroSection() {
       }
       
       trackEvent("cv_score_step2_completed", {
-        targetRole: formData.targetRole,
+        name: formData.name,
         hasResume: true
       });
       
@@ -271,39 +275,37 @@ export default function HeroSection() {
                   {step === 1 ? (
                     <form onSubmit={handleStep1Submit} className="space-y-4">
                       <div className="text-left">
-                        <Label htmlFor="email" className="text-white/80 text-sm font-medium">Email</Label>
+                        <Label htmlFor="name" className="text-white/80 text-sm font-medium">Name</Label>
                         <Input
-                          id="email"
-                          type="email"
-                          placeholder="name@gmail.com"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          id="name"
+                          type="text"
+                          placeholder="Enter your name"
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           className="mt-1.5 h-12 bg-white/5 border-white/15 text-white placeholder:text-white/40 focus:border-violet-500 focus:ring-violet-500/20 rounded-xl"
                           required
-                          data-testid="input-email"
+                          data-testid="input-name"
                         />
                       </div>
                       
                       <div className="text-left">
-                        <Label htmlFor="targetRole" className="text-white/80 text-sm font-medium">Target Role</Label>
-                        <Select 
-                          value={formData.targetRole} 
-                          onValueChange={(value) => setFormData({ ...formData, targetRole: value })}
-                        >
-                          <SelectTrigger 
-                            className="mt-1.5 h-12 bg-white/5 border-white/15 text-white focus:ring-violet-500/20 rounded-xl"
-                            data-testid="select-target-role"
-                          >
-                            <SelectValue placeholder="Select your target role" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {targetRoles.map((role) => (
-                              <SelectItem key={role} value={role}>
-                                {role}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Label htmlFor="phoneNumber" className="text-white/80 text-sm font-medium">Phone Number</Label>
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          placeholder="10-digit mobile number"
+                          value={formData.phoneNumber}
+                          onChange={(e) => {
+                            setFormData({ ...formData, phoneNumber: e.target.value });
+                            if (phoneError) setPhoneError("");
+                          }}
+                          className={`mt-1.5 h-12 bg-white/5 border-white/15 text-white placeholder:text-white/40 focus:border-violet-500 focus:ring-violet-500/20 rounded-xl ${phoneError ? 'border-red-500' : ''}`}
+                          required
+                          data-testid="input-phone"
+                        />
+                        {phoneError && (
+                          <p className="text-red-400 text-xs mt-1">{phoneError}</p>
+                        )}
                       </div>
                       
                       <Button 
