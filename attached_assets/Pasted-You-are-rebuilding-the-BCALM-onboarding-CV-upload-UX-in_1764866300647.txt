@@ -1,0 +1,298 @@
+You are rebuilding the BCALM onboarding + CV upload UX in my Replit app.
+Use Node.js + Express backend, vanilla HTML/CSS/JS frontend (no React).
+IMPORTANT: Do not invent or add any copy beyond what I provide below.
+Use the exact screen titles, subtitles, option labels, helper text, and CTA text I specify.
+Do not add tooltips, extra descriptions, or alternative wording.
+
+Flow overview
+
+After SSO login/signup, if profiles.onboarding_completed = false, show /onboarding.
+Onboarding is 3 steps + upload.
+User can skip Step 2 or Step 3.
+On skip or completion, mark onboarding as completed and proceed to upload.
+
+Database assumptions (Supabase)
+
+Table: profiles
+
+id (uuid, primary key, equals auth user id)
+
+current_status text nullable
+
+target_role text nullable
+
+years_experience int nullable
+
+onboarding_completed boolean default false
+
+All onboarding writes update this table for the logged-in user.
+
+Routes to implement
+
+GET /onboarding → serves Step 1 HTML
+
+GET /onboarding/role → Step 2 HTML
+
+GET /onboarding/experience → Step 3 HTML
+
+GET /upload → Upload CV HTML
+
+API:
+
+GET /api/profile/me
+
+POST /api/profile/status
+
+POST /api/profile/role
+
+POST /api/profile/experience
+
+POST /api/profile/complete-onboarding
+
+Each POST updates Supabase profiles for current user.
+
+Global UI rules
+
+Layout is centered card with soft radius 18px.
+
+Background: very dark purple gradient like current theme (keep).
+
+Top shows small text: Step X of 3 · ~20 sec for Step 1 & 2, and Step 3 of 3 · ~10 sec for Step 3.
+
+Primary CTA button disabled until a selection is made (except skip).
+
+Animations: subtle fade between screens.
+
+Only one primary action per screen.
+
+STEP 1: Current status (REQUIRED)
+
+Route: /onboarding
+
+Title (exact):
+“Quick setup for a better CV review”
+
+Subtitle (exact):
+“This helps us score you against the right bar.”
+
+Options (exact labels + descriptions):
+
+“Student / Fresher”
+“Starting out or recently graduated — we’ll focus on potential.”
+
+“Working Professional”
+“Already working — we’ll score for your next level.”
+
+“Switching Careers”
+“Moving into a new field — we’ll look for transferable wins.”
+
+Buttons (exact):
+
+Primary: “Continue”
+
+Secondary link: “Skip for now”
+
+Logic:
+
+On option select, enable Continue.
+
+POST /api/profile/status with { current_status }.
+
+If user clicks Skip for now:
+
+POST /api/profile/status with { current_status: null }
+
+Navigate to Step 2.
+
+Continue navigates to Step 2.
+
+STEP 2: Target role (OPTIONAL)
+
+Route: /onboarding/role
+
+Title (exact):
+“What role are you aiming for?”
+
+Subtitle (exact):
+“We’ll tailor the CV review to this role.”
+
+Section label (exact):
+“Popular picks”
+
+Suggested roles behavior:
+
+Suggested chips are dynamic (max 6) based on current_status:
+
+If Student / Fresher: show entry roles for their cluster.
+
+If Working Professional: show mid/senior roles for their cluster.
+
+If Switching Careers: show general roles for their cluster.
+
+If no cluster known, show generic roles.
+
+Search input placeholder (exact):
+“Type a role (e.g., Product Manager, Data Analyst…)”
+
+Safe option button (exact):
+“Not sure yet — score me for general readiness”
+
+Buttons (exact):
+
+Back
+
+Primary: “Continue”
+
+Secondary link: “Skip for now”
+
+Logic:
+
+If user selects a chip or types a role, enable Continue.
+
+If user types, use typed value even if no chip chosen.
+
+If user clicks “Not sure yet — score me for general readiness”:
+
+Set target_role = null
+
+Enable Continue.
+
+POST /api/profile/role with { target_role } on Continue.
+
+Skip for now:
+
+POST /api/profile/role with { target_role: null }
+
+Navigate to Step 3.
+
+STEP 3: Experience (OPTIONAL)
+
+Route: /onboarding/experience
+
+Title (exact):
+“How much experience do you have?”
+
+Subtitle (exact):
+“Helps us benchmark your CV fairly.”
+
+Helper line for Switching Careers ONLY (exact):
+“Count relevant experience, even from another field.”
+
+Options (exact):
+
+“0 years” — “Just starting”
+
+“1–2 years” — “Early career”
+
+“3–5 years” — “Mid level”
+
+“6–9 years” — “Experienced”
+
+“10+ years” — “Senior level”
+
+Buttons (exact):
+
+Back
+
+Primary: “Continue to upload”
+
+Secondary link: “Skip for now”
+
+Logic:
+
+If current_status === “Student / Fresher”
+
+Preselect “0 years”
+
+Show small text below subtitle (exact):
+“We pre-filled this based on your choice — change if needed.”
+
+Else no preselect.
+
+On Continue:
+
+POST /api/profile/experience with years_experience (0,1,3,6,10 buckets)
+
+Then POST /api/profile/complete-onboarding with { onboarding_completed: true }
+
+Navigate to /upload
+
+On Skip for now:
+
+POST /api/profile/experience with { years_experience: null }
+
+Then POST /api/profile/complete-onboarding true
+
+Navigate to /upload
+
+UPLOAD SCREEN
+
+Route: /upload
+
+Title (exact):
+“Upload your CV”
+
+Subtitle (exact):
+“Get your personalized review in ~60 seconds.”
+
+Dropzone text (exact):
+“Drag & drop your CV”
+“or browse files (PDF, DOC, DOCX)”
+
+Optional JD toggle label (exact):
+“Add a job description (optional) for fit score”
+
+Benefits bullets (exact):
+
+“Overall CV score + role readiness”
+
+“Top strengths recruiters notice”
+
+“Fastest fixes to improve your score”
+
+Privacy line (exact):
+“Your CV is private and never shared.”
+
+Primary CTA (exact):
+“Analyze my CV”
+
+Footer context line (exact format):
+“Scoring for: {target_role or ‘General readiness’} · {current_status or ‘Not specified’} · {years_experience or ‘Not specified’}”
+
+Logic:
+
+CTA disabled until CV file attached.
+
+On submit:
+
+Upload file to backend /api/cv/upload
+
+Parse CV text server-side
+
+Create submission + analysis job
+
+Trigger n8n webhook
+
+Redirect to /processing?jobId=...
+
+Deliverables
+
+Create/modify these files:
+
+server.js with all routes + APIs above.
+
+public/onboarding-step1.html
+
+public/onboarding-step2.html
+
+public/onboarding-step3.html
+
+public/upload.html
+
+public/onboarding.css
+
+public/onboarding.js (shared logic)
+
+public/upload.js
+
+Ensure end-to-end navigation works exactly as described and no extra copy is added.
