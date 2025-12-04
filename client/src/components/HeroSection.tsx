@@ -145,7 +145,7 @@ export default function HeroSection() {
         />
       </div>
       
-      <div className="relative z-10 container mx-auto px-4 py-12 md:py-16" style={{ maxWidth: '800px' }}>
+      <div className="relative z-10 container mx-auto px-4 py-4 md:py-6" style={{ maxWidth: '800px' }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -157,7 +157,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 md:mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-4 md:mb-5"
             style={{
               background: 'linear-gradient(135deg, rgba(138, 43, 226, 0.3) 0%, rgba(75, 0, 130, 0.3) 100%)',
               border: '1px solid rgba(138, 43, 226, 0.4)',
