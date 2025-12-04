@@ -945,49 +945,40 @@ export default function ResultsPage() {
             transition={{ delay: 0.65 }}
             className="mb-8"
           >
-            <Card className="bg-primary/10 border-primary/20">
+            <Card className="bg-white/5 border-white/10 overflow-hidden">
               <CardHeader className="pb-3">
-                <CardTitle className="text-lg text-primary flex items-center gap-2">
-                  <List className="h-5 w-5" />
+                <CardTitle className="text-lg text-white flex items-center gap-2">
+                  <Target className="h-5 w-5 text-red-400" />
                   7-Step Improvement Plan
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-primary/20" />
-                  <ol className="space-y-4">
-                    {sevenStepPlan.map((item, index) => (
-                      <motion.li
-                        key={index}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.65 + index * 0.05 }}
-                        className="flex items-start gap-4 relative"
-                      >
-                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-sm font-medium shrink-0 z-10">
-                          {item.step || index + 1}
-                        </div>
-                        <div className="flex-1 pt-0.5">
-                          <span className="text-white/80">{item.action}</span>
-                          {item.priority && (
-                            <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                              item.priority === 'high' ? 'bg-red-500/20 text-red-400' :
-                              item.priority === 'medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                              'bg-white/10 text-white/50'
-                            }`}>
-                              {item.priority}
-                            </span>
-                          )}
-                          {item.output && (
-                            <p className="text-white/50 text-sm mt-1">
-                              <span className="text-primary/70">Output:</span> {item.output}
-                            </p>
-                          )}
-                        </div>
-                      </motion.li>
-                    ))}
-                  </ol>
-                </div>
+              <CardContent className="p-0">
+                {sevenStepPlan.map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.65 + index * 0.05 }}
+                    className="grid grid-cols-[100px_1fr] border-b border-white/10 last:border-b-0"
+                    data-testid={`step-row-${index}`}
+                  >
+                    {/* Step Number */}
+                    <div className="p-4 flex items-start">
+                      <span className="text-white font-semibold">Step {item.step || index + 1}</span>
+                    </div>
+                    
+                    {/* Action and Output */}
+                    <div className="p-4 border-l border-white/10 space-y-1">
+                      <p className="text-white/90 leading-relaxed">{item.action}</p>
+                      {item.output && (
+                        <p className="text-sm">
+                          <span className="text-white/40">Output: </span>
+                          <span className="text-white/50">{item.output}</span>
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
               </CardContent>
             </Card>
           </motion.section>
