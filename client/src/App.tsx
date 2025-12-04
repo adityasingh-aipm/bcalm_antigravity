@@ -31,6 +31,7 @@ function Router() {
     <Switch>
       <Route path="/" component={LandingPage} />
       <Route path="/auth/callback" component={AuthCallbackPage} />
+      <Route path="/score" component={StartPage} />
       <Route path="/start" component={StartPage} />
       <Route path="/onboarding" component={OnboardingPage} />
       <Route path="/upload" component={UploadPage} />
