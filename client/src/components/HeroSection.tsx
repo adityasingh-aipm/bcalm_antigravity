@@ -140,39 +140,6 @@ export default function HeroSection() {
             Free AI CV Score + 30-Day Personalized Plan
           </p>
           
-          {/* Trust Line */}
-          <p className="text-sm md:text-base text-white/60 mb-4">
-            Trusted by Students from IITs, BITS, NITs & IIMs
-          </p>
-          
-          {/* College Chips */}
-          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-4">
-            {["IIT", "BITS", "NIT", "IIM"].map((college) => (
-              <span 
-                key={college}
-                className="px-4 py-1.5 rounded-full text-xs md:text-sm font-medium text-white/80"
-                style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                }}
-              >
-                {college}
-              </span>
-            ))}
-          </div>
-          
-          {/* Success Stories with Avatars */}
-          <div className="flex items-center justify-center gap-3 mb-10 md:mb-14">
-            <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 border-2 border-[#0a0014]" />
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-[#0a0014]" />
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-[#0a0014]" />
-            </div>
-            <p className="text-sm text-white/70">
-              <span className="font-semibold text-white">200+</span> success stories
-            </p>
-          </div>
-          
           {/* Lead Capture Form Card */}
           <motion.div
             id="lead-form-card"
@@ -264,10 +231,38 @@ export default function HeroSection() {
             </div>
           </motion.div>
           
-          {/* Urgency Microcopy */}
-          <p className="mt-4 text-xs md:text-sm text-amber-400/80">
-            37 students joined this week · Limited slots available
+          {/* Trust Line */}
+          <p className="text-sm md:text-base text-white/60 mt-8 mb-4">
+            Trusted by Students from IITs, BITS, NITs & IIMs
           </p>
+          
+          {/* College Chips */}
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-4">
+            {["IIT", "BITS", "NIT", "IIM"].map((college) => (
+              <span 
+                key={college}
+                className="px-4 py-1.5 rounded-full text-xs md:text-sm font-medium text-white/80"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                }}
+              >
+                {college}
+              </span>
+            ))}
+          </div>
+          
+          {/* Success Stories with Avatars */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 border-2 border-[#0a0014]" />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 border-2 border-[#0a0014]" />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 border-2 border-[#0a0014]" />
+            </div>
+            <p className="text-sm text-white/70">
+              <span className="font-semibold text-white">200+</span> success stories
+            </p>
+          </div>
         </motion.div>
       </div>
     </section>
