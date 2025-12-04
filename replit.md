@@ -88,6 +88,27 @@ Before auth will work, you must run the SQL in `supabase/complete_setup.sql` in 
 3. Add Redirect URI: `https://[your-project-ref].supabase.co/auth/v1/callback`
 4. If in "Testing" mode, add test users to OAuth consent screen
 
+#### CTA Components
+
+Three CTA systems are implemented for lead conversion:
+
+**Navbar CTAs:**
+- Logged OUT: "Start for free" (primary button) + "Sign in" (text link)
+- Logged IN: "Start for Free" (primary button) + User avatar/name dropdown with "Change Profile" and "Logout"
+- "Start for free" scrolls to the hero lead form
+
+**StickyMobileCTA (mobile only, lg:hidden):**
+- Fixed bottom bar with "Get your free CV score" text
+- "Check my CV" button navigates to /start (anonymous) or /upload (authenticated)
+- Safe area padding for iOS devices
+
+**DesktopFloatingCTA (desktop only, hidden lg:block):**
+- Fixed position right side (right: 24px, top: 58%)
+- Shows "Get a clear CV review" + "Check my CV" button
+- Appears after 18% page scroll with fade/slide animation
+- Dismissible with × icon, persists for 7 days via localStorage key `bcalm_cta_dismissed_until`
+- Hidden on /onboarding, /upload, /app, /start routes
+
 #### GTM Attribution Tracking
 
 A comprehensive analytics tracking system for multi-channel campaigns with UTM parameter support.
