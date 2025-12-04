@@ -104,24 +104,7 @@ export default function Navbar() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <button 
-                    onClick={() => setAuthModalOpen(true)}
-                    className="text-white/60 hover:text-white text-sm font-medium transition-colors cursor-pointer"
-                    data-testid="button-signin"
-                  >
-                    Sign in
-                  </button>
-                  <button 
-                    onClick={scrollToLeadForm}
-                    className="text-white bg-primary hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer"
-                    data-testid="button-get-cv-score-nav"
-                  >
-                    Start for free
-                  </button>
-                </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
