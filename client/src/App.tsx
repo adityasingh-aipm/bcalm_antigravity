@@ -21,6 +21,7 @@ import OnboardingPage from "@/pages/OnboardingPage";
 import UploadPage from "@/pages/UploadPage";
 import ProcessingPage from "@/pages/ProcessingPage";
 import ResultsPage from "@/pages/ResultsPage";
+import SharePage from "@/pages/SharePage";
 import DashboardPage from "@/pages/DashboardPage";
 import AuthCallbackPage from "@/pages/AuthCallbackPage";
 import StartPage from "@/pages/StartPage";
@@ -35,6 +36,7 @@ function Router() {
       <Route path="/upload" component={UploadPage} />
       <Route path="/processing" component={ProcessingPage} />
       <Route path="/results/:jobId" component={ResultsPage} />
+      <Route path="/share/:jobId" component={SharePage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/resources" component={ResourcesPage} />
       <Route path="/admin/resources" component={ResourcesAdminDashboard} />

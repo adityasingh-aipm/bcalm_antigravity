@@ -225,6 +225,42 @@ router.post("/submit", isAuthenticated, upload.single("cv"), async (req: Request
   }
 });
 
+router.get("/share/:jobId", async (req: Request, res: Response) => {
+  try {
+    const { jobId } = req.params;
+    
+    const { data: job, error } = await supabaseAdmin
+      .from('analysis_jobs')
+      .select('id, status, result_json, created_at')
+      .eq('id', jobId)
+      .single();
+    
+    if (error || !job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+    
+    if (job.status !== 'complete') {
+      return res.status(400).json({ message: "Analysis not complete" });
+    }
+    
+    const result = job.result_json?.result || job.result_json || {};
+    
+    res.json({
+      id: job.id,
+      status: job.status,
+      share_data: {
+        overall_score: result.overall_score || 0,
+        role_preset: result.role_preset || "General",
+        summary: result.summary?.split('.')[0] || "",
+        top_strength: result.top_strengths?.[0]?.point || result.top_strengths?.[0] || "",
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching share data:", error);
+    res.status(500).json({ message: "Failed to fetch share data" });
+  }
+});
+
 router.get("/:jobId", isAuthenticated, async (req: Request, res: Response) => {
   try {
     const { jobId } = req.params;
@@ -244,10 +280,12 @@ router.get("/:jobId", isAuthenticated, async (req: Request, res: Response) => {
       return res.status(403).json({ message: "Access denied" });
     }
     
+    const resultData = job.result_json?.result || job.result_json || {};
+    
     res.json({
       id: job.id,
       status: job.status,
-      result_json: job.result_json,
+      report: resultData,
       error_text: job.error_text,
       created_at: job.created_at,
       completed_at: job.completed_at,
@@ -273,13 +311,16 @@ router.get("/user/jobs", isAuthenticated, async (req: Request, res: Response) =>
       return res.status(500).json({ message: "Failed to fetch jobs" });
     }
     
-    res.json(jobs.map((job: any) => ({
-      id: job.id,
-      status: job.status,
-      score: job.result_json?.overall_score,
-      createdAt: job.created_at,
-      completedAt: job.completed_at,
-    })));
+    res.json(jobs.map((job: any) => {
+      const report = job.result_json?.result || job.result_json || {};
+      return {
+        id: job.id,
+        status: job.status,
+        score: report.overall_score,
+        createdAt: job.created_at,
+        completedAt: job.completed_at,
+      };
+    }));
   } catch (error) {
     console.error("Error fetching user jobs:", error);
     res.status(500).json({ message: "Failed to fetch user jobs" });
