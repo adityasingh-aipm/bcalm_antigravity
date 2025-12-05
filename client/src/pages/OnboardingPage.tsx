@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
-import { GraduationCap, Briefcase, RefreshCw, ChevronRight, ChevronLeft } from "lucide-react";
+import { GraduationCap, Briefcase, RefreshCw, ChevronRight, ChevronLeft, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type CurrentStatus = "student_fresher" | "working_professional" | "switching_careers";
@@ -136,7 +136,16 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#110022] to-[#1a0033] flex items-center justify-center px-4 py-8">
-      <Card className="w-full max-w-2xl bg-white/5 backdrop-blur border-white/10">
+      <Card className="w-full max-w-2xl bg-white/5 backdrop-blur border-white/10 relative">
+        {/* Close button */}
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors z-10"
+          data-testid="button-close-onboarding"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        
         <CardHeader className="text-center pb-2">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
