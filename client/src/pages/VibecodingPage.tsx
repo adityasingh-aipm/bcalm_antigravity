@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, Code, Users, Zap, CheckCircle2, ArrowRight, Linkedin } from "lucide-react";
 import { motion } from "framer-motion";
+import VibecodingEnrollmentModal from "@/components/VibecodingEnrollmentModal";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -24,6 +26,8 @@ const itemVariants = {
 };
 
 export default function VibecodingPage() {
+  const [enrollmentModalOpen, setEnrollmentModalOpen] = useState(false);
+
   const benefits = [
     {
       icon: Code,
@@ -128,11 +132,13 @@ export default function VibecodingPage() {
           </div>
           <Button
             size="sm"
+            onClick={() => setEnrollmentModalOpen(true)}
             className="font-semibold"
             style={{
               background: "linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FFA500 100%)",
               border: "1px solid rgba(255, 107, 53, 0.3)",
             }}
+            data-testid="button-enroll-nav"
           >
             Enroll Now
           </Button>
@@ -177,11 +183,13 @@ export default function VibecodingPage() {
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
+              onClick={() => setEnrollmentModalOpen(true)}
               className="font-semibold"
               style={{
                 background: "linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FFA500 100%)",
                 border: "1px solid rgba(255, 107, 53, 0.3)",
               }}
+              data-testid="button-enroll-hero"
             >
               Enroll Now
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -378,11 +386,13 @@ export default function VibecodingPage() {
           <motion.div variants={itemVariants}>
             <Button
               size="lg"
+              onClick={() => setEnrollmentModalOpen(true)}
               className="font-semibold"
               style={{
                 background: "linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FFA500 100%)",
                 border: "1px solid rgba(255, 107, 53, 0.3)",
               }}
+              data-testid="button-enroll-final-cta"
             >
               Enroll Now - Limited Spots
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -397,6 +407,9 @@ export default function VibecodingPage() {
           <p>&copy; 2025 Vibecoding. All rights reserved. | Part of BCALM ecosystem</p>
         </div>
       </footer>
+
+      {/* Enrollment Modal */}
+      <VibecodingEnrollmentModal open={enrollmentModalOpen} onOpenChange={setEnrollmentModalOpen} />
     </div>
   );
 }
