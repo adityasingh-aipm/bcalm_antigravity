@@ -96,8 +96,8 @@ export default function HeroSection({ onOpenLeadModal }: HeroSectionProps) {
             
             {/* Main Headline - polished typography */}
             <h1 className="hero-title mb-3 md:mb-4">
-              Crack Your <span className="accent">Dream Job</span><br />
-              in <span className="payoff">30 Days</span>
+              <span className="whitespace-nowrap">Crack Your <span className="accent">Dream Job</span></span><br />
+              <span className="whitespace-nowrap">in <span className="payoff">30 Days</span></span>
             </h1>
             
             {/* Subline */}
