@@ -175,13 +175,28 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#110022] to-[#1a0033] flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#110022] to-[#1a0033] flex items-center justify-center px-4 py-8 relative">
+      {/* Clickable backdrop - closes and goes to home */}
+      <div 
+        className="absolute inset-0 z-0"
+        onClick={() => navigate("/")}
+        data-testid="backdrop-close-upload"
+      />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl"
+        className="w-full max-w-2xl relative z-10"
       >
-        <Card className="bg-white/5 backdrop-blur border-white/10">
+        <Card className="bg-white/5 backdrop-blur border-white/10 relative">
+          {/* Close button */}
+          <button
+            onClick={() => navigate("/")}
+            className="absolute top-4 right-4 text-white/40 hover:text-white/80 transition-colors z-10"
+            data-testid="button-close-upload"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          
           <CardHeader className="text-center pb-2">
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
