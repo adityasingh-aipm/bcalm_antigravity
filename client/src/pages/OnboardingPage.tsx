@@ -135,8 +135,14 @@ export default function OnboardingPage() {
   const progress = (step / totalSteps) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#110022] to-[#1a0033] flex items-center justify-center px-4 py-8">
-      <Card className="w-full max-w-2xl bg-white/5 backdrop-blur border-white/10 relative">
+    <div className="min-h-screen bg-gradient-to-b from-[#110022] to-[#1a0033] flex items-center justify-center px-4 py-8 relative">
+      {/* Clickable backdrop - closes and goes to home */}
+      <div 
+        className="absolute inset-0 z-0"
+        onClick={() => navigate("/")}
+        data-testid="backdrop-close-onboarding"
+      />
+      <Card className="w-full max-w-2xl bg-white/5 backdrop-blur border-white/10 relative z-10">
         {/* Close button */}
         <button
           onClick={() => navigate("/")}
