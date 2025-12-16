@@ -1,11 +1,35 @@
-import { type User, type UpsertUser, type ResourcesUser, type InsertResourcesUser, type Resource, type InsertResource, type DownloadLog, type InsertDownloadLog, type AssessmentQuestion, type InsertAssessmentQuestion, type AssessmentAttempt, type InsertAssessmentAttempt, type AssessmentAnswer, type InsertAssessmentAnswer, type HackathonRegistration, type InsertHackathonRegistration, type CvSubmission, type InsertCvSubmission, type AnalysisJob, type InsertAnalysisJob, users, resourcesUsers, resources, downloadLogs, assessmentQuestions, assessmentAttempts, assessmentAnswers, hackathonRegistrations, cvSubmissions, analysisJobs } from "@shared/schema";
+import { type User, type UpsertUser, type ResourcesUser, type InsertResourcesUser, type Resource, type InsertResource, type DownloadLog, type InsertDownloadLog, type AssessmentQuestion, type InsertAssessmentQuestion, type AssessmentAttempt, type InsertAssessmentAttempt, type AssessmentAnswer, type InsertAssessmentAnswer, type HackathonRegistration, type InsertHackathonRegistration, type CvSubmission, type InsertCvSubmission, type AnalysisJob, type InsertAnalysisJob } from "@shared/schema";
 import bcrypt from "bcrypt";
-import { db } from "./db";
-import { eq, sql } from "drizzle-orm";
+import { supabaseAdmin } from "./supabaseClient";
 import { nanoid } from "nanoid";
 
-// modify the interface with any CRUD methods
-// you might need
+// Helper to convert snake_case DB results to camelCase domain objects
+function mapKeysToCamelCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(v => mapKeysToCamelCase(v));
+  } else if (obj !== null && obj.constructor === Object) {
+    return Object.keys(obj).reduce((result, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      result[camelKey] = mapKeysToCamelCase(obj[key]);
+      return result;
+    }, {} as any);
+  }
+  return obj;
+}
+
+// Helper to convert camelCase domain inputs to snake_case for DB
+function mapKeysToSnakeCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(v => mapKeysToSnakeCase(v));
+  } else if (obj !== null && obj.constructor === Object) {
+    return Object.keys(obj).reduce((result, key) => {
+      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+      result[snakeKey] = mapKeysToSnakeCase(obj[key]);
+      return result;
+    }, {} as any);
+  }
+  return obj;
+}
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -74,119 +98,143 @@ export interface IStorage {
   }): Promise<AnalysisJob | undefined>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class SupabaseStorage implements IStorage {
   async initialize(): Promise<void> {
     await this.initializeAdminUser();
     await this.initializeAssessmentQuestions();
   }
 
   private async initializeAdminUser(): Promise<void> {
+    if (!supabaseAdmin) {
+      console.warn("Supabase Admin not initialized. Skipping Admin User seed.");
+      return;
+    }
     const adminEmail = "admin@bcalm.org";
     const adminPassword = "admin123";
 
-    const existingAdmin = await this.getResourcesUserByEmail(adminEmail);
-    if (existingAdmin) {
-      console.log("Admin user already exists:", adminEmail);
-      return;
+    try {
+      const { data: existingAdmin } = await supabaseAdmin
+        .from('resources_users')
+        .select('*')
+        .eq('email', adminEmail)
+        .single();
+
+      if (existingAdmin) {
+        console.log("Admin user already exists:", adminEmail);
+        return;
+      }
+
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      await this.createResourcesUser({
+        name: "Admin User",
+        email: adminEmail,
+        password: hashedPassword,
+        isAdmin: true,
+      });
+
+      console.log("Admin user initialized:", adminEmail);
+    } catch (error) {
+      console.error("Failed to initialize admin user check via Supabase:", error);
     }
-
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    await this.createResourcesUser({
-      name: "Admin User",
-      email: adminEmail,
-      password: hashedPassword,
-      isAdmin: true,
-    });
-
-    console.log("Admin user initialized:", adminEmail);
   }
 
   private async initializeAssessmentQuestions(): Promise<void> {
-    const existingQuestions = await this.getAllAssessmentQuestions();
-    if (existingQuestions.length > 0) {
-      console.log("Assessment questions already seeded:", existingQuestions.length);
-      return;
+    if (!supabaseAdmin) return;
+    try {
+      const { count } = await supabaseAdmin.from('assessment_questions').select('*', { count: 'exact', head: true });
+      if (count && count > 0) {
+        console.log("Assessment questions already seeded:", count);
+        return;
+      }
+
+      const { ASSESSMENT_QUESTIONS } = await import("./data/assessmentQuestions");
+
+      // Bulk insert
+      const questionsSnake = ASSESSMENT_QUESTIONS.map(q => mapKeysToSnakeCase(q));
+      const { error } = await supabaseAdmin.from('assessment_questions').insert(questionsSnake);
+
+      if (error) throw error;
+      console.log("Assessment questions initialized:", ASSESSMENT_QUESTIONS.length);
+    } catch (error) {
+      console.error("Failed to seed assessment questions:", error);
     }
-
-    const { ASSESSMENT_QUESTIONS } = await import("./data/assessmentQuestions");
-
-    for (const question of ASSESSMENT_QUESTIONS) {
-      await this.createAssessmentQuestion(question);
-    }
-
-    console.log("Assessment questions initialized:", ASSESSMENT_QUESTIONS.length);
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    const { data } = await supabaseAdmin.from('users').select('*').eq('id', id).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
+    const snakeData = mapKeysToSnakeCase({ ...userData, updatedAt: new Date() });
+    const { data, error } = await supabaseAdmin
+      .from('users')
+      .upsert(snakeData, { onConflict: 'id' })
+      .select()
+      .single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getResourcesUserByEmail(email: string): Promise<ResourcesUser | undefined> {
-    const [user] = await db.select().from(resourcesUsers).where(eq(resourcesUsers.email, email));
-    return user || undefined;
+    const { data } = await supabaseAdmin.from('resources_users').select('*').eq('email', email).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async createResourcesUser(insertUser: InsertResourcesUser): Promise<ResourcesUser> {
-    const [user] = await db.insert(resourcesUsers).values(insertUser).returning();
-    return user;
+    const snakeData = mapKeysToSnakeCase(insertUser);
+    const { data, error } = await supabaseAdmin.from('resources_users').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getResourcesUserById(id: string): Promise<ResourcesUser | undefined> {
-    const [user] = await db.select().from(resourcesUsers).where(eq(resourcesUsers.id, id));
-    return user || undefined;
+    const { data } = await supabaseAdmin.from('resources_users').select('*').eq('id', id).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async getAllResources(): Promise<Resource[]> {
-    return await db.select().from(resources).where(eq(resources.isActive, true));
+    const { data } = await supabaseAdmin.from('resources').select('*').eq('is_active', true);
+    return data ? mapKeysToCamelCase(data) : [];
   }
 
   async getResourceById(id: string): Promise<Resource | undefined> {
-    const [resource] = await db.select().from(resources).where(eq(resources.id, id));
-    return resource || undefined;
+    const { data } = await supabaseAdmin.from('resources').select('*').eq('id', id).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async createResource(insertResource: InsertResource): Promise<Resource> {
-    const [resource] = await db.insert(resources).values(insertResource).returning();
-    return resource;
+    const snakeData = mapKeysToSnakeCase(insertResource);
+    const { data, error } = await supabaseAdmin.from('resources').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async updateResource(id: string, updateData: Partial<InsertResource>): Promise<Resource | undefined> {
-    const [resource] = await db
-      .update(resources)
-      .set({ ...updateData, updatedAt: new Date() })
-      .where(eq(resources.id, id))
-      .returning();
-    return resource || undefined;
+    const snakeData = mapKeysToSnakeCase({ ...updateData, updatedAt: new Date() });
+    const { data, error } = await supabaseAdmin
+      .from('resources')
+      .update(snakeData)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return undefined;
+    return mapKeysToCamelCase(data);
   }
 
   async deleteResource(id: string): Promise<boolean> {
-    const [resource] = await db
-      .update(resources)
-      .set({ isActive: false, updatedAt: new Date() })
-      .where(eq(resources.id, id))
-      .returning();
-    return !!resource;
+    const { error } = await supabaseAdmin
+      .from('resources')
+      .update({ is_active: false, updated_at: new Date() })
+      .eq('id', id);
+    return !error;
   }
 
   async logDownload(insertLog: InsertDownloadLog): Promise<DownloadLog> {
-    const [log] = await db.insert(downloadLogs).values(insertLog).returning();
-    return log;
+    const snakeData = mapKeysToSnakeCase(insertLog);
+    const { data, error } = await supabaseAdmin.from('download_logs').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getDownloadStats(): Promise<{
@@ -194,106 +242,106 @@ export class DatabaseStorage implements IStorage {
     totalDownloads: number;
     mostDownloaded: { resourceId: string; title: string; downloads: number } | null;
   }> {
-    const activeResources = await this.getAllResources();
-    const totalResources = activeResources.length;
+    const { count: totalResources } = await supabaseAdmin.from('resources').select('*', { count: 'exact', head: true }).eq('is_active', true);
+    const { data: logs } = await supabaseAdmin.from('download_logs').select('resource_id');
 
-    const allDownloads = await db.select().from(downloadLogs);
-    const totalDownloads = allDownloads.length;
+    if (!logs) return { totalResources: totalResources || 0, totalDownloads: 0, mostDownloaded: null };
 
-    const downloadCounts = new Map<string, number>();
-    allDownloads.forEach((log) => {
-      downloadCounts.set(log.resourceId, (downloadCounts.get(log.resourceId) || 0) + 1);
+    const totalDownloads = logs.length;
+    const counts: Record<string, number> = {};
+    logs.forEach((l: any) => counts[l.resource_id] = (counts[l.resource_id] || 0) + 1);
+
+    let maxId = "";
+    let maxCount = 0;
+    Object.entries(counts).forEach(([id, count]) => {
+      if (count > maxCount) { maxCount = count; maxId = id; }
     });
 
-    let mostDownloaded: { resourceId: string; title: string; downloads: number } | null = null;
-    let maxDownloads = 0;
-
-    for (const [resourceId, count] of Array.from(downloadCounts.entries())) {
-      if (count > maxDownloads) {
-        const resource = await this.getResourceById(resourceId);
-        if (resource) {
-          mostDownloaded = {
-            resourceId,
-            title: resource.title,
-            downloads: count,
-          };
-          maxDownloads = count;
-        }
-      }
+    let mostDownloaded = null;
+    if (maxId) {
+      const r = await this.getResourceById(maxId);
+      if (r) mostDownloaded = { resourceId: maxId, title: r.title, downloads: maxCount };
     }
 
     return {
-      totalResources,
+      totalResources: totalResources || 0,
       totalDownloads,
-      mostDownloaded,
+      mostDownloaded
     };
   }
 
   async getAllAssessmentQuestions(): Promise<AssessmentQuestion[]> {
-    return await db.select().from(assessmentQuestions).orderBy(assessmentQuestions.orderIndex);
+    const { data } = await supabaseAdmin.from('assessment_questions').select('*').order('order_index');
+    return data ? mapKeysToCamelCase(data) : [];
   }
 
   async createAssessmentQuestion(question: InsertAssessmentQuestion): Promise<AssessmentQuestion> {
-    const [newQuestion] = await db.insert(assessmentQuestions).values(question).returning();
-    return newQuestion;
+    const snakeData = mapKeysToSnakeCase(question);
+    const { data, error } = await supabaseAdmin.from('assessment_questions').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async createAssessmentAttempt(attempt: InsertAssessmentAttempt): Promise<AssessmentAttempt> {
-    const [newAttempt] = await db.insert(assessmentAttempts).values(attempt).returning();
-    return newAttempt;
+    const snakeData = mapKeysToSnakeCase(attempt);
+    const { data, error } = await supabaseAdmin.from('assessment_attempts').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getAssessmentAttempt(id: string): Promise<AssessmentAttempt | undefined> {
-    const [attempt] = await db.select().from(assessmentAttempts).where(eq(assessmentAttempts.id, id));
-    return attempt || undefined;
+    const { data } = await supabaseAdmin.from('assessment_attempts').select('*').eq('id', id).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async getLatestIncompleteAttempt(userId: string): Promise<AssessmentAttempt | undefined> {
-    const { and } = await import("drizzle-orm");
-    const [attempt] = await db
-      .select()
-      .from(assessmentAttempts)
-      .where(and(
-        eq(assessmentAttempts.userId, userId),
-        eq(assessmentAttempts.isCompleted, false)
-      ))
-      .orderBy(sql`${assessmentAttempts.createdAt} DESC`)
-      .limit(1);
-    return attempt || undefined;
+    const { data } = await supabaseAdmin
+      .from('assessment_attempts')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_completed', false)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async deleteAssessmentAttempt(id: string): Promise<boolean> {
-    await db.delete(assessmentAnswers).where(eq(assessmentAnswers.attemptId, id));
-    const result = await db.delete(assessmentAttempts).where(eq(assessmentAttempts.id, id));
-    return true;
+    await supabaseAdmin.from('assessment_answers').delete().eq('attempt_id', id);
+    const { error } = await supabaseAdmin.from('assessment_attempts').delete().eq('id', id);
+    return !error;
   }
 
   async saveAssessmentAnswer(answer: InsertAssessmentAnswer): Promise<AssessmentAnswer> {
-    const { and } = await import("drizzle-orm");
-    const existing = await db
-      .select()
-      .from(assessmentAnswers)
-      .where(and(
-        eq(assessmentAnswers.attemptId, answer.attemptId),
-        eq(assessmentAnswers.questionId, answer.questionId)
-      ))
-      .limit(1);
+    // Check existing
+    const { data: existing } = await supabaseAdmin
+      .from('assessment_answers')
+      .select('*')
+      .eq('attempt_id', answer.attemptId)
+      .eq('question_id', answer.questionId)
+      .single();
 
-    if (existing.length > 0) {
-      const [updated] = await db
-        .update(assessmentAnswers)
-        .set({ answerValue: answer.answerValue })
-        .where(eq(assessmentAnswers.id, existing[0].id))
-        .returning();
-      return updated;
+    const snakeAnswer = mapKeysToSnakeCase(answer);
+
+    if (existing) {
+      const { data, error } = await supabaseAdmin
+        .from('assessment_answers')
+        .update({ answer_value: answer.answerValue })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return mapKeysToCamelCase(data);
     }
 
-    const [newAnswer] = await db.insert(assessmentAnswers).values(answer).returning();
-    return newAnswer;
+    const { data, error } = await supabaseAdmin.from('assessment_answers').insert(snakeAnswer).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getAttemptAnswers(attemptId: string): Promise<AssessmentAnswer[]> {
-    return await db.select().from(assessmentAnswers).where(eq(assessmentAnswers.attemptId, attemptId));
+    const { data } = await supabaseAdmin.from('assessment_answers').select('*').eq('attempt_id', attemptId);
+    return data ? mapKeysToCamelCase(data) : [];
   }
 
   async completeAssessmentAttempt(
@@ -303,99 +351,96 @@ export class DatabaseStorage implements IStorage {
     scoresJson: string
   ): Promise<AssessmentAttempt | undefined> {
     const shareToken = nanoid(16);
-
-    const [updated] = await db
-      .update(assessmentAttempts)
-      .set({
-        totalScore,
-        readinessBand,
-        scoresJson,
-        isCompleted: true,
-        completedAt: new Date(),
-        shareToken,
+    const { data, error } = await supabaseAdmin
+      .from('assessment_attempts')
+      .update({
+        total_score: totalScore,
+        readiness_band: readinessBand,
+        scores_json: scoresJson,
+        is_completed: true,
+        completed_at: new Date(),
+        share_token: shareToken
       })
-      .where(eq(assessmentAttempts.id, attemptId))
-      .returning();
-    return updated || undefined;
+      .eq('id', attemptId)
+      .select()
+      .single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getAssessmentAttemptByShareToken(shareToken: string): Promise<AssessmentAttempt | undefined> {
-    const [attempt] = await db
-      .select()
-      .from(assessmentAttempts)
-      .where(eq(assessmentAttempts.shareToken, shareToken));
-    return attempt || undefined;
+    const { data } = await supabaseAdmin.from('assessment_attempts').select('*').eq('share_token', shareToken).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async createHackathonRegistration(registration: InsertHackathonRegistration): Promise<HackathonRegistration> {
-    const [newRegistration] = await db.insert(hackathonRegistrations).values(registration).returning();
-    return newRegistration;
+    const snakeData = mapKeysToSnakeCase(registration);
+    const { data, error } = await supabaseAdmin.from('hackathon_registrations').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getHackathonRegistrationById(id: string): Promise<HackathonRegistration | undefined> {
-    const [registration] = await db
-      .select()
-      .from(hackathonRegistrations)
-      .where(eq(hackathonRegistrations.id, id));
-    return registration || undefined;
+    const { data } = await supabaseAdmin.from('hackathon_registrations').select('*').eq('id', id).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async getHackathonRegistrationByPhone(phone: string): Promise<HackathonRegistration | undefined> {
-    const [registration] = await db
-      .select()
-      .from(hackathonRegistrations)
-      .where(eq(hackathonRegistrations.phone, phone));
-    return registration || undefined;
+    const { data } = await supabaseAdmin.from('hackathon_registrations').select('*').eq('phone', phone).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async getHackathonRegistrationByEmail(email: string): Promise<HackathonRegistration | undefined> {
-    const [registration] = await db
-      .select()
-      .from(hackathonRegistrations)
-      .where(eq(hackathonRegistrations.email, email));
-    return registration || undefined;
+    const { data } = await supabaseAdmin.from('hackathon_registrations').select('*').eq('email', email).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async updateHackathonOtp(id: string, otpCode: string, expiresAt: Date): Promise<HackathonRegistration | undefined> {
-    const [updated] = await db
-      .update(hackathonRegistrations)
-      .set({ otpCode, otpExpiresAt: expiresAt })
-      .where(eq(hackathonRegistrations.id, id))
-      .returning();
-    return updated || undefined;
+    const { data, error } = await supabaseAdmin
+      .from('hackathon_registrations')
+      .update({ otp_code: otpCode, otp_expires_at: expiresAt })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return undefined;
+    return mapKeysToCamelCase(data);
   }
 
   async verifyHackathonRegistration(id: string): Promise<HackathonRegistration | undefined> {
-    const [updated] = await db
-      .update(hackathonRegistrations)
-      .set({ isVerified: true, otpCode: null, otpExpiresAt: null })
-      .where(eq(hackathonRegistrations.id, id))
-      .returning();
-    return updated || undefined;
+    const { data, error } = await supabaseAdmin
+      .from('hackathon_registrations')
+      .update({ is_verified: true, otp_code: null, otp_expires_at: null })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) return undefined;
+    return mapKeysToCamelCase(data);
   }
 
-  // CV Submission Methods
   async createCvSubmission(submission: InsertCvSubmission): Promise<CvSubmission> {
-    const [newSubmission] = await db.insert(cvSubmissions).values(submission).returning();
-    return newSubmission;
+    const snakeData = mapKeysToSnakeCase(submission);
+    const { data, error } = await supabaseAdmin.from('cv_submissions').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getAllCvSubmissions(): Promise<CvSubmission[]> {
-    return await db.select().from(cvSubmissions).orderBy(sql`${cvSubmissions.createdAt} DESC`);
+    const { data } = await supabaseAdmin.from('cv_submissions').select('*').order('created_at', { ascending: false });
+    return data ? mapKeysToCamelCase(data) : [];
   }
 
   async getCvSubmissionStats(): Promise<{ total: number; byRole: Record<string, number>; today: number }> {
-    const allSubmissions = await this.getAllCvSubmissions();
-    const total = allSubmissions.length;
+    const submissions = await this.getAllCvSubmissions();
+    const total = submissions.length;
 
     const byRole: Record<string, number> = {};
-    allSubmissions.forEach((sub) => {
+    submissions.forEach(sub => {
       byRole[sub.targetRole] = (byRole[sub.targetRole] || 0) + 1;
     });
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const todayCount = allSubmissions.filter((sub) => {
+    const todayCount = submissions.filter((sub) => {
       const subDate = new Date(sub.createdAt);
       subDate.setHours(0, 0, 0, 0);
       return subDate.getTime() === today.getTime();
@@ -404,7 +449,6 @@ export class DatabaseStorage implements IStorage {
     return { total, byRole, today: todayCount };
   }
 
-  // User Onboarding Methods
   async updateUserOnboarding(userId: string, data: {
     currentStatus?: string;
     targetRole?: string;
@@ -412,492 +456,32 @@ export class DatabaseStorage implements IStorage {
     onboardingStatus?: string;
     personalizationQuality?: string;
   }): Promise<User | undefined> {
-    const [updated] = await db
-      .update(users)
-      .set({
-        ...data,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, userId))
-      .returning();
-    return updated || undefined;
-  }
-
-  // Analysis Job Methods
-  async createAnalysisJob(job: InsertAnalysisJob): Promise<AnalysisJob> {
-    const [newJob] = await db.insert(analysisJobs).values(job).returning();
-    return newJob;
-  }
-
-  async getAnalysisJob(id: string): Promise<AnalysisJob | undefined> {
-    const [job] = await db.select().from(analysisJobs).where(eq(analysisJobs.id, id));
-    return job || undefined;
-  }
-
-  async getAnalysisJobsByUser(userId: string): Promise<AnalysisJob[]> {
-    return await db
+    const snakeData = mapKeysToSnakeCase({ ...data, updatedAt: new Date() });
+    const { data: updated, error } = await supabaseAdmin
+      .from('users')
+      .update(snakeData)
+      .eq('id', userId)
       .select()
-      .from(analysisJobs)
-      .where(eq(analysisJobs.userId, userId))
-      .orderBy(sql`${analysisJobs.createdAt} DESC`);
-  }
-
-  async updateAnalysisJobResults(id: string, results: {
-    status: string;
-    score?: number;
-    strengths?: string[];
-    gaps?: string[];
-    quickWins?: string[];
-    notes?: string;
-    needsJd?: boolean;
-    needsTargetRole?: boolean;
-  }): Promise<AnalysisJob | undefined> {
-    const [updated] = await db
-      .update(analysisJobs)
-      .set({
-        status: results.status,
-        score: results.score,
-        strengths: results.strengths,
-        gaps: results.gaps,
-        quickWins: results.quickWins,
-        notes: results.notes,
-        needsJd: results.needsJd,
-        needsTargetRole: results.needsTargetRole,
-        completedAt: results.status === "complete" ? new Date() : undefined,
-      })
-      .where(eq(analysisJobs.id, id))
-      .returning();
-    return updated || undefined;
-  }
-}
-
-export class MemStorage implements IStorage {
-  private users: Map<string, User> = new Map();
-  private resourcesUsers: Map<string, ResourcesUser> = new Map();
-  private resources: Map<string, Resource> = new Map();
-  private downloadLogs: Map<string, DownloadLog> = new Map();
-  private assessmentQuestions: Map<string, AssessmentQuestion> = new Map();
-  private assessmentAttempts: Map<string, AssessmentAttempt> = new Map();
-  private assessmentAnswers: Map<string, AssessmentAnswer> = new Map();
-  private hackathonRegistrations: Map<string, HackathonRegistration> = new Map();
-  private cvSubmissions: Map<string, CvSubmission> = new Map();
-  private analysisJobs: Map<string, AnalysisJob> = new Map();
-
-  async initialize(): Promise<void> {
-    await this.initializeAdminUser();
-    await this.initializeAssessmentQuestions();
-  }
-
-  private async initializeAdminUser(): Promise<void> {
-    const adminEmail = "admin@bcalm.org";
-    const adminPassword = "admin123";
-
-    if (this.resourcesUsers.size > 0) return; // Already seeded?
-
-    // Check if admin exists
-    const existing = await this.getResourcesUserByEmail(adminEmail);
-    if (existing) return;
-
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    const userId = nanoid();
-    const newUser: ResourcesUser = {
-      id: userId,
-      email: adminEmail,
-      password: hashedPassword,
-      name: "Admin User",
-      year: null,
-      background: null,
-      isAdmin: true,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.resourcesUsers.set(userId, newUser);
-    console.log("Admin user initialized (Memory):", adminEmail);
-  }
-
-  private async initializeAssessmentQuestions(): Promise<void> {
-    if (this.assessmentQuestions.size > 0) return;
-
-    const { ASSESSMENT_QUESTIONS } = await import("./data/assessmentQuestions");
-
-    for (const question of ASSESSMENT_QUESTIONS) {
-      this.createAssessmentQuestion(question); // No await needed really
-    }
-    console.log("Assessment questions initialized (Memory):", ASSESSMENT_QUESTIONS.length);
-  }
-
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async upsertUser(userData: UpsertUser): Promise<User> {
-    // Check if user exists by id
-    const id = userData.id || nanoid();
-    // In upsert, usually we check conflicts. 
-    // Here we assume if ID provided it exists, or create new.
-    let user = this.users.get(id);
-    if (user) {
-      user = { ...user, ...userData, updatedAt: new Date() } as User;
-    } else {
-      user = {
-        ...userData,
-        id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        // Defaults
-        onboardingStatus: userData.onboardingStatus || "not_started",
-      } as User;
-    }
-    this.users.set(id, user);
-    return user;
-  }
-
-  async getResourcesUserByEmail(email: string): Promise<ResourcesUser | undefined> {
-    return Array.from(this.resourcesUsers.values()).find(u => u.email === email);
-  }
-
-  async getResourcesUserById(id: string): Promise<ResourcesUser | undefined> {
-    return this.resourcesUsers.get(id);
-  }
-
-  async createResourcesUser(insertUser: InsertResourcesUser): Promise<ResourcesUser> {
-    const id = nanoid();
-    const user: ResourcesUser = {
-      ...insertUser,
-      id,
-      year: insertUser.year || null,
-      background: insertUser.background || null,
-      isAdmin: false, // Default
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    this.resourcesUsers.set(id, user);
-    return user;
-  }
-
-  async getAllResources(): Promise<Resource[]> {
-    return Array.from(this.resources.values()).filter(r => r.isActive);
-  }
-
-  async getResourceById(id: string): Promise<Resource | undefined> {
-    return this.resources.get(id);
-  }
-
-  async createResource(resource: InsertResource): Promise<Resource> {
-    const id = nanoid();
-    const newResource: Resource = {
-      ...resource,
-      id,
-      filePath: resource.filePath || null,
-      fileSize: resource.fileSize || null,
-      originalFileName: resource.originalFileName || null,
-      mimeType: resource.mimeType || null,
-      isActive: true,
-      uploadedDate: new Date(),
-      updatedAt: new Date()
-    };
-    this.resources.set(id, newResource);
-    return newResource;
-  }
-
-  async updateResource(id: string, resource: Partial<InsertResource>): Promise<Resource | undefined> {
-    const existing = this.resources.get(id);
-    if (!existing) return undefined;
-    const updated = { ...existing, ...resource, updatedAt: new Date() };
-    this.resources.set(id, updated);
-    return updated;
-  }
-
-  async deleteResource(id: string): Promise<boolean> {
-    const existing = this.resources.get(id);
-    if (!existing) return false;
-    existing.isActive = false;
-    existing.updatedAt = new Date();
-    this.resources.set(id, existing);
-    return true;
-  }
-
-  async logDownload(log: InsertDownloadLog): Promise<DownloadLog> {
-    const id = nanoid();
-    const newLog: DownloadLog = {
-      ...log,
-      id,
-      downloadedAt: new Date()
-    };
-    this.downloadLogs.set(id, newLog);
-    return newLog;
-  }
-
-  async getDownloadStats(): Promise<{
-    totalResources: number;
-    totalDownloads: number;
-    mostDownloaded: { resourceId: string; title: string; downloads: number } | null;
-  }> {
-    const activeResources = await this.getAllResources();
-    const totalResources = activeResources.length;
-    const totalDownloads = this.downloadLogs.size;
-
-    const downloadCounts = new Map<string, number>();
-    this.downloadLogs.forEach(log => {
-      downloadCounts.set(log.resourceId, (downloadCounts.get(log.resourceId) || 0) + 1);
-    });
-
-    let mostDownloaded: { resourceId: string; title: string; downloads: number } | null = null;
-    let maxDownloads = 0;
-
-    for (const [resourceId, count] of Array.from(downloadCounts.entries())) {
-      if (count > maxDownloads) {
-        const resource = this.resources.get(resourceId);
-        if (resource) {
-          mostDownloaded = { resourceId, title: resource.title, downloads: count };
-          maxDownloads = count;
-        }
-      }
-    }
-    return { totalResources, totalDownloads, mostDownloaded };
-  }
-
-  async getAllAssessmentQuestions(): Promise<AssessmentQuestion[]> {
-    return Array.from(this.assessmentQuestions.values()).sort((a, b) => a.orderIndex - b.orderIndex);
-  }
-
-  async createAssessmentQuestion(question: InsertAssessmentQuestion): Promise<AssessmentQuestion> {
-    const id = nanoid();
-    const newQ: AssessmentQuestion = {
-      ...question,
-      id,
-      createdAt: new Date()
-    };
-    this.assessmentQuestions.set(id, newQ);
-    return newQ;
-  }
-
-  async createAssessmentAttempt(attempt: InsertAssessmentAttempt): Promise<AssessmentAttempt> {
-    const id = nanoid();
-    const newAttempt: AssessmentAttempt = {
-      ...attempt,
-      id,
-      totalScore: null,
-      readinessBand: null,
-      scoresJson: null,
-      isCompleted: false,
-      shareToken: null,
-      createdAt: new Date(),
-      completedAt: null
-    };
-    this.assessmentAttempts.set(id, newAttempt);
-    return newAttempt;
-  }
-
-  async getAssessmentAttempt(id: string): Promise<AssessmentAttempt | undefined> {
-    return this.assessmentAttempts.get(id);
-  }
-
-  async getLatestIncompleteAttempt(userId: string): Promise<AssessmentAttempt | undefined> {
-    const attempts = Array.from(this.assessmentAttempts.values())
-      .filter(a => a.userId === userId && !a.isCompleted)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-    return attempts[0];
-  }
-
-  async deleteAssessmentAttempt(id: string): Promise<boolean> {
-    // Delete answers first
-    const answerIdsToDelete: string[] = [];
-    this.assessmentAnswers.forEach((val, key) => {
-      if (val.attemptId === id) answerIdsToDelete.push(key);
-    });
-    answerIdsToDelete.forEach(kid => this.assessmentAnswers.delete(kid));
-
-    const deleted = this.assessmentAttempts.delete(id);
-    return deleted;
-  }
-
-  async saveAssessmentAnswer(answer: InsertAssessmentAnswer): Promise<AssessmentAnswer> {
-    // Check if exists
-    const existing = Array.from(this.assessmentAnswers.values())
-      .find(a => a.attemptId === answer.attemptId && a.questionId === answer.questionId);
-
-    if (existing) {
-      existing.answerValue = answer.answerValue;
-      return existing;
-    }
-
-    const id = nanoid();
-    const newAnswer: AssessmentAnswer = {
-      ...answer,
-      id,
-      createdAt: new Date()
-    };
-    this.assessmentAnswers.set(id, newAnswer);
-    return newAnswer;
-  }
-
-  async getAttemptAnswers(attemptId: string): Promise<AssessmentAnswer[]> {
-    return Array.from(this.assessmentAnswers.values()).filter(a => a.attemptId === attemptId);
-  }
-
-  async completeAssessmentAttempt(
-    attemptId: string,
-    totalScore: number,
-    readinessBand: string,
-    scoresJson: string
-  ): Promise<AssessmentAttempt | undefined> {
-    const attempt = this.assessmentAttempts.get(attemptId);
-    if (!attempt) return undefined;
-
-    attempt.totalScore = totalScore;
-    attempt.readinessBand = readinessBand;
-    attempt.scoresJson = scoresJson;
-    attempt.isCompleted = true;
-    attempt.completedAt = new Date();
-    attempt.shareToken = nanoid(16);
-
-    return attempt;
-  }
-
-  async getAssessmentAttemptByShareToken(shareToken: string): Promise<AssessmentAttempt | undefined> {
-    return Array.from(this.assessmentAttempts.values()).find(a => a.shareToken === shareToken);
-  }
-
-  async createHackathonRegistration(registration: InsertHackathonRegistration): Promise<HackathonRegistration> {
-    const id = nanoid();
-    const newReg: HackathonRegistration = {
-      ...registration,
-      id,
-      otpCode: null,
-      otpExpiresAt: null,
-      isVerified: false, // Default
-      utmSource: registration.utmSource || null,
-      utmMedium: registration.utmMedium || null,
-      utmCampaign: registration.utmCampaign || null,
-      createdAt: new Date()
-    };
-    this.hackathonRegistrations.set(id, newReg);
-    return newReg;
-  }
-
-  async getHackathonRegistrationById(id: string): Promise<HackathonRegistration | undefined> {
-    return this.hackathonRegistrations.get(id);
-  }
-
-  async getHackathonRegistrationByPhone(phone: string): Promise<HackathonRegistration | undefined> {
-    return Array.from(this.hackathonRegistrations.values()).find(r => r.phone === phone);
-  }
-
-  async getHackathonRegistrationByEmail(email: string): Promise<HackathonRegistration | undefined> {
-    return Array.from(this.hackathonRegistrations.values()).find(r => r.email === email);
-  }
-
-  async updateHackathonOtp(id: string, otpCode: string, expiresAt: Date): Promise<HackathonRegistration | undefined> {
-    const reg = this.hackathonRegistrations.get(id);
-    if (!reg) return undefined;
-    reg.otpCode = otpCode;
-    reg.otpExpiresAt = expiresAt;
-    return reg;
-  }
-
-  async verifyHackathonRegistration(id: string): Promise<HackathonRegistration | undefined> {
-    const reg = this.hackathonRegistrations.get(id);
-    if (!reg) return undefined;
-    reg.isVerified = true;
-    reg.otpCode = null;
-    reg.otpExpiresAt = null;
-    return reg;
-  }
-
-  async createCvSubmission(submission: InsertCvSubmission): Promise<CvSubmission> {
-    const id = nanoid();
-    const newSub: CvSubmission = {
-      ...submission,
-      id,
-      cvFilePath: submission.cvFilePath || null,
-      cvFileName: submission.cvFileName || null,
-      cvFileSize: submission.cvFileSize || null,
-      cvMimeType: submission.cvMimeType || null,
-      utmSource: submission.utmSource || null,
-      utmMedium: submission.utmMedium || null,
-      utmCampaign: submission.utmCampaign || null,
-      createdAt: new Date()
-    };
-    this.cvSubmissions.set(id, newSub);
-    return newSub;
-  }
-
-  async getAllCvSubmissions(): Promise<CvSubmission[]> {
-    return Array.from(this.cvSubmissions.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-
-  async getCvSubmissionStats(): Promise<{ total: number; byRole: Record<string, number>; today: number }> {
-    const submissions = await this.getAllCvSubmissions();
-    const total = submissions.length;
-    const byRole: Record<string, number> = {};
-    submissions.forEach(s => {
-      byRole[s.targetRole] = (byRole[s.targetRole] || 0) + 1;
-    });
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayCount = submissions.filter(s => {
-      const fd = new Date(s.createdAt);
-      fd.setHours(0, 0, 0, 0);
-      return fd.getTime() === today.getTime();
-    }).length;
-    return { total, byRole, today: todayCount };
-  }
-
-  async updateUserOnboarding(userId: string, data: {
-    currentStatus?: string;
-    targetRole?: string;
-    yearsExperience?: number;
-    onboardingStatus?: string;
-    personalizationQuality?: string;
-  }): Promise<User | undefined> {
-    const user = this.users.get(userId);
-    if (!user) return undefined;
-
-    if (data.currentStatus !== undefined) user.currentStatus = data.currentStatus;
-    if (data.targetRole !== undefined) user.targetRole = data.targetRole;
-    if (data.yearsExperience !== undefined) user.yearsExperience = data.yearsExperience;
-    if (data.onboardingStatus !== undefined) user.onboardingStatus = data.onboardingStatus;
-    if (data.personalizationQuality !== undefined) user.personalizationQuality = data.personalizationQuality;
-
-    user.updatedAt = new Date();
-    return user;
+      .single();
+    if (error) return undefined;
+    return mapKeysToCamelCase(updated);
   }
 
   async createAnalysisJob(job: InsertAnalysisJob): Promise<AnalysisJob> {
-    const id = nanoid();
-    const newJob: AnalysisJob = {
-      ...job,
-      id,
-      completedAt: null,
-      createdAt: new Date(),
-      score: null,
-      strengths: null,
-      gaps: null,
-      quickWins: null,
-      notes: null,
-      // Provide default values for optional fields if not present in job
-      // checking InsertAnalysisJob type... it aligns with schema except id/createdAt
-      // But wait, schema defined defaults
-      needsJd: job.needsJd ?? false,
-      needsTargetRole: job.needsTargetRole ?? false,
-      cvFilePath: job.cvFilePath || null,
-      cvFileName: job.cvFileName || null,
-      cvText: job.cvText || null,
-      jdText: job.jdText || null
-    };
-    this.analysisJobs.set(id, newJob);
-    return newJob;
+    const snakeData = mapKeysToSnakeCase(job);
+    const { data, error } = await supabaseAdmin.from('analysis_jobs').insert(snakeData).select().single();
+    if (error) throw error;
+    return mapKeysToCamelCase(data);
   }
 
   async getAnalysisJob(id: string): Promise<AnalysisJob | undefined> {
-    return this.analysisJobs.get(id);
+    const { data } = await supabaseAdmin.from('analysis_jobs').select('*').eq('id', id).single();
+    return data ? mapKeysToCamelCase(data) : undefined;
   }
 
   async getAnalysisJobsByUser(userId: string): Promise<AnalysisJob[]> {
-    return Array.from(this.analysisJobs.values())
-      .filter(j => j.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const { data } = await supabaseAdmin.from('analysis_jobs').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    return data ? mapKeysToCamelCase(data) : [];
   }
 
   async updateAnalysisJobResults(id: string, results: {
@@ -910,22 +494,21 @@ export class MemStorage implements IStorage {
     needsJd?: boolean;
     needsTargetRole?: boolean;
   }): Promise<AnalysisJob | undefined> {
-    const job = this.analysisJobs.get(id);
-    if (!job) return undefined;
+    const snakeData = mapKeysToSnakeCase({
+      ...results,
+      completedAt: results.status === "complete" ? new Date() : undefined
+    });
 
-    job.status = results.status;
-    if (results.score !== undefined) job.score = results.score;
-    if (results.strengths !== undefined) job.strengths = results.strengths;
-    if (results.gaps !== undefined) job.gaps = results.gaps;
-    if (results.quickWins !== undefined) job.quickWins = results.quickWins;
-    if (results.notes !== undefined) job.notes = results.notes;
-    if (results.needsJd !== undefined) job.needsJd = results.needsJd;
-    if (results.needsTargetRole !== undefined) job.needsTargetRole = results.needsTargetRole;
-    if (results.status === "complete") job.completedAt = new Date();
+    const { data, error } = await supabaseAdmin
+      .from('analysis_jobs')
+      .update(snakeData)
+      .eq('id', id)
+      .select()
+      .single();
 
-    return job;
+    if (error) return undefined;
+    return mapKeysToCamelCase(data);
   }
 }
 
-// export const storage = new DatabaseStorage();
-export const storage = new MemStorage();
+export const storage = new SupabaseStorage();
