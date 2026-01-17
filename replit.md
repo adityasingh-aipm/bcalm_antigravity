@@ -4,6 +4,8 @@
 
 This project develops a landing page for "Bcalm's AI Product Manager Launchpad," a 30-day educational program for students and recent graduates aspiring to AI Product Management roles from top Indian colleges. The platform offers comprehensive program details, including curriculum, career support, testimonials, instructor profiles, pricing, and enrollment. It also features an **AI PM Readiness Check** assessment for lead generation, providing personalized skill assessments and gap analysis. The project aims to equip emerging talent with essential AI Product Management skills, addressing a high-growth educational market.
 
+<img width="1437" height="811" alt="image" src="https://github.com/user-attachments/assets/c359f124-a58e-46d4-b718-8d75b3d6eb33" />
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
