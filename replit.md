@@ -162,8 +162,8 @@ A comprehensive analytics tracking system for multi-channel campaigns with UTM p
 - **Supabase Configuration**: Client configured in `client/src/lib/supabase.ts` using environment variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
 - **Production Deployment**: Before publishing to Replit, run this command to embed Supabase variables into the production build:
   ```bash
-  VITE_SUPABASE_URL="https://rhwvwvvwjwvtlxzqooii.supabase.co" \
-  VITE_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJod3Z3dnZ3and2dGx4enFvb2lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI1ODQzOTEsImV4cCI6MjA3ODE2MDM5MX0.tvv9lDe_4PACmq4s1j1jkwAPiTEYATjLZUaDtW_e4Ms" \
+  VITE_SUPABASE_URL="https://" \
+  VITE_SUPABASE_ANON_KEY="" \
   npm run build && mkdir -p server/public && cp -r dist/public/* server/public/
   ```
   This ensures Supabase analytics tracking works in production. Immediately after running this, click Publish in Replit.
